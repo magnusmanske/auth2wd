@@ -4,12 +4,12 @@ use wikibase::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 
-pub struct BNE {
+pub struct GND {
     id: String,
     graph: FastGraph,
 }
 
-impl ExternalImporter for BNE {
+impl ExternalImporter for GND {
     fn graph(&self) -> &FastGraph {
         &self.graph
     }
@@ -19,17 +19,17 @@ impl ExternalImporter for BNE {
     }
 
     fn primary_language(&self) -> String {
-        "es".to_string()
+        "de".to_string()
     }
 
     fn get_key_url(&self, _key: &str) -> String {
-        format!("https://datos.bne.es/resource/{}",self.id)
+        format!("https://d-nb.info/gnd/{}",self.id)
     }
 }
 
-impl BNE {
+impl GND {
     pub async fn new(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let rdf_url = format!("https://datos.bne.es/resource/{}.rdf",id);
+        let rdf_url = format!("https://d-nb.info/gnd/{}/about/lds.rdf",id);
         let resp = reqwest::get(rdf_url).await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
         let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
@@ -40,23 +40,24 @@ impl BNE {
     pub async fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>> {
         let mut ret = MetaItem::new();
 
-        ret.item.add_claim(self.new_statement_string(950, &self.id));
+        ret.item.add_claim(self.new_statement_string(227, &self.id));
 
         self.add_same_as(&mut ret)?;
         self.add_gender(&mut ret)?;
         self.add_label_aliases(&mut ret)?;
         self.add_description(&mut ret)?;
         self.add_language(&mut ret)?;
-
+/*
         // Nationality
         for text in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
             ret.prop_text.push((27,text))
         }
+ */
 
         // Born/died
         let birth_death = [
-            ("https://datos.bne.es/def/P5010",569),
-            ("https://datos.bne.es/def/P5011",570),
+            ("https://d-nb.info/standards/elementset/gnd#dateOfBirth",569),
+            ("https://d-nb.info/standards/elementset/gnd#dateOfDeath",570),
         ];
         for bd in birth_death {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
@@ -67,34 +68,36 @@ impl BNE {
             }
         }
 
-/*
-
-
-        for s in self.triples_subject_literals(&format!("http://www.BNE.fr/{}/birth",self.id),"http://purl.org/vocab/bio/0.1/date")? {
-            match ret.parse_date(&s) {
-                Some((time,precision)) => ret.item.add_claim(self.new_statement_time(569,&time,precision)),
-                None => ret.prop_text.push((569,s))
+        // Places
+        let key_prop = [
+            ("https://d-nb.info/standards/elementset/gnd#placeOfBirth",19),
+            ("https://d-nb.info/standards/elementset/gnd#placeOfDeath",20),
+            ("https://d-nb.info/standards/elementset/gnd#professionOrOccupation",106),
+            ("https://d-nb.info/standards/elementset/agrelon#hasChild",40),
+            // TODO parent
+        ];
+        for kp in key_prop {
+            for url in self.triples_subject_iris(&self.get_id_url(), kp.0)? {
+                if let Some(gnd_id) = url.split("/").last() {
+                    if let Some(item) = Self::get_item_for_external_id_value(227,&gnd_id).await {
+                        ret.item.add_claim(self.new_statement_item(kp.1,&item));
+                    } else {
+                        ret.prop_text.push((kp.1,url))
+                    }
+                } else {
+                    ret.prop_text.push((kp.1,url))
+                }
             }
         }
- */
-        //self.bibliography(&mut ret)?;
-
+        
         // TODO find better way
         let new_statements = self.try_rescue_prop_text(&mut ret).await?;
         for (prop,item) in new_statements {
-            let statement = self.new_statement_item(prop,&item);
-            ret.item.add_claim(statement);
+            ret.item.add_claim(self.new_statement_item(prop,&item));
         }
         Ok(ret)
     }
 
-    /*
-    fn bibliography(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
-        let id_url = self.get_id_url();
-        let authored = self.triples_property_object_iris("http://id.loc.gov/vocabulary/relators/aut",&id_url)?;
-        println!("{:?}",&authored);
-        Ok(())
-    } */
 }
 
-// https://datos.bne.es/resource/XX1553066.rdf
+// https://datos.GND.es/resource/XX1553066.rdf

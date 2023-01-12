@@ -15,16 +15,17 @@ lazy_static! {
     static ref EXTERNAL_ID_REGEXPS : Vec<(Regex,String,usize)> = {
         let mut vec : Vec<(Regex,String,usize)> = vec![] ;
         // NOTE: The pattern always needs to cover the whole string, so use ^$
-        vec.push((Regex::new(r"^http://viaf.org/viaf/(\d+)$").unwrap(),"${1}".to_string(),214));
-        vec.push((Regex::new(r"^http://isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{4})$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
-        vec.push((Regex::new(r"^http://isni-url.oclc.nl/isni/(\d{4})(\d{4})(\d{4})(\d{4})$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
-        vec.push((Regex::new(r"^http://d-nb.info/gnd/(1[012]?\d{7}[0-9X]|[47]\d{6}-\d|[1-9]\d{0,7}-[0-9X]|3\d{7}[0-9X])$").unwrap(),"${1}".to_string(),227));
-        vec.push((Regex::new(r"^http://id.loc.gov/authorities/names/(gf|n|nb|nr|no|ns|sh|sj)([4-9][0-9]|00|20[0-2][0-9])([0-9]{6})$").unwrap(),"${1}${2}${3}".to_string(),244));
-        vec.push((Regex::new(r"^http://data.bnf.fr/(\d{8,9}).*$").unwrap(),"${1}".to_string(),268));
-        vec.push((Regex::new(r"^http://data.bnf.fr/ark:/12148/cb(\d{8,9}[0-9bcdfghjkmnpqrstvwxz]).*$").unwrap(),"${1}".to_string(),268));
-        vec.push((Regex::new(r"^http://www.idref.fr/(\d{8}[\dX])$").unwrap(),"${1}".to_string(),269));
-        vec.push((Regex::new(r"^http://libris.kb.se/resource/auth/([1-9]\d{4,5})$").unwrap(),"${1}".to_string(),906));
-        vec.push((Regex::new(r"^http://sws.geonames.org/([1-9][0-9]{0,8}).*$").unwrap(),"${1}".to_string(),1566));
+        vec.push((Regex::new(r"^https{0,1}://viaf.org/viaf/(\d+)$").unwrap(),"${1}".to_string(),214));
+        vec.push((Regex::new(r"^https{0,1}://isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{4})$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
+        vec.push((Regex::new(r"^https{0,1}://isni-url.oclc.nl/isni/(\d{4})(\d{4})(\d{4})(\d{4})$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
+        vec.push((Regex::new(r"^https{0,1}://d-nb.info/gnd/(1[012]?\d{7}[0-9X]|[47]\d{6}-\d|[1-9]\d{0,7}-[0-9X]|3\d{7}[0-9X])$").unwrap(),"${1}".to_string(),227));
+        vec.push((Regex::new(r"^https{0,1}://id.loc.gov/authorities/names/(gf|n|nb|nr|no|ns|sh|sj)([4-9][0-9]|00|20[0-2][0-9])([0-9]{6})$").unwrap(),"${1}${2}${3}".to_string(),244));
+        vec.push((Regex::new(r"^https{0,1}://id.loc.gov/rwo/agents/(gf|n|nb|nr|no|ns|sh|sj)([4-9][0-9]|00|20[0-2][0-9])([0-9]{6})(\.html){0,1}$").unwrap(),"${1}${2}${3}".to_string(),244));
+        vec.push((Regex::new(r"^https{0,1}://data.bnf.fr/(\d{8,9}).*$").unwrap(),"${1}".to_string(),268));
+        vec.push((Regex::new(r"^https{0,1}://data.bnf.fr/ark:/12148/cb(\d{8,9}[0-9bcdfghjkmnpqrstvwxz]).*$").unwrap(),"${1}".to_string(),268));
+        vec.push((Regex::new(r"^https{0,1}://www.idref.fr/(\d{8}[\dX])$").unwrap(),"${1}".to_string(),269));
+        vec.push((Regex::new(r"^https{0,1}://libris.kb.se/resource/auth/([1-9]\d{4,5})$").unwrap(),"${1}".to_string(),906));
+        vec.push((Regex::new(r"^https{0,1}://sws.geonames.org/([1-9][0-9]{0,8}).*$").unwrap(),"${1}".to_string(),1566));
         vec
     };
 }
@@ -201,10 +202,16 @@ pub trait ExternalImporter {
 
 
     fn add_same_as(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
-        for url in self.triples_iris("http://www.w3.org/2002/07/owl#sameAs")? {
-            match self.url2external_id(&url) {
-                Some(extid) => ret.item.add_claim(self.new_statement_string(extid.property, &extid.id)),
-                None => ret.same_as_iri.push(url)
+        let iris = [
+            "http://www.w3.org/2002/07/owl#sameAs",
+            "http://www.w3.org/2002/07/owl#sameAs",
+        ];
+        for iri in iris {
+            for url in self.triples_iris(iri)? {
+                match self.url2external_id(&url) {
+                    Some(extid) => ret.item.add_claim(self.new_statement_string(extid.property, &extid.id)),
+                    None => ret.same_as_iri.push(url)
+                }
             }
         }
         Ok(())
@@ -227,7 +234,22 @@ pub trait ExternalImporter {
             }
         }
 
+        for url in self.triples_iris("https://d-nb.info/standards/elementset/gnd#gender")? {
+            match url.as_str() {
+                "https://d-nb.info/standards/vocab/gnd/gender#male" => ret.item.add_claim(self.new_statement_item(21,"Q6581097")),
+                "https://d-nb.info/standards/vocab/gnd/gender#female" => ret.item.add_claim(self.new_statement_item(21,"Q6581072")),
+                _ => ret.prop_text.push((21,url))
+            }
+        }
+
         Ok(())
+    }
+
+    fn limit_string_length(&self, s: &str) -> String {
+        match s.get(..250) {
+            Some(s) => s.to_string(),
+            None => s.to_string()
+        }
     }
 
     fn add_label_aliases(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
@@ -237,11 +259,13 @@ pub trait ExternalImporter {
         let urls = [
             "http://xmlns.com/foaf/0.1/name",
             "http://www.w3.org/2000/01/rdf-schema#label",
-            "https://datos.bne.es/def/P5012"
+            "https://datos.bne.es/def/P5012",
+            "https://d-nb.info/standards/elementset/gnd#preferredNameForThePerson",
+            "https://d-nb.info/standards/elementset/gnd#variantNameForThePerson",
         ];
         for url in urls {
             for s in self.triples_literals(&url)? {
-                let s = s[0..250].to_string();
+                let s = self.limit_string_length(&s);
                 if ret.item.label_in_locale(&language).is_none() {
                     ret.item.labels_mut().push(LocaleString::new(&language, &s));
                 } else {
@@ -262,7 +286,7 @@ pub trait ExternalImporter {
         for iri in iris {
             for s in self.triples_literals(iri)? {
                 if ret.item.description_in_locale(&language).is_none() {
-                    let s = s[0..250].to_string();
+                    let s = self.limit_string_length(&s);
                     ret.item.descriptions_mut().push(LocaleString::new(&language, &s));
                 }
             }
