@@ -17,6 +17,7 @@ lazy_static! {
 pub struct MetaItem {
     pub item: ItemEntity,
     pub prop_text: Vec<(usize,String)>,
+    pub prop_item : Vec<(usize,String)>,
     pub same_as_iri: Vec<String>,
 }
 
@@ -25,6 +26,7 @@ impl MetaItem {
         Self {
             item: ItemEntity::new_empty(),
             prop_text: vec![],
+            prop_item: vec![],
             same_as_iri: vec![],
         }
     }
