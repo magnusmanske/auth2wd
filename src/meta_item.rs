@@ -18,7 +18,6 @@ pub struct MetaItem {
     pub item: ItemEntity,
     pub prop_text: Vec<(usize,String)>,
     pub prop_item : Vec<(usize,String)>,
-    pub same_as_iri: Vec<String>,
 }
 
 impl MetaItem {
@@ -27,8 +26,18 @@ impl MetaItem {
             item: ItemEntity::new_empty(),
             prop_text: vec![],
             prop_item: vec![],
-            same_as_iri: vec![],
         }
+    }
+
+    pub fn to_string(&self) -> String {
+        let mut ret = "{\"item\":".to_string();
+        ret += &self.item.to_json().to_string().replace(",\"type\":null",",\"type\":\"item\""); // Fixing type issue with JSON generator for new items
+        ret += ",\"prop_text\":";
+        ret += &serde_json::to_string(&self.prop_text).unwrap();
+        ret += ",\"prop_item\":";
+        ret += &serde_json::to_string(&self.prop_item).unwrap();
+        ret += "}";
+        ret
     }
 
     pub fn parse_date(&self, s: &str) -> Option<(String,u64)> {
@@ -40,5 +49,29 @@ impl MetaItem {
                 Some((replaced.to_string(),e.2))
             }
         }).next()
+    }
+
+    pub fn add_claim(&mut self, s: Statement) {
+        for s2 in self.item.claims_mut() {
+            if s.main_snak()==s2.main_snak() && s.qualifiers()==s2.qualifiers() {
+                let mut new_references = s.references().clone();
+                for r in s.references() {
+                    if !s2.references().contains(r) {
+                        new_references.push(r.to_owned());
+                    }
+                }
+                s2.set_references(new_references);
+                // TODO merge references
+                return ;
+            }
+        }
+        self.item.add_claim(s);
+    }
+
+    pub fn cleanup(&mut self) {
+        self.prop_text.sort();
+        self.prop_text.dedup();
+        self.prop_item.sort();
+        self.prop_item.dedup();
     }
 }

@@ -1,3 +1,4 @@
+use chrono::prelude::*;
 use sophia::serializer::*;
 use sophia::serializer::nt::NtSerializer;
 use sophia::term::Term;
@@ -43,6 +44,9 @@ pub trait ExternalImporter {
     fn graph(&self) -> &FastGraph;
     fn graph_mut(&mut self) -> &mut FastGraph;
     fn primary_language(&self) -> String;
+    fn my_property(&self) -> usize;
+    fn my_id(&self) -> String;
+    fn my_stated_in(&self) -> &str;
 
 
 
@@ -120,7 +124,7 @@ pub trait ExternalImporter {
 
     #[async_recursion]
     async fn search_wikidata_single_item(query: &str) -> Option<String> {
-        // TODO urlencode?
+        // TODO urlencode query?
         let url = format!("https://www.wikidata.org/w/api.php?action=query&list=search&srnamespace=0&format=json&srsearch={}",&query);
         let text = reqwest::get(url).await.ok()?.text().await.ok()?;
         let j: serde_json::Value = serde_json::from_str(&text).ok()?;
@@ -142,8 +146,41 @@ pub trait ExternalImporter {
         Self::search_wikidata_single_item(&query).await
     }
 
-    // Overload this to insert references to the source
-    fn get_ref(&self) -> Vec<Reference> { vec![] }
+    fn get_ref(&self) -> Vec<Reference> {
+        let time = Utc::now();
+        let time = time.format("+%Y-%m-%dT00:00:00Z").to_string();
+        vec![
+            Reference::new(vec![
+                Snak::new(
+                    SnakDataType::WikibaseItem,
+                    "P248",
+                    SnakType::Value,
+                    Some(DataValue::new(
+                        DataValueType::EntityId, 
+                        Value::Entity(EntityValue::new(EntityType::Item, self.my_stated_in()))
+                    ))
+                ),
+                Snak::new(
+                    SnakDataType::ExternalId , 
+                    format!("{}",self.my_property()), 
+                    SnakType::Value , 
+                    Some(DataValue::new(
+                        DataValueType::StringType, 
+                        Value::StringValue(self.my_id())
+                    ))
+                ),
+                Snak::new(
+                    SnakDataType::Time,
+                    "P813",
+                    SnakType::Value , 
+                    Some(DataValue::new(
+                        DataValueType::Time, 
+                        Value::Time(TimeValue::new(0, 0, "http://www.wikidata.org/entity/Q1985727", 11, &time, 0))
+                    ))
+                ),
+            ])
+        ]
+    }
 
     fn new_statement_string(&self, property: usize, s: &str) -> Statement {
         Statement::new(
@@ -151,6 +188,24 @@ pub trait ExternalImporter {
             StatementRank::Normal,
             Snak::new(
                 SnakDataType::ExternalId,
+                format!("P{}",property),
+                SnakType::Value,
+                Some(DataValue::new(
+                    DataValueType::StringType, 
+                    Value::StringValue(s.to_owned())
+                ))
+                ),
+            vec![],
+            self.get_ref()
+        )
+    }
+
+    fn new_statement_url(&self, property: usize, s: &str) -> Statement {
+        Statement::new(
+            "statement",
+            StatementRank::Normal,
+            Snak::new(
+                SnakDataType::Url,
                 format!("P{}",property),
                 SnakType::Value,
                 Some(DataValue::new(
@@ -182,12 +237,11 @@ pub trait ExternalImporter {
     }
 
     fn new_statement_time(&self, property: usize, time: &str, precision: u64) -> Statement {
-        // TOSO
         Statement::new(
             "statement",
             StatementRank::Normal,
             Snak::new(
-                SnakDataType::ExternalId,
+                SnakDataType::Time,
                 format!("P{}",property),
                 SnakType::Value,
                 Some(DataValue::new(
@@ -209,8 +263,8 @@ pub trait ExternalImporter {
         for iri in iris {
             for url in self.triples_iris(iri)? {
                 match self.url2external_id(&url) {
-                    Some(extid) => ret.item.add_claim(self.new_statement_string(extid.property, &extid.id)),
-                    None => ret.same_as_iri.push(url)
+                    Some(extid) => ret.add_claim(self.new_statement_string(extid.property, &extid.id)),
+                    None => ret.add_claim(self.new_statement_url(973, &url))
                 }
             }
         }
@@ -220,24 +274,24 @@ pub trait ExternalImporter {
     fn add_gender(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
         for s in self.triples_literals("http://xmlns.com/foaf/0.1/gender")? {
             match s.as_str() {
-                "male" => ret.item.add_claim(self.new_statement_item(21,"Q6581097")),
-                "female" => ret.item.add_claim(self.new_statement_item(21,"Q6581072")),
+                "male" => ret.add_claim(self.new_statement_item(21,"Q6581097")),
+                "female" => ret.add_claim(self.new_statement_item(21,"Q6581072")),
                 _ => ret.prop_text.push((21,s))
             }
         }
 
         for s in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50116")? {
             match s.as_str() {
-                "Masculino" => ret.item.add_claim(self.new_statement_item(21,"Q6581097")),
-                "Femenino" => ret.item.add_claim(self.new_statement_item(21,"Q6581072")),
+                "Masculino" => ret.add_claim(self.new_statement_item(21,"Q6581097")),
+                "Femenino" => ret.add_claim(self.new_statement_item(21,"Q6581072")),
                 _ => ret.prop_text.push((21,s))
             }
         }
 
         for url in self.triples_iris("https://d-nb.info/standards/elementset/gnd#gender")? {
             match url.as_str() {
-                "https://d-nb.info/standards/vocab/gnd/gender#male" => ret.item.add_claim(self.new_statement_item(21,"Q6581097")),
-                "https://d-nb.info/standards/vocab/gnd/gender#female" => ret.item.add_claim(self.new_statement_item(21,"Q6581072")),
+                "https://d-nb.info/standards/vocab/gnd/gender#male" => ret.add_claim(self.new_statement_item(21,"Q6581097")),
+                "https://d-nb.info/standards/vocab/gnd/gender#female" => ret.add_claim(self.new_statement_item(21,"Q6581072")),
                 _ => ret.prop_text.push((21,url))
             }
         }
@@ -249,6 +303,19 @@ pub trait ExternalImporter {
         match s.get(..250) {
             Some(s) => s.to_string(),
             None => s.to_string()
+        }
+    }
+
+    fn transform_label(&self, s: &str) -> String {
+        s.to_string()
+    }
+
+    fn transform_label_last_first_name(&self, s: &str) -> String {
+        let v : Vec<&str> = s.split(", ").collect();
+        if v.len()==2 {
+            format!("{} {}",v[1],v[0])
+        } else {
+            s.to_string()
         }
     }
 
@@ -265,6 +332,7 @@ pub trait ExternalImporter {
         ];
         for url in urls {
             for s in self.triples_literals(&url)? {
+                let s = self.transform_label(&s);
                 let s = self.limit_string_length(&s);
                 if ret.item.label_in_locale(&language).is_none() {
                     ret.item.labels_mut().push(LocaleString::new(&language, &s));

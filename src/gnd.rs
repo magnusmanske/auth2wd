@@ -1,6 +1,5 @@
 use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
-use wikibase::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 
@@ -10,6 +9,18 @@ pub struct GND {
 }
 
 impl ExternalImporter for GND {
+    fn my_property(&self) -> usize {
+        227
+    }
+
+    fn my_id(&self) -> String {
+        self.id.to_owned()
+    }
+
+    fn my_stated_in(&self) -> &str {
+        "Q36578"
+    }
+
     fn graph(&self) -> &FastGraph {
         &self.graph
     }
@@ -24,6 +35,10 @@ impl ExternalImporter for GND {
 
     fn get_key_url(&self, _key: &str) -> String {
         format!("https://d-nb.info/gnd/{}",self.id)
+    }
+
+    fn transform_label(&self, s: &str) -> String {
+        self.transform_label_last_first_name(s)
     }
 }
 
@@ -40,7 +55,7 @@ impl GND {
     pub async fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>> {
         let mut ret = MetaItem::new();
 
-        ret.item.add_claim(self.new_statement_string(227, &self.id));
+        ret.add_claim(self.new_statement_string(self.my_property(), &self.id));
 
         self.add_same_as(&mut ret)?;
         self.add_gender(&mut ret)?;
@@ -62,7 +77,7 @@ impl GND {
         for bd in birth_death {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
                 match ret.parse_date(&s) {
-                    Some((time,precision)) => ret.item.add_claim(self.new_statement_time(bd.1,&time,precision)),
+                    Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
                     None => ret.prop_text.push((bd.1,s))
                 }
             }
@@ -80,7 +95,7 @@ impl GND {
             for url in self.triples_subject_iris(&self.get_id_url(), kp.0)? {
                 if let Some(gnd_id) = url.split("/").last() {
                     if let Some(item) = Self::get_item_for_external_id_value(227,&gnd_id).await {
-                        ret.item.add_claim(self.new_statement_item(kp.1,&item));
+                        ret.add_claim(self.new_statement_item(kp.1,&item));
                     } else {
                         ret.prop_text.push((kp.1,url))
                     }
@@ -93,8 +108,9 @@ impl GND {
         // TODO find better way
         let new_statements = self.try_rescue_prop_text(&mut ret).await?;
         for (prop,item) in new_statements {
-            ret.item.add_claim(self.new_statement_item(prop,&item));
+            ret.add_claim(self.new_statement_item(prop,&item));
         }
+        ret.cleanup();
         Ok(ret)
     }
 

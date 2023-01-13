@@ -16,3 +16,4 @@ wikibase = { git="https://gitlab.com/tobias47n9e/wikibase_rs"}
 async-recursion = "*"
 serde_json = "1"
 nom-bibtex = "*"
+chrono = "*"

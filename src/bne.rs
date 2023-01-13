@@ -1,6 +1,5 @@
 use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
-use wikibase::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 
@@ -10,6 +9,18 @@ pub struct BNE {
 }
 
 impl ExternalImporter for BNE {
+    fn my_property(&self) -> usize {
+        950
+    }
+
+    fn my_id(&self) -> String {
+        self.id.to_owned()
+    }
+
+    fn my_stated_in(&self) -> &str {
+        "Q50358336"
+    }
+
     fn graph(&self) -> &FastGraph {
         &self.graph
     }
@@ -24,6 +35,10 @@ impl ExternalImporter for BNE {
 
     fn get_key_url(&self, _key: &str) -> String {
         format!("https://datos.bne.es/resource/{}",self.id)
+    }
+
+    fn transform_label(&self, s: &str) -> String {
+        self.transform_label_last_first_name(s)
     }
 }
 
@@ -40,7 +55,7 @@ impl BNE {
     pub async fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>> {
         let mut ret = MetaItem::new();
 
-        ret.item.add_claim(self.new_statement_string(950, &self.id));
+        ret.add_claim(self.new_statement_string(self.my_property(), &self.id));
 
         self.add_same_as(&mut ret)?;
         self.add_gender(&mut ret)?;
@@ -61,7 +76,7 @@ impl BNE {
         for bd in birth_death {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
                 match ret.parse_date(&s) {
-                    Some((time,precision)) => ret.item.add_claim(self.new_statement_time(bd.1,&time,precision)),
+                    Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
                     None => ret.prop_text.push((bd.1,s))
                 }
             }
@@ -72,7 +87,7 @@ impl BNE {
 
         for s in self.triples_subject_literals(&format!("http://www.BNE.fr/{}/birth",self.id),"http://purl.org/vocab/bio/0.1/date")? {
             match ret.parse_date(&s) {
-                Some((time,precision)) => ret.item.add_claim(self.new_statement_time(569,&time,precision)),
+                Some((time,precision)) => ret.add_claim(self.new_statement_time(569,&time,precision)),
                 None => ret.prop_text.push((569,s))
             }
         }
@@ -83,8 +98,9 @@ impl BNE {
         let new_statements = self.try_rescue_prop_text(&mut ret).await?;
         for (prop,item) in new_statements {
             let statement = self.new_statement_item(prop,&item);
-            ret.item.add_claim(statement);
+            ret.add_claim(statement);
         }
+        ret.cleanup();
         Ok(ret)
     }
 
