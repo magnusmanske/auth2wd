@@ -8,6 +8,10 @@ pub struct GND {
     graph: FastGraph,
 }
 
+unsafe impl Send for GND {}
+unsafe impl Sync for GND {}
+
+
 impl ExternalImporter for GND {
     fn my_property(&self) -> usize {
         227
@@ -40,19 +44,9 @@ impl ExternalImporter for GND {
     fn transform_label(&self, s: &str) -> String {
         self.transform_label_last_first_name(s)
     }
-}
-
-impl GND {
-    pub async fn new(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let rdf_url = format!("https://d-nb.info/gnd/{}/about/lds.rdf",id);
-        let resp = reqwest::get(rdf_url).await?.text().await?;
-        let mut graph: FastGraph = FastGraph::new();
-        let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
-        Ok(Self { id:id.to_string(), graph })
-    }
 
 
-    pub async fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>> {
+    fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>> {
         let mut ret = MetaItem::new();
 
         ret.add_claim(self.new_statement_string(self.my_property(), &self.id));
@@ -94,7 +88,7 @@ impl GND {
         for kp in key_prop {
             for url in self.triples_subject_iris(&self.get_id_url(), kp.0)? {
                 if let Some(gnd_id) = url.split("/").last() {
-                    if let Some(item) = Self::get_item_for_external_id_value(227,&gnd_id).await {
+                    if let Some(item) = ExternalId::new(227,&gnd_id).get_item_for_external_id_value() {
                         ret.add_claim(self.new_statement_item(kp.1,&item));
                     } else {
                         ret.prop_text.push((kp.1,url))
@@ -105,15 +99,18 @@ impl GND {
             }
         }
         
-        // TODO find better way
-        let new_statements = self.try_rescue_prop_text(&mut ret).await?;
-        for (prop,item) in new_statements {
-            ret.add_claim(self.new_statement_item(prop,&item));
-        }
+        self.try_rescue_prop_text(&mut ret)?;
         ret.cleanup();
         Ok(ret)
     }
-
 }
 
-// https://datos.GND.es/resource/XX1553066.rdf
+impl GND {
+    pub fn new(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
+        let rdf_url = format!("https://d-nb.info/gnd/{}/about/lds.rdf",id);
+        let resp = ureq::get(&rdf_url).call()?.into_string()?;
+        let mut graph: FastGraph = FastGraph::new();
+        let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
+        Ok(Self { id:id.to_string(), graph })
+    }
+}

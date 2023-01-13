@@ -1,3 +1,5 @@
+use serde_json::json;
+use serde::ser::{Serialize, Serializer, SerializeStruct};
 use regex::Regex;
 use std::vec::Vec;
 use wikibase::*;
@@ -13,11 +15,24 @@ lazy_static! {
     };
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MetaItem {
     pub item: ItemEntity,
     pub prop_text: Vec<(usize,String)>,
-    pub prop_item : Vec<(usize,String)>,
+}
+
+impl Serialize for MetaItem {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut state = serializer.serialize_struct("MetaItem", 2)?;
+        let mut item = self.item.to_json();
+        item["type"] = json!("item");
+        state.serialize_field("item", &item)?;
+        state.serialize_field("prop_text", &self.prop_text)?;
+        state.end()
+    }
 }
 
 impl MetaItem {
@@ -25,19 +40,7 @@ impl MetaItem {
         Self {
             item: ItemEntity::new_empty(),
             prop_text: vec![],
-            prop_item: vec![],
         }
-    }
-
-    pub fn to_string(&self) -> String {
-        let mut ret = "{\"item\":".to_string();
-        ret += &self.item.to_json().to_string().replace(",\"type\":null",",\"type\":\"item\""); // Fixing type issue with JSON generator for new items
-        ret += ",\"prop_text\":";
-        ret += &serde_json::to_string(&self.prop_text).unwrap();
-        ret += ",\"prop_item\":";
-        ret += &serde_json::to_string(&self.prop_item).unwrap();
-        ret += "}";
-        ret
     }
 
     pub fn parse_date(&self, s: &str) -> Option<(String,u64)> {
@@ -71,7 +74,5 @@ impl MetaItem {
     pub fn cleanup(&mut self) {
         self.prop_text.sort();
         self.prop_text.dedup();
-        self.prop_item.sort();
-        self.prop_item.dedup();
     }
 }

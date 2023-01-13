@@ -8,6 +8,9 @@ pub struct IdRef {
     graph: FastGraph,
 }
 
+unsafe impl Send for IdRef {}
+unsafe impl Sync for IdRef {}
+
 impl ExternalImporter for IdRef {
     fn my_property(&self) -> usize {
         269
@@ -36,19 +39,9 @@ impl ExternalImporter for IdRef {
     fn get_key_url(&self, key: &str) -> String {
         format!("http://www.idref.fr/{}/{}",self.id,key)
     }
-}
-
-impl IdRef {
-    pub async fn new(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let rdf_url = format!("https://www.idref.fr/{}.rdf",id);
-        let resp = reqwest::get(rdf_url).await?.text().await?;
-        let mut graph: FastGraph = FastGraph::new();
-        let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
-        Ok(Self { id:id.to_string(), graph })
-    }
 
 
-    pub async fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>> {
+    fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>> {
         let mut ret = MetaItem::new();
 
         ret.add_claim(self.new_statement_string(self.my_property(), &self.id));
@@ -62,7 +55,7 @@ impl IdRef {
         for url in self.triples_iris("http://dbpedia.org/ontology/citizenship")? {
             match self.url2external_id(&url) {
                 Some(extid) => {
-                    match Self::get_item_for_external_id_value(extid.property,&extid.id).await {
+                    match extid.get_item_for_external_id_value() {
                         Some(item) => ret.add_claim(self.new_statement_item(27,&item)),
                         None => ret.prop_text.push((27,url))
                     }
@@ -84,23 +77,20 @@ impl IdRef {
             }
         }
 
-        //self.bibliography(&mut ret)?;
-
-        // TODO find better way
-        let new_statements = self.try_rescue_prop_text(&mut ret).await?;
-        for (prop,item) in new_statements {
-            let statement = self.new_statement_item(prop,&item);
-            ret.add_claim(statement);
-        }
+        self.try_rescue_prop_text(&mut ret)?;
         ret.cleanup();
         Ok(ret)
     }
 
-    /*
-    fn bibliography(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
-        let id_url = self.get_id_url();
-        let authored = self.triples_property_object_iris("http://id.loc.gov/vocabulary/relators/aut",&id_url)?;
-        println!("{:?}",&authored);
-        Ok(())
-    } */
+}
+
+impl IdRef {
+    pub fn new(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
+        let rdf_url = format!("https://www.idref.fr/{}.rdf",id);
+        let resp = ureq::get(&rdf_url).call()?.into_string()?;
+        let mut graph: FastGraph = FastGraph::new();
+        let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
+        Ok(Self { id:id.to_string(), graph })
+    }
+
 }

@@ -6,7 +6,6 @@ use sophia::graph::{*, inmem::FastGraph};
 use sophia::triple::Triple;
 use sophia::triple::stream::TripleSource;
 use sophia::term::SimpleIri;
-use async_recursion::async_recursion;
 use regex::Regex;
 use std::vec::Vec;
 use wikibase::*;
@@ -31,11 +30,41 @@ lazy_static! {
     };
 }
 
-
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExternalId {
     pub property: usize,
     pub id: String
+}
+
+impl ExternalId {
+    pub fn new(property: usize, id: &str ) -> Self {
+        Self {
+            property,
+            id: id.to_string()
+        }
+    }
+
+    pub fn search_wikidata_single_item(&self, query: &str) -> Option<String> {
+        // TODO urlencode query?
+        let url = format!("https://www.wikidata.org/w/api.php?action=query&list=search&srnamespace=0&format=json&srsearch={}",&query);
+        //let text = reqwest::get(url).await.ok()?.text().await.ok()?;
+        let text = ureq::get(&url).call().ok()?.into_string().ok()?;
+        let j: serde_json::Value = serde_json::from_str(&text).ok()?;
+        if j["query"]["searchinfo"]["totalhits"].as_i64()? == 1 {
+            return Some(j["query"]["search"][0]["title"].as_str()?.to_string());
+        }
+        None
+    }
+
+    pub fn get_item_for_external_id_value(&self) -> Option<String> {
+        let query = format!("haswbstatement:\"P{}={}\"",self.property,self.id);
+        self.search_wikidata_single_item(&query)
+    }
+
+    pub fn get_item_for_string_external_id_value(&self, s: &str) -> Option<String> {
+        let query = format!("{s} haswbstatement:\"P{}={}\"",self.property,&self.id);
+        self.search_wikidata_single_item(&query)
+    }
 }
 
 pub trait ExternalImporter {
@@ -47,6 +76,7 @@ pub trait ExternalImporter {
     fn my_property(&self) -> usize;
     fn my_id(&self) -> String;
     fn my_stated_in(&self) -> &str;
+    fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>>;
 
 
 
@@ -120,30 +150,6 @@ pub trait ExternalImporter {
             }
         )?;
         Ok(ret)
-    }
-
-    #[async_recursion]
-    async fn search_wikidata_single_item(query: &str) -> Option<String> {
-        // TODO urlencode query?
-        let url = format!("https://www.wikidata.org/w/api.php?action=query&list=search&srnamespace=0&format=json&srsearch={}",&query);
-        let text = reqwest::get(url).await.ok()?.text().await.ok()?;
-        let j: serde_json::Value = serde_json::from_str(&text).ok()?;
-        if j["query"]["searchinfo"]["totalhits"].as_i64()? == 1 {
-            return Some(j["query"]["search"][0]["title"].as_str()?.to_string());
-        }
-        None
-    }
-
-    #[async_recursion]
-    async fn get_item_for_external_id_value(property: usize, value: &str) -> Option<String> {
-        let query = format!("haswbstatement:\"P{}={}\"",property,value);
-        Self::search_wikidata_single_item(&query).await
-    }
-
-    #[async_recursion]
-    async fn get_item_for_string_external_id_value(s: &str, property: usize, value: &str) -> Option<String> {
-        let query = format!("{s} haswbstatement:\"P{property}={value}\"");
-        Self::search_wikidata_single_item(&query).await
     }
 
     fn get_ref(&self) -> Vec<Reference> {
@@ -369,24 +375,26 @@ pub trait ExternalImporter {
         Ok(())
     }
 
-    #[async_recursion]
-    async fn try_rescue_prop_text(&self, mi : &mut MetaItem) -> Result<Vec<(usize,String)>, Box<dyn std::error::Error>> {
+    fn try_rescue_prop_text(&self, mi : &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
         let mut new_prop_text = vec![];
-        let mut new_statements = vec![];
-        for (prop,s) in &mi.prop_text {
+        for (prop,s) in &mi.prop_text.clone() {
             let p31 = match prop {
                 1412 => "Q34770", // Language spoken or written => laguage
                 131 => "Q515", // Located in => city
                 27 => "Q6256", // Nationality
                 _ => continue
             };
-            match Self::get_item_for_string_external_id_value(&s,31,p31).await {
-                Some(item) => new_statements.push((*prop,item.to_string())),
+            let extid = ExternalId::new(*prop,&p31);
+            match extid.get_item_for_string_external_id_value(s) {
+                Some(item) => {
+                    let statement = self.new_statement_item(*prop,&item);
+                    mi.add_claim(statement);
+                }
                 None => new_prop_text.push((*prop,s.to_owned()))
             }
         }
         mi.prop_text = new_prop_text;
-        Ok(new_statements)
+        Ok(())
     }
 
 }
