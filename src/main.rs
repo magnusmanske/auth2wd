@@ -33,7 +33,7 @@ async fn root() -> Html<&'static str> {
     <li><a href="/item/P950/XX990809">BNE</a> ("Charles Darwin" from Biblioteca Nacional de España)</li>
     <li><a href="/item/P1006/068364229">NB</a> ("Charles Darwin" from Nationale Thesaurus voor Auteurs ID)</li>
     </ul>
-    Also vailable are:
+    Also available are:
     <ul>
     <li><a href="/meta_item/P1006/068364229">meta_item</a>, item plus some properties that could not be resolved automatically</li>
     <li><a href="/graph/P227/118523813">graph</a>, the internal graph representation before parsing</li>
