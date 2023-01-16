@@ -20,6 +20,7 @@ use std::net::SocketAddr;
 use tracing;
 use tracing_subscriber;
 use external_importer::*;
+use tower_http::cors::{Any, CorsLayer};
 
 async fn root() -> Html<&'static str> {
     Html(r##"<h1>Auhority Control data to Wikidata item</h1>
@@ -102,13 +103,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     tracing_subscriber::fmt::init();
 
+    let cors = CorsLayer::new().allow_origin(Any);
+
     let app = Router::new()
         .route("/", get(root))
         .route("/item/:prop/:id", get(item))
         .route("/meta_item/:prop/:id", get(meta_item))
         .route("/graph/:prop/:id", get(graph))
-        ;
-
+        .layer(cors);
+    
     let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
     tracing::debug!("listening on {}", addr);
     axum::Server::bind(&addr)
