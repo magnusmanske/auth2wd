@@ -84,11 +84,17 @@ pub trait ExternalImporter {
         self.get_key_url("id")
     }
 
-    fn dump_graph(&mut self) {
+    fn get_graph_text(&mut self) -> String {
         let mut nt_stringifier = NtSerializer::new_stringifier();
         let graph: &mut FastGraph = self.graph_mut();
-        let example2 = nt_stringifier.serialize_graph(graph).unwrap().as_str();
-        println!("The resulting graph\n{}", example2);
+        match nt_stringifier.serialize_graph(graph) {
+            Ok(s) => s.to_string(),
+            Err(_) => String::new(),
+        }
+    }
+
+    fn dump_graph(&mut self) {
+        println!("The resulting graph\n{}", self.get_graph_text());
     }
 
     fn url2external_id(&self, url: &str) -> Option<ExternalId> {

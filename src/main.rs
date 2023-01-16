@@ -32,6 +32,11 @@ async fn root() -> Html<&'static str> {
     <li><a href="/item/P950/XX990809">BNE</a> ("Charles Darwin" from Biblioteca Nacional de España)</li>
     <li><a href="/item/P1006/068364229">NB</a> ("Charles Darwin" from Nationale Thesaurus voor Auteurs ID)</li>
     </ul>
+    Also vailable are:
+    <ul>
+    <li><a href="/meta_item/P1006/068364229">meta_item</a>, item plus some properties that could not be resolved automatically</li>
+    <li><a href="/item/P227/118523813">graph</a>, the internal graph representation before parsing</li>
+    </ul>
     <hr/>
     <a href='https://github.com/magnusmanske/auth2wd'>git</a>
     "##)
@@ -61,6 +66,27 @@ async fn item(Path((property,id)): Path<(String,String)>) -> Json<serde_json::Va
     Json(j)
 }
 
+async fn meta_item(Path((property,id)): Path<(String,String)>) -> Json<serde_json::Value> {
+    let parser: Box<dyn ExternalImporter> = match get_parser_for_property(&property, &id) {
+        Ok(parser) => parser,
+        Err(e) => return Json(json!({"status":e.to_string()}))
+    };
+    let mi = match parser.run() {
+        Ok(mi) => mi,
+        Err(e) => return Json(json!({"status":e.to_string()}))
+    };
+    let mut j = json!(mi);
+    j["status"] = json!("OK");
+    Json(j)
+}
+
+async fn graph(Path((property,id)): Path<(String,String)>) -> String {
+    let mut parser: Box<dyn ExternalImporter> = match get_parser_for_property(&property, &id) {
+        Ok(parser) => parser,
+        Err(e) => return e.to_string()
+    };
+    parser.get_graph_text()
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -79,6 +105,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .route("/", get(root))
         .route("/item/:prop/:id", get(item))
+        .route("/meta_item/:prop/:id", get(meta_item))
+        .route("/graph/:prop/:id", get(graph))
         ;
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
