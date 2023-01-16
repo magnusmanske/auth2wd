@@ -35,7 +35,7 @@ async fn root() -> Html<&'static str> {
     Also vailable are:
     <ul>
     <li><a href="/meta_item/P1006/068364229">meta_item</a>, item plus some properties that could not be resolved automatically</li>
-    <li><a href="/item/P227/118523813">graph</a>, the internal graph representation before parsing</li>
+    <li><a href="/graph/P227/118523813">graph</a>, the internal graph representation before parsing</li>
     </ul>
     <hr/>
     <a href='https://github.com/magnusmanske/auth2wd'>git</a>
