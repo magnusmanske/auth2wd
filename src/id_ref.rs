@@ -46,6 +46,7 @@ impl ExternalImporter for IdRef {
 
         ret.add_claim(self.new_statement_string(self.my_property(), &self.id));
 
+        self.add_instance_of(&mut ret)?;
         self.add_same_as(&mut ret)?;
         self.add_gender(&mut ret)?;
         self.add_label_aliases(&mut ret)?;

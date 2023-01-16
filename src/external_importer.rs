@@ -328,26 +328,45 @@ pub trait ExternalImporter {
     fn add_label_aliases(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
         let language = self.primary_language();
 
-        // TODO "last, first" => "first last"
         let urls = [
+            "http://schema.org/name",
             "http://xmlns.com/foaf/0.1/name",
-            "http://www.w3.org/2000/01/rdf-schema#label",
             "https://datos.bne.es/def/P5012",
             "https://d-nb.info/standards/elementset/gnd#preferredNameForThePerson",
             "https://d-nb.info/standards/elementset/gnd#variantNameForThePerson",
+            "http://schema.org/alternateName",
+            "http://www.w3.org/2000/01/rdf-schema#label",
         ];
         for url in urls {
             for s in self.triples_literals(&url)? {
                 let s = self.transform_label(&s);
                 let s = self.limit_string_length(&s);
-                if ret.item.label_in_locale(&language).is_none() {
-                    ret.item.labels_mut().push(LocaleString::new(&language, &s));
-                } else {
-                    ret.item.aliases_mut().push(LocaleString::new(&language, &s));
+                match ret.item.label_in_locale(&language) {
+                    None => ret.item.labels_mut().push(LocaleString::new(&language, &s)),
+                    Some(label) => {
+                        if label!=s && label!=self.transform_label(&s) {
+                            ret.item.aliases_mut().push(LocaleString::new(&language, &s))
+                        }
+                    }
                 }
             }
         }
 
+        self.add_item_statement_or_prop_text(ret, 734, "http://schema.org/familyName")?;
+        self.add_item_statement_or_prop_text(ret, 735, "http://schema.org/givenName")?;
+
+        Ok(())
+    }
+
+    fn add_item_statement_or_prop_text(&self, ret: &mut MetaItem, prop: usize, p_iri: &str) -> Result<(), Box<dyn std::error::Error>> {
+        for s in self.triples_literals(p_iri)? {
+            let ext_id = ExternalId::new(prop, &s);
+            let query = format!("{s} haswbstatement:\"P{}={}\"",prop,&s);
+            match ext_id.search_wikidata_single_item(&query) {
+                Some(item) => ret.add_claim(self.new_statement_item(prop,&item)),
+                None => ret.prop_text.push((prop,s.to_owned()))
+            }
+        }
         Ok(())
     }
 
@@ -363,6 +382,16 @@ pub trait ExternalImporter {
                     let s = self.limit_string_length(&s);
                     ret.item.descriptions_mut().push(LocaleString::new(&language, &s));
                 }
+            }
+        }
+        Ok(())
+    }
+    
+    fn add_instance_of(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
+        for url in self.triples_iris("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")? {
+            match url.as_str() {
+                "http://schema.org/Person" => ret.add_claim(self.new_statement_item(31,"Q5")),
+                s => ret.prop_text.push((31,s.to_string()))
             }
         }
         Ok(())
@@ -387,8 +416,7 @@ pub trait ExternalImporter {
             let extid = ExternalId::new(*prop,&p31);
             match extid.get_item_for_string_external_id_value(s) {
                 Some(item) => {
-                    let statement = self.new_statement_item(*prop,&item);
-                    mi.add_claim(statement);
+                    mi.add_claim(self.new_statement_item(*prop,&item));
                 }
                 None => new_prop_text.push((*prop,s.to_owned()))
             }
