@@ -30,6 +30,8 @@ async fn root() -> Html<&'static str> {
     <li><a href="/item/P269/026812304">IdRef</a> ("Charles Darwin" from IdRef/SUDOC)</li>
     <li><a href="/item/P950/XX990809">BNE</a> ("Charles Darwin" from Biblioteca Nacional de España)</li>
     </ul>
+    <hr/>
+    <a href='https://github.com/magnusmanske/auth2wd'>git</a>
     "##)
 }
 
