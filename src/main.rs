@@ -27,7 +27,7 @@ async fn root() -> Html<&'static str> {
     Html(r##"<h1>Auhority Control data to Wikidata item</h1>
     This API can load AC (Authority Control) data from other sources and convert them into a Wikidata item.
 
-    <h2>Examples</h3>
+    <h2>Available sources</h3>
     <ul>
     <li><a href="/item/P227/118523813">GND</a> ("Charles Darwin" from Deutsche Nationalbibliothek)</li>
     <li><a href="/item/P268/11898689q">BnF</a> ("Charles Darwin" from Bibliothèque nationale de France)</li>
@@ -35,8 +35,9 @@ async fn root() -> Html<&'static str> {
     <li><a href="/item/P950/XX990809">BNE</a> ("Charles Darwin" from Biblioteca Nacional de España)</li>
     <li><a href="/item/P1006/068364229">NB</a> ("Charles Darwin" from Nationale Thesaurus voor Auteurs ID)</li>
     </ul>
-    Also available are:
+    <h2>Functions</h2>
     <ul>
+    <li><a href="/item/P227/118523813">item</a>, the JSON of a new item containing the parsed data from the respective source</li>
     <li><a href="/meta_item/P1006/068364229">meta_item</a>, item plus some properties that could not be resolved automatically</li>
     <li><a href="/graph/P227/118523813">graph</a>, the internal graph representation before parsing</li>
     </ul>
