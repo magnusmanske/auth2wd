@@ -11,6 +11,7 @@ lazy_static! {
         vec.push((Regex::new(r"^(\d{3,})$").unwrap(),"+${1}-01-01T00:00:00Z".to_string(),9));
         vec.push((Regex::new(r"^(\d{3,})-(\d{2})$").unwrap(),"+${1}-${2}-01T00:00:00Z".to_string(),10));
         vec.push((Regex::new(r"^(\d{3,})-(\d{2})-(\d{2})$").unwrap(),"+${1}-${2}-${3}T00:00:00Z".to_string(),11));
+        vec.push((Regex::new(r"^https{0,1}://data.bnf.fr/date/(\d+)/$").unwrap(),"+${1}-01-01T00:00:00Z".to_string(),9));
         vec
     };
 }

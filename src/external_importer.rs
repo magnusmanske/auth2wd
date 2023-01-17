@@ -271,6 +271,7 @@ pub trait ExternalImporter {
         let iris = [
             "http://www.w3.org/2002/07/owl#sameAs",
             "http://www.w3.org/2002/07/owl#sameAs",
+            "http://www.w3.org/2004/02/skos/core#exactMatch",
         ];
         for iri in iris {
             for url in self.triples_iris(iri)? {
@@ -359,7 +360,10 @@ pub trait ExternalImporter {
         }
 
         self.add_item_statement_or_prop_text(ret, 734, "http://schema.org/familyName")?;
+        self.add_item_statement_or_prop_text(ret, 734, "http://xmlns.com/foaf/0.1/familyName")?;
+
         self.add_item_statement_or_prop_text(ret, 735, "http://schema.org/givenName")?;
+        self.add_item_statement_or_prop_text(ret, 735, "http://xmlns.com/foaf/0.1/givenName")?;
 
         Ok(())
     }
@@ -381,6 +385,9 @@ pub trait ExternalImporter {
         let iris = [
             "http://www.w3.org/2004/02/skos/core#prefLabel",
             "https://datos.bne.es/def/P3067",
+            "http://rdaregistry.info/Elements/a/#P50113",
+            "http://rdvocab.info/ElementsGr2/biographicalInformation",
+            "http://www.w3.org/2004/02/skos/core#altLabel",
         ];
         for iri in iris {
             for s in self.triples_literals(iri)? {
@@ -392,11 +399,23 @@ pub trait ExternalImporter {
         }
         Ok(())
     }
+
+    fn add_the_usual(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
+        ret.add_claim(self.new_statement_string(self.my_property(), &self.my_id()));
+        self.add_instance_of(ret)?;
+        self.add_same_as(ret)?;
+        self.add_gender(ret)?;
+        self.add_label_aliases(ret)?;
+        self.add_description(ret)?;
+        self.add_language(ret)?;
+        Ok(())
+    }
     
     fn add_instance_of(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
         for url in self.triples_iris("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")? {
             match url.as_str() {
                 "http://schema.org/Person" => ret.add_claim(self.new_statement_item(31,"Q5")),
+                "http://xmlns.com/foaf/0.1/Person" => ret.add_claim(self.new_statement_item(31,"Q5")),
                 s => ret.prop_text.push((31,s.to_string()))
             }
         }

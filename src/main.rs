@@ -6,6 +6,7 @@ pub mod external_importer ;
 pub mod meta_item ;
 pub mod id_ref ;
 pub mod bne ;
+pub mod bnf ;
 pub mod gnd ;
 pub mod nb ;
 
@@ -29,6 +30,7 @@ async fn root() -> Html<&'static str> {
     <h2>Examples</h3>
     <ul>
     <li><a href="/item/P227/118523813">GND</a> ("Charles Darwin" from Deutsche Nationalbibliothek)</li>
+    <li><a href="/item/P268/toDO">BnF</a> ("Charles Darwin" from Bibliothèque nationale de France)</li>
     <li><a href="/item/P269/026812304">IdRef</a> ("Charles Darwin" from IdRef/SUDOC)</li>
     <li><a href="/item/P950/XX990809">BNE</a> ("Charles Darwin" from Biblioteca Nacional de España)</li>
     <li><a href="/item/P1006/068364229">NB</a> ("Charles Darwin" from Nationale Thesaurus voor Auteurs ID)</li>
@@ -46,6 +48,7 @@ async fn root() -> Html<&'static str> {
 fn get_parser_for_property(property: &str, id: &str) -> Result<Box<dyn ExternalImporter>,Box<dyn std::error::Error>> {
     match property.to_ascii_uppercase().as_str() {
         "P227" => Ok(Box::new(gnd::GND::new(&id)?)),
+        "P268" => Ok(Box::new(bnf::BNF::new(&id)?)),
         "P269" => Ok(Box::new(id_ref::IdRef::new(&id)?)),
         "P950" => Ok(Box::new(bne::BNE::new(&id)?)),
         "P1006" => Ok(Box::new(nb::NB::new(&id)?)),
@@ -92,7 +95,7 @@ async fn graph(Path((property,id)): Path<(String,String)>) -> String {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if false {
-        let mut parser = nb::NB::new(&"068364229")?;
+        let mut parser = bnf::BNF::new(&"11928016k")?;
         if false {
             parser.dump_graph();
         } else {

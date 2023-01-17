@@ -48,15 +48,7 @@ impl ExternalImporter for BNE {
 
     fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>> {
         let mut ret = MetaItem::new();
-
-        ret.add_claim(self.new_statement_string(self.my_property(), &self.id));
-
-        self.add_instance_of(&mut ret)?;
-        self.add_same_as(&mut ret)?;
-        self.add_gender(&mut ret)?;
-        self.add_label_aliases(&mut ret)?;
-        self.add_description(&mut ret)?;
-        self.add_language(&mut ret)?;
+        self.add_the_usual(&mut ret)?;
 
         // Nationality
         for text in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
