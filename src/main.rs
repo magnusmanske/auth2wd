@@ -30,7 +30,7 @@ async fn root() -> Html<&'static str> {
     <h2>Examples</h3>
     <ul>
     <li><a href="/item/P227/118523813">GND</a> ("Charles Darwin" from Deutsche Nationalbibliothek)</li>
-    <li><a href="/item/P268/toDO">BnF</a> ("Charles Darwin" from Bibliothèque nationale de France)</li>
+    <li><a href="/item/P268/11898689q">BnF</a> ("Charles Darwin" from Bibliothèque nationale de France)</li>
     <li><a href="/item/P269/026812304">IdRef</a> ("Charles Darwin" from IdRef/SUDOC)</li>
     <li><a href="/item/P950/XX990809">BNE</a> ("Charles Darwin" from Biblioteca Nacional de España)</li>
     <li><a href="/item/P1006/068364229">NB</a> ("Charles Darwin" from Nationale Thesaurus voor Auteurs ID)</li>
