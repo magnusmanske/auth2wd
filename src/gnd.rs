@@ -1,8 +1,8 @@
 use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
 use crate::external_importer::*;
-use crate::meta_item::*;
 use crate::external_id::*;
+use crate::meta_item::*;
 
 
 pub struct GND {
@@ -68,7 +68,7 @@ impl ExternalImporter for GND {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
                 match ret.parse_date(&s) {
                     Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
-                    None => ret.prop_text.push((bd.1,s))
+                    None => ret.prop_text.push(ExternalId::new(bd.1,&s))
                 }
             }
         }
@@ -87,10 +87,10 @@ impl ExternalImporter for GND {
                     if let Some(item) = ExternalId::new(227,&gnd_id).get_item_for_external_id_value() {
                         ret.add_claim(self.new_statement_item(kp.1,&item));
                     } else {
-                        ret.prop_text.push((kp.1,url))
+                        ret.prop_text.push(ExternalId::new(kp.1,&url))
                     }
                 } else {
-                    ret.prop_text.push((kp.1,url))
+                    ret.prop_text.push(ExternalId::new(kp.1,&url))
                 }
             }
         }
@@ -102,11 +102,22 @@ impl ExternalImporter for GND {
 }
 
 impl GND {
+    /// Changes internal ID in case of redirect
+    fn fix_own_id(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        let ids = self.triples_property_literals("https://d-nb.info/standards/elementset/gnd#gndIdentifier")?;
+        if ids.len()==1 {
+            self.id = ids[0].to_owned();
+        }
+        Ok(())
+    }
+
     pub fn new(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let rdf_url = format!("https://d-nb.info/gnd/{}/about/lds.rdf",id);
         let resp = ureq::get(&rdf_url).call()?.into_string()?;
         let mut graph: FastGraph = FastGraph::new();
         let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
-        Ok(Self { id:id.to_string(), graph })
+        let mut ret = Self { id:id.to_string(), graph };
+        ret.fix_own_id()?;
+        Ok(ret)
     }
 }

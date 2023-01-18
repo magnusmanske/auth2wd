@@ -122,6 +122,17 @@ pub trait ExternalImporter {
         Ok(ret)
     }
 
+    fn triples_property_literals(&self, p: &str) ->  Result<Vec<String>, Box<dyn std::error::Error>> {
+        let mut ret = vec![];
+        let iri_p = SimpleIri::new(p, None)?;
+        self.graph().triples_with_p(&iri_p).for_each_triple(|t|
+            if let Term::Literal(iri) = t.o() {
+                ret.push(iri.txt().to_string());
+            }
+        )?;
+        Ok(ret)
+    }
+
     fn get_ref(&self) -> Vec<Reference> {
         let time = Utc::now();
         let time = time.format("+%Y-%m-%dT00:00:00Z").to_string();
@@ -236,6 +247,7 @@ pub trait ExternalImporter {
             "http://www.w3.org/2002/07/owl#sameAs",
             "http://www.w3.org/2002/07/owl#sameAs",
             "http://www.w3.org/2004/02/skos/core#exactMatch",
+            "https://id.kb.se/vocab/sameAs",
         ];
         for iri in iris {
             for url in self.triples_iris(iri)? {
@@ -253,7 +265,7 @@ pub trait ExternalImporter {
             match s.as_str() {
                 "male" => ret.add_claim(self.new_statement_item(21,"Q6581097")),
                 "female" => ret.add_claim(self.new_statement_item(21,"Q6581072")),
-                _ => ret.prop_text.push((21,s))
+                _ => ret.prop_text.push(ExternalId::new(21,&s))
             }
         }
 
@@ -261,7 +273,7 @@ pub trait ExternalImporter {
             match s.as_str() {
                 "Masculino" => ret.add_claim(self.new_statement_item(21,"Q6581097")),
                 "Femenino" => ret.add_claim(self.new_statement_item(21,"Q6581072")),
-                _ => ret.prop_text.push((21,s))
+                _ => ret.prop_text.push(ExternalId::new(21,&s))
             }
         }
 
@@ -269,7 +281,7 @@ pub trait ExternalImporter {
             match url.as_str() {
                 "https://d-nb.info/standards/vocab/gnd/gender#male" => ret.add_claim(self.new_statement_item(21,"Q6581097")),
                 "https://d-nb.info/standards/vocab/gnd/gender#female" => ret.add_claim(self.new_statement_item(21,"Q6581072")),
-                _ => ret.prop_text.push((21,url))
+                _ => ret.prop_text.push(ExternalId::new(21,&url))
             }
         }
 
@@ -323,22 +335,37 @@ pub trait ExternalImporter {
             }
         }
 
-        self.add_item_statement_or_prop_text(ret, 734, "http://schema.org/familyName")?;
-        self.add_item_statement_or_prop_text(ret, 734, "http://xmlns.com/foaf/0.1/familyName")?;
+        let family_names = [
+            "http://schema.org/familyName",
+            "http://xmlns.com/foaf/0.1/familyName",
+            "https://id.kb.se/vocab/familyName",
+        ];
+        for family_name in family_names {
+            self.add_item_statement_or_prop_text(ret, 734, family_name, "Q202444")?;
+            self.add_item_statement_or_prop_text(ret, 734, family_name, "Q3409032")?;
+            self.add_item_statement_or_prop_text(ret, 734, family_name, "Q12308941")?;
+            self.add_item_statement_or_prop_text(ret, 734, family_name, "Q11879590")?;
+        }
 
-        self.add_item_statement_or_prop_text(ret, 735, "http://schema.org/givenName")?;
-        self.add_item_statement_or_prop_text(ret, 735, "http://xmlns.com/foaf/0.1/givenName")?;
+        let given_names = [
+            "http://schema.org/givenName",
+            "http://xmlns.com/foaf/0.1/givenName",
+            "https://id.kb.se/vocab/givenName",
+        ];
+        for given_name in given_names {
+            self.add_item_statement_or_prop_text(ret, 735, given_name, "Q101352")?;
+        }
 
         Ok(())
     }
 
-    fn add_item_statement_or_prop_text(&self, ret: &mut MetaItem, prop: usize, p_iri: &str) -> Result<(), Box<dyn std::error::Error>> {
+    fn add_item_statement_or_prop_text(&self, ret: &mut MetaItem, prop: usize, p_iri: &str, p31: &str) -> Result<(), Box<dyn std::error::Error>> {
         for s in self.triples_literals(p_iri)? {
             let ext_id = ExternalId::new(prop, &s);
-            let query = format!("{s} haswbstatement:\"P{}={}\"",prop,&s);
+            let query = format!("{s} haswbstatement:P31={p31}");
             match ext_id.search_wikidata_single_item(&query) {
                 Some(item) => ret.add_claim(self.new_statement_item(prop,&item)),
-                None => ret.prop_text.push((prop,s.to_owned()))
+                None => ret.prop_text.push(ExternalId::new(prop,&s))
             }
         }
         Ok(())
@@ -352,6 +379,7 @@ pub trait ExternalImporter {
             "http://rdaregistry.info/Elements/a/#P50113",
             "http://rdvocab.info/ElementsGr2/biographicalInformation",
             "http://www.w3.org/2004/02/skos/core#altLabel",
+            "https://id.kb.se/vocab/description",
         ];
         for iri in iris {
             for s in self.triples_literals(iri)? {
@@ -380,7 +408,8 @@ pub trait ExternalImporter {
             match url.as_str() {
                 "http://schema.org/Person" => ret.add_claim(self.new_statement_item(31,"Q5")),
                 "http://xmlns.com/foaf/0.1/Person" => ret.add_claim(self.new_statement_item(31,"Q5")),
-                s => ret.prop_text.push((31,s.to_string()))
+                "https://id.kb.se/vocab/Person" => ret.add_claim(self.new_statement_item(31,"Q5")),
+                s => ret.prop_text.push(ExternalId::new(31,s))
             }
         }
         Ok(())
@@ -388,26 +417,26 @@ pub trait ExternalImporter {
 
     fn add_language(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
         for s in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
-            ret.prop_text.push((1412,s))
+            ret.prop_text.push(ExternalId::new(1412,&s))
         }
         Ok(())
     }
 
     fn try_rescue_prop_text(&self, mi : &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
         let mut new_prop_text = vec![];
-        for (prop,s) in &mi.prop_text.clone() {
-            let p31 = match prop {
+        for ext_id in &mi.prop_text.to_owned() {
+            let p31 = match ext_id.property {
                 1412 => "Q34770", // Language spoken or written => laguage
                 131 => "Q515", // Located in => city
                 27 => "Q6256", // Nationality
                 _ => continue
             };
-            let extid = ExternalId::new(*prop,&p31);
-            match extid.get_item_for_string_external_id_value(s) {
+            let extid = ExternalId::new(ext_id.property,&p31);
+            match extid.get_item_for_string_external_id_value(&ext_id.id) {
                 Some(item) => {
-                    mi.add_claim(self.new_statement_item(*prop,&item));
+                    mi.add_claim(self.new_statement_item(ext_id.property,&item));
                 }
-                None => new_prop_text.push((*prop,s.to_owned()))
+                None => new_prop_text.push(ext_id.to_owned())
             }
         }
         mi.prop_text = new_prop_text;

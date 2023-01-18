@@ -20,7 +20,7 @@ lazy_static! {
 #[derive(Debug, Clone)]
 pub struct MetaItem {
     pub item: ItemEntity,
-    pub prop_text: Vec<(usize,String)>,
+    pub prop_text: Vec<ExternalId>,
 }
 
 impl Serialize for MetaItem {

@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::meta_item::*;
 use crate::external_importer::*;
 use crate::external_id::*;
@@ -5,24 +6,34 @@ use crate::external_id::*;
 
 #[derive(Debug, Clone)]
 pub struct Combinator {
-    pub items: Vec<MetaItem>,
+    pub items: HashMap<String,MetaItem>,
 }
 
 impl Combinator {
     pub fn new() -> Self {
         Self {
-            items: vec![],
+            items: HashMap::new(),
         }
     }
 
     pub fn get_parser_for_property(property: &str, id: &str) -> Result<Box<dyn ExternalImporter>,Box<dyn std::error::Error>> {
-        match property.to_ascii_uppercase().as_str() {
-            "P227" => Ok(Box::new(crate::gnd::GND::new(&id)?)),
-            "P268" => Ok(Box::new(crate::bnf::BNF::new(&id)?)),
-            "P269" => Ok(Box::new(crate::id_ref::IdRef::new(&id)?)),
-            "P950" => Ok(Box::new(crate::bne::BNE::new(&id)?)),
-            "P1006" => Ok(Box::new(crate::nb::NB::new(&id)?)),
-            _ => Err(format!("unknown property: '{property}'").into())
+        let property = match ExternalId::prop_numeric(property) {
+            Some(property) => property,
+            None => return Err(format!("malformed property: '{property}'").into())
+        };
+        let ext_id = ExternalId::new(property,id);
+        Self::get_parser_for_ext_id(&ext_id)
+    }
+
+    pub fn get_parser_for_ext_id(id: &ExternalId) -> Result<Box<dyn ExternalImporter>,Box<dyn std::error::Error>> {
+        match id.property {
+             227 => Ok(Box::new(crate::gnd::GND::new(&id.id)?)),
+             268 => Ok(Box::new(crate::bnf::BNF::new(&id.id)?)),
+             269 => Ok(Box::new(crate::id_ref::IdRef::new(&id.id)?)),
+             950 => Ok(Box::new(crate::bne::BNE::new(&id.id)?)),
+             906 => Ok(Box::new(crate::selibr::SELIBR::new(&id.id)?)),
+            1006 => Ok(Box::new(crate::nb::NB::new(&id.id)?)),
+            _ => Err(format!("unsupported property: '{}'",id.property).into())
         }
     }
 
@@ -34,15 +45,18 @@ impl Combinator {
                 Some(id) => id,
                 None => break,
             };
-            println!("{:?}",&id);
             ids_used.push(id.to_owned());
             let parser = match Self::get_parser_for_property(&format!("P{}",id.property), &id.id) {
                 Ok(parser) => parser,
                 _ => continue,
             };
+            if self.items.contains_key(&parser.my_id()) {
+                continue;
+            }
+            //println!("{:?} => {}",&id, parser.my_id());
             let item = parser.run()?;
             let external_ids = item.get_external_ids();
-            self.items.push(item);
+            self.items.insert(parser.my_id(), item);
             for external_id in external_ids {
                 if !ids_used.contains(&external_id) && !ids.contains(&external_id){
                     ids.push(external_id.to_owned());

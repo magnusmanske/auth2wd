@@ -1,6 +1,7 @@
 use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
 use crate::external_importer::*;
+use crate::external_id::*;
 use crate::meta_item::*;
 
 pub struct NB {
@@ -52,7 +53,7 @@ impl ExternalImporter for NB {
 
         // Nationality
         for text in self.triples_literals("http://schema.org/nationality")? {
-            ret.prop_text.push((27,text))
+            ret.prop_text.push(ExternalId::new(27,&text))
         }
         
 
@@ -65,7 +66,7 @@ impl ExternalImporter for NB {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
                 match ret.parse_date(&s) {
                     Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
-                    None => ret.prop_text.push((bd.1,s))
+                    None => ret.prop_text.push(ExternalId::new(bd.1,&s))
                 }
             }
         }

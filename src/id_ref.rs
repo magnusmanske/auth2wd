@@ -1,6 +1,7 @@
 use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
 use crate::external_importer::*;
+use crate::external_id::*;
 use crate::meta_item::*;
 
 pub struct IdRef {
@@ -50,10 +51,10 @@ impl ExternalImporter for IdRef {
                 Some(extid) => {
                     match extid.get_item_for_external_id_value() {
                         Some(item) => ret.add_claim(self.new_statement_item(27,&item)),
-                        None => ret.prop_text.push((27,url))
+                        None => ret.prop_text.push(ExternalId::new(27,&url))
                     }
                 }
-                None => ret.prop_text.push((27,url))
+                None => ret.prop_text.push(ExternalId::new(27,&url))
             }
         }
 
@@ -65,7 +66,7 @@ impl ExternalImporter for IdRef {
             for s in self.triples_subject_literals(&format!("http://www.idref.fr/{}/{}",self.id,bd.0),"http://purl.org/vocab/bio/0.1/date")? {
                 match ret.parse_date(&s) {
                     Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
-                    None => ret.prop_text.push((bd.1,s))
+                    None => ret.prop_text.push(ExternalId::new(bd.1,&s))
                 }
             }
         }

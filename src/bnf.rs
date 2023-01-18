@@ -2,6 +2,7 @@ use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
 use regex::Regex;
 use crate::external_importer::*;
+use crate::external_id::*;
 use crate::meta_item::*;
 
 lazy_static!{
@@ -66,7 +67,7 @@ impl ExternalImporter for BNF {
             for s in self.triples_subject_iris(&self.get_id_url(), bd.0)? {
                 match ret.parse_date(&s) {
                     Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
-                    None => ret.prop_text.push((bd.1,s))
+                    None => ret.prop_text.push(ExternalId::new(bd.1,&s))
                 }
             }
         }
@@ -79,7 +80,7 @@ impl ExternalImporter for BNF {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
                 match ret.parse_date(&s) {
                     Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
-                    None => ret.prop_text.push((bd.1,s))
+                    None => ret.prop_text.push(ExternalId::new(bd.1,&s))
                 }
             }
         }
