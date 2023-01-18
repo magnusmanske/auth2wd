@@ -58,7 +58,7 @@ pub trait ExternalImporter {
     }
 
     fn dump_graph(&mut self) {
-        println!("The resulting graph\n{}", self.get_graph_text());
+        println!("{}", self.get_graph_text());
     }
 
     fn url2external_id(&self, url: &str) -> Option<ExternalId> {
@@ -87,6 +87,8 @@ pub trait ExternalImporter {
                 ret.push(iri.ns().to_string());
             }
         )?;
+        ret.sort();
+        ret.dedup();
         Ok(ret)
     }
 
@@ -103,6 +105,8 @@ pub trait ExternalImporter {
                 ret.push(iri.txt().to_string());
             }
         )?;
+        ret.sort();
+        ret.dedup();
         Ok(ret)
     }
 
@@ -119,6 +123,8 @@ pub trait ExternalImporter {
                 ret.push(iri.ns().to_string());
             }
         )?;
+        ret.sort();
+        ret.dedup();
         Ok(ret)
     }
 
@@ -130,6 +136,8 @@ pub trait ExternalImporter {
                 ret.push(iri.txt().to_string());
             }
         )?;
+        ret.sort();
+        ret.dedup();
         Ok(ret)
     }
 
@@ -350,25 +358,29 @@ pub trait ExternalImporter {
             "https://id.kb.se/vocab/givenName",
         ];
         for given_name in given_names {
-            self.add_item_statement_or_prop_text(ret, 735, given_name, "Q202444")?;
-            self.add_item_statement_or_prop_text(ret, 735, given_name, "Q3409032")?;
-            self.add_item_statement_or_prop_text(ret, 735, given_name, "Q12308941")?;
-            self.add_item_statement_or_prop_text(ret, 735, given_name, "Q11879590")?;
+            if self.add_item_statement_or_prop_text(ret, 735, given_name, "Q202444")? { continue }
+            if self.add_item_statement_or_prop_text(ret, 735, given_name, "Q3409032")? { continue }
+            if self.add_item_statement_or_prop_text(ret, 735, given_name, "Q12308941")? { continue }
+            if self.add_item_statement_or_prop_text(ret, 735, given_name, "Q11879590")? { continue }
         }
 
         Ok(())
     }
 
-    fn add_item_statement_or_prop_text(&self, ret: &mut MetaItem, prop: usize, p_iri: &str, p31: &str) -> Result<(), Box<dyn std::error::Error>> {
+    fn add_item_statement_or_prop_text(&self, ret: &mut MetaItem, prop: usize, p_iri: &str, p31: &str) -> Result<bool, Box<dyn std::error::Error>> {
+        let mut found = false;
         for s in self.triples_literals(p_iri)? {
             let ext_id = ExternalId::new(prop, &s);
             let query = format!("{s} haswbstatement:P31={p31}");
             match ext_id.search_wikidata_single_item(&query) {
-                Some(item) => ret.add_claim(self.new_statement_item(prop,&item)),
+                Some(item) => {
+                    ret.add_claim(self.new_statement_item(prop,&item));
+                    found = true ;
+                }
                 None => ret.prop_text.push(ExternalId::new(prop,&s)),
             }
         }
-        Ok(())
+        Ok(found)
     }
 
     fn add_description(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {

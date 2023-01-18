@@ -8,6 +8,7 @@ pub mod external_id ;
 pub mod combinator ;
 pub mod id_ref ;
 pub mod selibr;
+pub mod viaf;
 pub mod bne ;
 pub mod bnf ;
 pub mod gnd ;
@@ -37,6 +38,7 @@ async fn root() -> Html<&'static str> {
 
     <h2>Available sources</h3>
     <ul>
+    <li><a href="/item/P214/27063124">VIAF</a> ("Charles Darwin" from Virtual International Authority File)</li>
     <li><a href="/item/P227/118523813">GND</a> ("Charles Darwin" from Deutsche Nationalbibliothek)</li>
     <li><a href="/item/P268/11898689q">BnF</a> ("Charles Darwin" from Bibliothèque nationale de France)</li>
     <li><a href="/item/P269/026812304">IdRef</a> ("Charles Darwin" from IdRef/SUDOC)</li>
@@ -130,8 +132,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let ext_id = get_extid_from_argv(&argv)?;
             let mut combinator = Combinator::new();
             combinator.import(vec![ext_id])?;
-            println!("{} items",combinator.items.len());
-            println!("{:?}",combinator.items.keys());
+            println!("{} items: {:?}",combinator.items.len(),combinator.items.keys());
         }
         Some("parser") => { // Single parser
             let ext_id = get_extid_from_argv(&argv)?;
@@ -154,7 +155,5 @@ cargo run -- combinator P950 XX990809
 
 TODO:
 P244
-P214
-P906
 P213
 */

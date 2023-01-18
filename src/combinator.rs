@@ -27,11 +27,12 @@ impl Combinator {
 
     pub fn get_parser_for_ext_id(id: &ExternalId) -> Result<Box<dyn ExternalImporter>,Box<dyn std::error::Error>> {
         match id.property {
+             214 => Ok(Box::new(crate::viaf::VIAF::new(&id.id)?)),
              227 => Ok(Box::new(crate::gnd::GND::new(&id.id)?)),
              268 => Ok(Box::new(crate::bnf::BNF::new(&id.id)?)),
              269 => Ok(Box::new(crate::id_ref::IdRef::new(&id.id)?)),
-             950 => Ok(Box::new(crate::bne::BNE::new(&id.id)?)),
              906 => Ok(Box::new(crate::selibr::SELIBR::new(&id.id)?)),
+             950 => Ok(Box::new(crate::bne::BNE::new(&id.id)?)),
             1006 => Ok(Box::new(crate::nb::NB::new(&id.id)?)),
             _ => Err(format!("unsupported property: '{}'",id.property).into())
         }

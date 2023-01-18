@@ -1,15 +1,8 @@
 use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
-use regex::Regex;
 use crate::external_importer::*;
 use crate::external_id::*;
 use crate::meta_item::*;
-
-lazy_static!{
-    static ref RE_NUMERIC_ID : Regex = Regex::new(r#"^(\d{8,9})[0-9bcdfghjkmnpqrstvwxz]$"#).expect("Regexp error");
-    static ref RE_URL : Regex = Regex::new(r#"<meta property="og:url" content="https://data.SELIBR.fr/\d+/(.+?)/" />"#).expect("Regexp error");
-}
-
 
 pub struct SELIBR {
     id: String,
