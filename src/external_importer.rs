@@ -365,7 +365,11 @@ pub trait ExternalImporter {
             let query = format!("{s} haswbstatement:P31={p31}");
             match ext_id.search_wikidata_single_item(&query) {
                 Some(item) => ret.add_claim(self.new_statement_item(prop,&item)),
-                None => ret.prop_text.push(ExternalId::new(prop,&s))
+                None => {
+                    let ext_id = ExternalId::new(prop,&s);
+                    println!("Adding {:?}",&ext_id);
+                    ret.prop_text.push(ext_id)
+                }
             }
         }
         Ok(())
