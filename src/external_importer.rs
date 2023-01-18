@@ -341,10 +341,7 @@ pub trait ExternalImporter {
             "https://id.kb.se/vocab/familyName",
         ];
         for family_name in family_names {
-            self.add_item_statement_or_prop_text(ret, 734, family_name, "Q202444")?;
-            self.add_item_statement_or_prop_text(ret, 734, family_name, "Q3409032")?;
-            self.add_item_statement_or_prop_text(ret, 734, family_name, "Q12308941")?;
-            self.add_item_statement_or_prop_text(ret, 734, family_name, "Q11879590")?;
+            self.add_item_statement_or_prop_text(ret, 734, family_name, "Q101352")?;
         }
 
         let given_names = [
@@ -353,7 +350,10 @@ pub trait ExternalImporter {
             "https://id.kb.se/vocab/givenName",
         ];
         for given_name in given_names {
-            self.add_item_statement_or_prop_text(ret, 735, given_name, "Q101352")?;
+            self.add_item_statement_or_prop_text(ret, 735, given_name, "Q202444")?;
+            self.add_item_statement_or_prop_text(ret, 735, given_name, "Q3409032")?;
+            self.add_item_statement_or_prop_text(ret, 735, given_name, "Q12308941")?;
+            self.add_item_statement_or_prop_text(ret, 735, given_name, "Q11879590")?;
         }
 
         Ok(())
@@ -365,11 +365,7 @@ pub trait ExternalImporter {
             let query = format!("{s} haswbstatement:P31={p31}");
             match ext_id.search_wikidata_single_item(&query) {
                 Some(item) => ret.add_claim(self.new_statement_item(prop,&item)),
-                None => {
-                    let ext_id = ExternalId::new(prop,&s);
-                    println!("Adding {:?}",&ext_id);
-                    ret.prop_text.push(ext_id)
-                }
+                None => ret.prop_text.push(ExternalId::new(prop,&s)),
             }
         }
         Ok(())
@@ -428,19 +424,28 @@ pub trait ExternalImporter {
 
     fn try_rescue_prop_text(&self, mi : &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
         let mut new_prop_text = vec![];
+        mi.cleanup();
         for ext_id in &mi.prop_text.to_owned() {
-            let p31 = match ext_id.property {
-                1412 => "Q34770", // Language spoken or written => laguage
-                131 => "Q515", // Located in => city
-                27 => "Q6256", // Nationality
-                _ => continue
-            };
-            let extid = ExternalId::new(ext_id.property,&p31);
-            match extid.get_item_for_string_external_id_value(&ext_id.id) {
-                Some(item) => {
-                    mi.add_claim(self.new_statement_item(ext_id.property,&item));
+            let p31s = match ext_id.property {
+                1412 => vec!["Q34770"], // Language spoken or written => laguage
+                131 => vec!["Q1549591","Q515"], // Located in => city
+                27 => vec!["Q6256"], // Nationality
+                _ => {
+                    new_prop_text.push(ext_id.to_owned());
+                    continue
                 }
-                None => new_prop_text.push(ext_id.to_owned())
+            };
+            let mut found = false;
+            for p31 in p31s {
+                let extid = ExternalId::new(ext_id.property,&p31);
+                if let Some(item) = extid.get_item_for_string_external_id_value(&ext_id.id) {
+                    mi.add_claim(self.new_statement_item(ext_id.property,&item));
+                    found = true ;
+                    break;
+                }
+            }
+            if !found {
+                new_prop_text.push(ext_id.to_owned());
             }
         }
         mi.prop_text = new_prop_text;
