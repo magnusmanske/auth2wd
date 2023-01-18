@@ -2,6 +2,8 @@ use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::external_id::*;
+
 
 pub struct GND {
     id: String,

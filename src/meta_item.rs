@@ -3,6 +3,7 @@ use serde::ser::{Serialize, Serializer, SerializeStruct};
 use regex::Regex;
 use std::vec::Vec;
 use wikibase::*;
+use crate::external_id::*;
 
 lazy_static! {
     static ref DATES : Vec<(Regex,String,u64)> = {
@@ -70,6 +71,15 @@ impl MetaItem {
             }
         }
         self.item.add_claim(s);
+    }
+
+    pub fn get_external_ids(&self) -> Vec<ExternalId> {
+        self
+            .item
+            .claims()
+            .iter()
+            .filter_map(|claim|ExternalId::from_external_id_claim(claim))
+            .collect()
     }
 
     pub fn cleanup(&mut self) {

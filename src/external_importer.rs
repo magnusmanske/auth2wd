@@ -10,6 +10,7 @@ use regex::Regex;
 use std::vec::Vec;
 use wikibase::*;
 use crate::meta_item::*;
+use crate::external_id::*;
 
 lazy_static! {
     static ref EXTERNAL_ID_REGEXPS : Vec<(Regex,String,usize)> = {
@@ -28,43 +29,6 @@ lazy_static! {
         vec.push((Regex::new(r"^https{0,1}://sws.geonames.org/([1-9][0-9]{0,8}).*$").unwrap(),"${1}".to_string(),1566));
         vec
     };
-}
-
-#[derive(Debug, Clone)]
-pub struct ExternalId {
-    pub property: usize,
-    pub id: String
-}
-
-impl ExternalId {
-    pub fn new(property: usize, id: &str ) -> Self {
-        Self {
-            property,
-            id: id.to_string()
-        }
-    }
-
-    pub fn search_wikidata_single_item(&self, query: &str) -> Option<String> {
-        // TODO urlencode query?
-        let url = format!("https://www.wikidata.org/w/api.php?action=query&list=search&srnamespace=0&format=json&srsearch={}",&query);
-        //let text = reqwest::get(url).await.ok()?.text().await.ok()?;
-        let text = ureq::get(&url).call().ok()?.into_string().ok()?;
-        let j: serde_json::Value = serde_json::from_str(&text).ok()?;
-        if j["query"]["searchinfo"]["totalhits"].as_i64()? == 1 {
-            return Some(j["query"]["search"][0]["title"].as_str()?.to_string());
-        }
-        None
-    }
-
-    pub fn get_item_for_external_id_value(&self) -> Option<String> {
-        let query = format!("haswbstatement:\"P{}={}\"",self.property,self.id);
-        self.search_wikidata_single_item(&query)
-    }
-
-    pub fn get_item_for_string_external_id_value(&self, s: &str) -> Option<String> {
-        let query = format!("{s} haswbstatement:\"P{}={}\"",self.property,&self.id);
-        self.search_wikidata_single_item(&query)
-    }
 }
 
 pub trait ExternalImporter {

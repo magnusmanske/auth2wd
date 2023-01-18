@@ -4,6 +4,8 @@ extern crate nom_bibtex;
 
 pub mod external_importer ;
 pub mod meta_item ;
+pub mod external_id ;
+pub mod combinator ;
 pub mod id_ref ;
 pub mod bne ;
 pub mod bnf ;
@@ -21,6 +23,7 @@ use std::net::SocketAddr;
 use tracing;
 use tracing_subscriber;
 use external_importer::*;
+use combinator::*;
 use tower_http::cors::{Any, CorsLayer};
 
 async fn root() -> Html<&'static str> {
@@ -46,19 +49,9 @@ async fn root() -> Html<&'static str> {
     "##)
 }
 
-fn get_parser_for_property(property: &str, id: &str) -> Result<Box<dyn ExternalImporter>,Box<dyn std::error::Error>> {
-    match property.to_ascii_uppercase().as_str() {
-        "P227" => Ok(Box::new(gnd::GND::new(&id)?)),
-        "P268" => Ok(Box::new(bnf::BNF::new(&id)?)),
-        "P269" => Ok(Box::new(id_ref::IdRef::new(&id)?)),
-        "P950" => Ok(Box::new(bne::BNE::new(&id)?)),
-        "P1006" => Ok(Box::new(nb::NB::new(&id)?)),
-        _ => Err(format!("unknown property: '{property}'").into())
-    }
-}
 
 async fn item(Path((property,id)): Path<(String,String)>) -> Json<serde_json::Value> {
-    let parser: Box<dyn ExternalImporter> = match get_parser_for_property(&property, &id) {
+    let parser: Box<dyn ExternalImporter> = match Combinator::get_parser_for_property(&property, &id) {
         Ok(parser) => parser,
         Err(e) => return Json(json!({"status":e.to_string()}))
     };
@@ -72,7 +65,7 @@ async fn item(Path((property,id)): Path<(String,String)>) -> Json<serde_json::Va
 }
 
 async fn meta_item(Path((property,id)): Path<(String,String)>) -> Json<serde_json::Value> {
-    let parser: Box<dyn ExternalImporter> = match get_parser_for_property(&property, &id) {
+    let parser: Box<dyn ExternalImporter> = match Combinator::get_parser_for_property(&property, &id) {
         Ok(parser) => parser,
         Err(e) => return Json(json!({"status":e.to_string()}))
     };
@@ -86,7 +79,7 @@ async fn meta_item(Path((property,id)): Path<(String,String)>) -> Json<serde_jso
 }
 
 async fn graph(Path((property,id)): Path<(String,String)>) -> String {
-    let mut parser: Box<dyn ExternalImporter> = match get_parser_for_property(&property, &id) {
+    let mut parser: Box<dyn ExternalImporter> = match Combinator::get_parser_for_property(&property, &id) {
         Ok(parser) => parser,
         Err(e) => return e.to_string()
     };
@@ -95,8 +88,14 @@ async fn graph(Path((property,id)): Path<(String,String)>) -> String {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    if false {
-        let mut parser = bnf::BNF::new(&"11928016k")?;
+    if false { // Combinator
+        let mut combinator = Combinator::new();
+        combinator.import(vec![external_id::ExternalId::new(950,"XX990809")])?;
+        println!("{} items",combinator.items.len());
+        return Ok(());
+    }
+    if false { // Single parser
+        let mut parser = bnf::BNF::new("11928016k")?;
         if false {
             parser.dump_graph();
         } else {
