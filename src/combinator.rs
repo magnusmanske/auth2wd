@@ -51,13 +51,13 @@ impl Combinator {
                 Ok(parser) => parser,
                 _ => continue,
             };
-            if self.items.contains_key(&parser.my_id()) {
+            let key = ExternalId::new(id.property,&parser.my_id()).to_string();
+            if self.items.contains_key(&key) {
                 continue;
             }
-            //println!("{:?} => {}",&id, parser.my_id());
             let item = parser.run()?;
             let external_ids = item.get_external_ids();
-            self.items.insert(parser.my_id(), item);
+            self.items.insert(key, item);
             for external_id in external_ids {
                 if !ids_used.contains(&external_id) && !ids.contains(&external_id){
                     ids.push(external_id.to_owned());

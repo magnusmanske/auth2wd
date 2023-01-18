@@ -27,11 +27,6 @@ impl ExternalImporter for VIAF {
     fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>> {
         let mut ret = MetaItem::new();
         self.add_the_usual(&mut ret)?;
-/*
-        for url in self.triples_iris("https://id.kb.se/vocab/nationality")? {
-            ret.prop_text.push(ExternalId::new(27,&url));
-        } */
-
         self.try_rescue_prop_text(&mut ret)?;
         ret.cleanup();
         Ok(ret)
