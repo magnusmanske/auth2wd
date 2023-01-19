@@ -129,10 +129,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let argv: Vec<String> = env::args().collect();
     match argv.get(1).map(|s|s.as_str()) {
         Some("combinator") => { // Combinator
+            let mut base_item = meta_item::MetaItem::from_entity("Q1035").await?;
             let ext_id = get_extid_from_argv(&argv)?;
             let mut combinator = Combinator::new();
             combinator.import(vec![ext_id])?;
             println!("{} items: {:?}",combinator.items.len(),combinator.items.keys());
+            let other = combinator.combine().expect("No items to combine");
+            println!("{} items: {:?}",combinator.items.len(),combinator.items.keys());
+            let diff = base_item.merge(&other);
+            println!("{:?}",&diff);
         }
         Some("parser") => { // Single parser
             let ext_id = get_extid_from_argv(&argv)?;

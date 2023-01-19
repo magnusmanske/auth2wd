@@ -65,10 +65,10 @@ impl ExternalImporter for BNF {
         ];
         for bd in birth_death {
             for s in self.triples_subject_iris(&self.get_id_url(), bd.0)? {
-                match ret.parse_date(&s) {
+                let _ = match ret.parse_date(&s) {
                     Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
-                    None => ret.prop_text.push(ExternalId::new(bd.1,&s))
-                }
+                    None => ret.add_prop_text(ExternalId::new(bd.1,&s))
+                };
             }
         }
 
@@ -78,10 +78,10 @@ impl ExternalImporter for BNF {
         ];
         for bd in birth_death {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
-                match ret.parse_date(&s) {
+                let _ = match ret.parse_date(&s) {
                     Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
-                    None => ret.prop_text.push(ExternalId::new(bd.1,&s))
-                }
+                    None => ret.add_prop_text(ExternalId::new(bd.1,&s))
+                };
             }
         }
 

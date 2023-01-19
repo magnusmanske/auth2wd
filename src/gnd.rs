@@ -55,7 +55,7 @@ impl ExternalImporter for GND {
         /*
         // Nationality
         for text in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
-            ret.prop_text.push((27,text))
+            ret.add_prop_text((27,text))
         }
  */
 
@@ -66,10 +66,10 @@ impl ExternalImporter for GND {
         ];
         for bd in birth_death {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
-                match ret.parse_date(&s) {
+                let _ = match ret.parse_date(&s) {
                     Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
-                    None => ret.prop_text.push(ExternalId::new(bd.1,&s))
-                }
+                    None => ret.add_prop_text(ExternalId::new(bd.1,&s))
+                };
             }
         }
 
@@ -87,10 +87,10 @@ impl ExternalImporter for GND {
                     if let Some(item) = ExternalId::new(227,&gnd_id).get_item_for_external_id_value() {
                         ret.add_claim(self.new_statement_item(kp.1,&item));
                     } else {
-                        ret.prop_text.push(ExternalId::new(kp.1,&url))
+                        let _ = ret.add_prop_text(ExternalId::new(kp.1,&url));
                     }
                 } else {
-                    ret.prop_text.push(ExternalId::new(kp.1,&url))
+                    let _ = ret.add_prop_text(ExternalId::new(kp.1,&url));
                 }
             }
         }

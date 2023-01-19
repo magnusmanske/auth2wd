@@ -66,4 +66,16 @@ impl Combinator {
         }
         Ok(())
     }
+
+    pub fn combine(&mut self) -> Option<MetaItem> {
+        while self.items.len()>1 {
+            let keys: Vec<String> = self.items.keys().cloned().collect() ;
+            let k1 = &keys[0];
+            let k2 = &keys[1];
+            let other = self.items.get(k2).unwrap().to_owned();
+            let _ = self.items.get_mut(k1).unwrap().merge(&other);
+            self.items.remove(k2);
+        }
+        self.items.iter().next().map(|(_,v)|v.to_owned())
+    }
 }

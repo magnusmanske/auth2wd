@@ -259,10 +259,10 @@ pub trait ExternalImporter {
         ];
         for iri in iris {
             for url in self.triples_iris(iri)? {
-                match self.url2external_id(&url) {
+                let _ = match self.url2external_id(&url) {
                     Some(extid) => ret.add_claim(self.new_statement_string(extid.property, &extid.id)),
                     None => ret.add_claim(self.new_statement_url(973, &url))
-                }
+                };
             }
         }
         Ok(())
@@ -270,27 +270,27 @@ pub trait ExternalImporter {
 
     fn add_gender(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
         for s in self.triples_literals("http://xmlns.com/foaf/0.1/gender")? {
-            match s.as_str() {
+            let _ = match s.as_str() {
                 "male" => ret.add_claim(self.new_statement_item(21,"Q6581097")),
                 "female" => ret.add_claim(self.new_statement_item(21,"Q6581072")),
-                _ => ret.prop_text.push(ExternalId::new(21,&s))
-            }
+                _ => ret.add_prop_text(ExternalId::new(21,&s))
+            };
         }
 
         for s in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50116")? {
-            match s.as_str() {
+            let _ = match s.as_str() {
                 "Masculino" => ret.add_claim(self.new_statement_item(21,"Q6581097")),
                 "Femenino" => ret.add_claim(self.new_statement_item(21,"Q6581072")),
-                _ => ret.prop_text.push(ExternalId::new(21,&s))
-            }
+                _ => ret.add_prop_text(ExternalId::new(21,&s))
+            };
         }
 
         for url in self.triples_iris("https://d-nb.info/standards/elementset/gnd#gender")? {
-            match url.as_str() {
+            let _ = match url.as_str() {
                 "https://d-nb.info/standards/vocab/gnd/gender#male" => ret.add_claim(self.new_statement_item(21,"Q6581097")),
                 "https://d-nb.info/standards/vocab/gnd/gender#female" => ret.add_claim(self.new_statement_item(21,"Q6581072")),
-                _ => ret.prop_text.push(ExternalId::new(21,&url))
-            }
+                _ => ret.add_prop_text(ExternalId::new(21,&url))
+            };
         }
 
         Ok(())
@@ -377,7 +377,9 @@ pub trait ExternalImporter {
                     ret.add_claim(self.new_statement_item(prop,&item));
                     found = true ;
                 }
-                None => ret.prop_text.push(ExternalId::new(prop,&s)),
+                None => {
+                    let _ = ret.add_prop_text(ExternalId::new(prop,&s));
+                }
             }
         }
         Ok(found)
@@ -417,19 +419,19 @@ pub trait ExternalImporter {
     
     fn add_instance_of(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
         for url in self.triples_iris("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")? {
-            match url.as_str() {
+            let _ = match url.as_str() {
                 "http://schema.org/Person" => ret.add_claim(self.new_statement_item(31,"Q5")),
                 "http://xmlns.com/foaf/0.1/Person" => ret.add_claim(self.new_statement_item(31,"Q5")),
                 "https://id.kb.se/vocab/Person" => ret.add_claim(self.new_statement_item(31,"Q5")),
-                s => ret.prop_text.push(ExternalId::new(31,s))
-            }
+                s => ret.add_prop_text(ExternalId::new(31,s))
+            };
         }
         Ok(())
     }
 
     fn add_language(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
         for s in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
-            ret.prop_text.push(ExternalId::new(1412,&s))
+            let _ = ret.add_prop_text(ExternalId::new(1412,&s));
         }
         Ok(())
     }

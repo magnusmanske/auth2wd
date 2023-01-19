@@ -49,12 +49,14 @@ impl ExternalImporter for IdRef {
         for url in self.triples_iris("http://dbpedia.org/ontology/citizenship")? {
             match self.url2external_id(&url) {
                 Some(extid) => {
-                    match extid.get_item_for_external_id_value() {
+                    let _ = match extid.get_item_for_external_id_value() {
                         Some(item) => ret.add_claim(self.new_statement_item(27,&item)),
-                        None => ret.prop_text.push(ExternalId::new(27,&url))
-                    }
+                        None => ret.add_prop_text(ExternalId::new(27,&url))
+                    };
                 }
-                None => ret.prop_text.push(ExternalId::new(27,&url))
+                None => {
+                    let _ = ret.add_prop_text(ExternalId::new(27,&url));
+                }
             }
         }
 
@@ -64,10 +66,10 @@ impl ExternalImporter for IdRef {
         ];
         for bd in birth_death {
             for s in self.triples_subject_literals(&format!("http://www.idref.fr/{}/{}",self.id,bd.0),"http://purl.org/vocab/bio/0.1/date")? {
-                match ret.parse_date(&s) {
+                let _ = match ret.parse_date(&s) {
                     Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
-                    None => ret.prop_text.push(ExternalId::new(bd.1,&s))
-                }
+                    None => ret.add_prop_text(ExternalId::new(bd.1,&s))
+                };
             }
         }
 

@@ -53,7 +53,7 @@ impl ExternalImporter for BNE {
 
         // Nationality
         for text in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
-            ret.prop_text.push(ExternalId::new(27,&text))
+            let _ = ret.add_prop_text(ExternalId::new(27,&text));
         }
 
         // Born/died
@@ -63,10 +63,10 @@ impl ExternalImporter for BNE {
         ];
         for bd in birth_death {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
-                match ret.parse_date(&s) {
+                let _ = match ret.parse_date(&s) {
                     Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
-                    None => ret.prop_text.push(ExternalId::new(bd.1,&s))
-                }
+                    None => ret.add_prop_text(ExternalId::new(bd.1,&s))
+                };
             }
         }
 

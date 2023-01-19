@@ -31,7 +31,7 @@ impl ExternalImporter for SELIBR {
         self.add_the_usual(&mut ret)?;
 
         for url in self.triples_iris("https://id.kb.se/vocab/nationality")? {
-            ret.prop_text.push(ExternalId::new(27,&url));
+            ret.add_prop_text(ExternalId::new(27,&url));
         }
 
         self.try_rescue_prop_text(&mut ret)?;
