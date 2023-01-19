@@ -3,6 +3,7 @@ extern crate lazy_static;
 extern crate nom_bibtex;
 
 pub mod external_importer ;
+pub mod merge_diff ;
 pub mod meta_item ;
 pub mod external_id ;
 pub mod combinator ;
@@ -51,6 +52,7 @@ async fn root() -> Html<&'static str> {
     <li><a href="/item/P227/118523813">item</a>, the JSON of a new item containing the parsed data from the respective source</li>
     <li><a href="/meta_item/P1006/068364229">meta_item</a>, item plus some properties that could not be resolved automatically</li>
     <li><a href="/graph/P227/118523813">graph</a>, the internal graph representation before parsing</li>
+    <li><a href="/extend/Q1035>extend</a>, extract AC data from external IDs in an item, and get the payload for <tt>wbeditentity</tt></li>
     </ul>
     <hr/>
     <a href='https://github.com/magnusmanske/auth2wd'>git</a>
@@ -93,6 +95,29 @@ async fn graph(Path((property,id)): Path<(String,String)>) -> String {
     parser.get_graph_text()
 }
 
+async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
+    let mut base_item = match meta_item::MetaItem::from_entity(&item).await {
+        Ok(base_item) => base_item,
+        Err(e) => return Json(json!({"status":e.to_string()}))
+    };
+    let ext_ids: Vec<ExternalId> = base_item
+        .extract_external_ids()
+        .iter()
+        .filter(|ext_id|Combinator::get_parser_for_ext_id(ext_id).ok().is_some())
+        .cloned()
+        .collect();
+    let mut combinator = Combinator::new();
+    if let Err(e) = combinator.import(ext_ids) {
+        return Json(json!({"status":e.to_string()}))
+    }
+    let other = match combinator.combine() {
+        Some(other) => other,
+        None => return Json(json!({"status":"No items to combine"}))
+    };
+    let diff = base_item.merge(&other);
+    Json(json!(diff))
+}
+
 async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
 
@@ -103,6 +128,7 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
         .route("/item/:prop/:id", get(item))
         .route("/meta_item/:prop/:id", get(meta_item))
         .route("/graph/:prop/:id", get(graph))
+        .route("/extend/:item", get(extend))
         .layer(TraceLayer::new_for_http())
         .layer(CompressionLayer::new())
         .layer(cors);
@@ -130,16 +156,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match argv.get(1).map(|s|s.as_str()) {
         Some("combinator") => { // Combinator
             let mut base_item = meta_item::MetaItem::from_entity("Q1035").await?;
-            println!("{:?}",&base_item);
+            //println!("{:?}",&base_item);
             let ext_id = get_extid_from_argv(&argv)?;
             let mut combinator = Combinator::new();
             combinator.import(vec![ext_id])?;
             println!("{} items: {:?}",combinator.items.len(),combinator.items.keys());
             let other = combinator.combine().expect("No items to combine");
             println!("{} items: {:?}",combinator.items.len(),combinator.items.keys());
-            println!("{:?}",&other);
+            //println!("{:?}",&other);
             let diff = base_item.merge(&other);
-            println!("{:?}",&diff);
+            //println!("{:?}",&diff);
+            println!("Altered: {}, added: {}",diff.altered_statements.len(),diff.added_statements.len());
+            let payload = json!(diff);
+            println!("{}",&serde_json::to_string_pretty(&payload).unwrap());
         }
         Some("parser") => { // Single parser
             let ext_id = get_extid_from_argv(&argv)?;

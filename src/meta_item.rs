@@ -1,11 +1,11 @@
 use serde_json::json;
 use serde::ser::{Serialize, Serializer, SerializeStruct};
 use regex::Regex;
-use std::collections::HashMap;
 use std::vec::Vec;
 use std::cmp::Ordering;
 use wikibase::*;
 use crate::external_id::*;
+use crate::merge_diff::*;
 
 lazy_static! {
     static ref DATES : Vec<(Regex,String,u64)> = {
@@ -19,37 +19,6 @@ lazy_static! {
     };
 }
 
-/// This contains the wbeditentiry payload to ADD data to a base item, generated from a merge
-#[derive(Debug, Clone)]
-pub struct MergeDiff {
-    labels: Vec<LocaleString>,
-    aliases: Vec<LocaleString>,
-    descriptions: Vec<LocaleString>,
-    sitelinks: Vec<SiteLink>,
-    altered_statements: HashMap<String,Statement>,
-    added_statements: Vec<Statement>,
-}
-
-impl MergeDiff {
-    pub fn new() -> Self {
-        Self {
-            labels: vec!(), 
-            aliases: vec!(), 
-            descriptions: vec!(), 
-            sitelinks: vec!(), 
-            altered_statements: HashMap::new(), 
-            added_statements: vec!()
-        }
-    }
-
-    pub fn add_statement(&mut self, s: Statement) {
-        if let Some(id) = s.id() {
-            self.altered_statements.insert(id, s);
-        } else {
-            self.added_statements.push(s);
-        }
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct MetaItem {
@@ -103,18 +72,48 @@ impl MetaItem {
         }).next()
     }
 
+    pub fn extract_external_ids(&self) -> Vec<ExternalId> {
+        self
+            .item
+            .claims()
+            .iter()
+            .filter(|s|*s.main_snak().datatype() == SnakDataType::ExternalId)
+            .filter(|s|s.main_snak().data_value().is_some())
+            .map(|s|(s.property().to_string(),s.main_snak().data_value().to_owned().unwrap()))
+            .filter_map(|(prop,dv)|{
+                match dv.value() {
+                    Value::StringValue(s) => {
+                        let prop_numeric = ExternalId::prop_numeric(&prop).unwrap();
+                        Some(ExternalId::new(prop_numeric,s))
+                    }
+                    _ => None
+                }
+            })
+            .collect()
+    }
+
     pub fn add_claim(&mut self, s: Statement) -> Option<Statement>{
         for s2 in self.item.claims_mut() {
             if s.main_snak()==s2.main_snak() && s.qualifiers()==s2.qualifiers() {
+                if *s.main_snak().datatype() == SnakDataType::ExternalId {
+                    // Don't add reference to external IDs
+                    return None
+                }
                 let mut new_references = s.references().clone();
+                let mut reference_changed = false;
                 for r in s.references() {
                     if !s2.references().contains(r) {
                         new_references.push(r.to_owned());
+                        reference_changed = true;
                     }
                 }
-                s2.set_references(new_references);
-                // TODO merge references
-                return Some(s2.to_owned());
+                if reference_changed {
+                    s2.set_references(new_references);
+                    // TODO merge references
+                    return Some(s2.to_owned());
+                } else {
+                    return None
+                }
             }
         }
         self.item.add_claim(s.clone());
@@ -179,6 +178,8 @@ impl MetaItem {
         let _ = Self::merge_locale_strings(self.item.descriptions_mut(),other.item.descriptions(), &mut diff.descriptions);
 
         new_aliases.append(&mut other.item.aliases().clone());
+        new_aliases.sort_by(Self::compare_locale_string);
+        new_aliases.dedup();
         diff.aliases = new_aliases
             .iter()
             .filter(|a|!self.item.aliases().contains(a))
@@ -188,6 +189,7 @@ impl MetaItem {
         self.item.aliases_mut().sort_by(Self::compare_locale_string);
         self.item.aliases_mut().dedup();
 
+        // Sitelinks: add only
         if let Some(sitelinks) = other.item.sitelinks() {
             let mut new_ones: Vec<SiteLink> = sitelinks
             .iter()

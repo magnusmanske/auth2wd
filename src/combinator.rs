@@ -25,6 +25,10 @@ impl Combinator {
         Self::get_parser_for_ext_id(&ext_id)
     }
 
+    pub fn get_supported_properties() -> &'static [usize] {
+        &[214,227,268,269,906,950,1006]
+    }
+
     pub fn get_parser_for_ext_id(id: &ExternalId) -> Result<Box<dyn ExternalImporter>,Box<dyn std::error::Error>> {
         match id.property {
              214 => Ok(Box::new(crate::viaf::VIAF::new(&id.id)?)),
