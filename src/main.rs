@@ -52,7 +52,7 @@ async fn root() -> Html<&'static str> {
     <li><a href="/item/P227/118523813">item</a>, the JSON of a new item containing the parsed data from the respective source</li>
     <li><a href="/meta_item/P1006/068364229">meta_item</a>, item plus some properties that could not be resolved automatically</li>
     <li><a href="/graph/P227/118523813">graph</a>, the internal graph representation before parsing</li>
-    <li><a href="/extend/Q1035>extend</a>, extract AC data from external IDs in an item, and get the payload for <tt>wbeditentity</tt></li>
+    <li><a href="/extend/Q1035">extend</a>, extract AC data from external IDs in an item, and get the payload for <tt>wbeditentity</tt></li>
     </ul>
     <hr/>
     <a href='https://github.com/magnusmanske/auth2wd'>git</a>
