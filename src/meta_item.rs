@@ -80,8 +80,11 @@ impl MetaItem {
     }
 
     pub async fn from_entity(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let config = Configuration::new("AC2WD/0.1").await?;
-        let entity = wikibase::Entity::new_from_id(id,&config).await?;
+        //let config = Configuration::new("AC2WD/0.1").await?;
+        let api = mediawiki::api::Api::new("https://www.wikidata.org/w/api.php").await?;
+        let entity_container = wikibase::entity_container::EntityContainer::new();
+        let entity = entity_container.load_entity(&api,id).await?;
+        //let entity = wikibase::Entity::new_from_id(id,&config).await?;
         let item = match entity {
             Entity::Item(item) => item,
             _ => return Err(format!("Not an item: '{id}'").into())
@@ -149,12 +152,19 @@ impl MetaItem {
         let mut new_ones: Vec<LocaleString> = other
             .iter()
             .filter_map(|x|{
-                if mine.iter().any(|y|x.language()==y.language()) {
-                    println!("Skipping {:?}",x);
-                    ret.push(x.clone()); // Labels for which a language already exists, as aliases
-                    None
-                } else {
-                    Some(x.clone())
+                match mine.iter().filter(|y|x.language()==y.language()).next() {
+                    Some(y) => {
+                        if x.value()!=y.value() {
+                            println!("Adding as alias {:?}",x);
+                            ret.push(x.clone()); // Labels for which a language already exists, as aliases
+                        } else {
+                            println!("Skipping {:?}",x);
+                        }
+                        None    
+                    }
+                    None => {
+                        Some(x.clone())
+                    }
                 }
             })
             .collect();
