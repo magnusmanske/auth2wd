@@ -144,25 +144,32 @@ impl MetaItem {
         }
     }
 
-    fn merge_locale_strings(mine: &mut Vec<LocaleString>, other: &Vec<LocaleString>, diff: &mut Vec<LocaleString>) {
-        // TODO add "other" labels where one already exists as aliases
+    fn merge_locale_strings(mine: &mut Vec<LocaleString>, other: &Vec<LocaleString>, diff: &mut Vec<LocaleString>) -> Vec<LocaleString> {
+        let mut ret = vec![];
         let mut new_ones: Vec<LocaleString> = other
             .iter()
-            .filter(|x|{
-                !mine.iter().any(|y|x.language()==y.language())
+            .filter_map(|x|{
+                if mine.iter().any(|y|x.language()==y.language()) {
+                    println!("Skipping {:?}",x);
+                    ret.push(x.clone()); // Labels for which a language already exists, as aliases
+                    None
+                } else {
+                    Some(x.clone())
+                }
             })
-            .cloned()
             .collect();
         diff.append(&mut new_ones.clone());
         mine.append(&mut new_ones);
+        ret
     }
 
     pub fn merge(&mut self, other: &MetaItem) -> MergeDiff {
         let mut diff = MergeDiff::new();
-        Self::merge_locale_strings(self.item.labels_mut(),other.item.labels(), &mut diff.labels);
-        Self::merge_locale_strings(self.item.descriptions_mut(),other.item.descriptions(), &mut diff.descriptions);
+        let mut new_aliases = Self::merge_locale_strings(self.item.labels_mut(),other.item.labels(), &mut diff.labels);
+        let _ = Self::merge_locale_strings(self.item.descriptions_mut(),other.item.descriptions(), &mut diff.descriptions);
 
-        diff.aliases = other.item.aliases()
+        new_aliases.append(&mut other.item.aliases().clone());
+        diff.aliases = new_aliases
             .iter()
             .filter(|a|!self.item.aliases().contains(a))
             .cloned()
