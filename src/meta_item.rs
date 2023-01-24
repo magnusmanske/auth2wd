@@ -183,6 +183,7 @@ impl MetaItem {
         diff.aliases = new_aliases
             .iter()
             .filter(|a|!self.item.aliases().contains(a))
+            .filter(|a|!self.item.labels().contains(a))
             .cloned()
             .collect();
         self.item.aliases_mut().append(&mut other.item.aliases().to_owned());
