@@ -183,6 +183,7 @@ impl MetaItem {
                 }
             )
             .filter(|d|!self.item.labels().contains(d))
+            .filter(|d|!self.item.aliases().contains(d))
             .collect();
         diff.descriptions.append(&mut new_ones.clone());
         self.item.descriptions_mut().append(&mut new_ones);
@@ -195,6 +196,7 @@ impl MetaItem {
             .iter()
             .filter(|a|!self.item.aliases().contains(a))
             .filter(|a|!self.item.labels().contains(a))
+            .filter(|a|!self.item.descriptions().contains(a))
             .cloned()
             .collect();
         self.item.aliases_mut().append(&mut other.item.aliases().to_owned());
