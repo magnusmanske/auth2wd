@@ -157,7 +157,7 @@ pub trait ExternalImporter {
                 ),
                 Snak::new(
                     SnakDataType::ExternalId , 
-                    format!("{}",self.my_property()), 
+                    format!("P{}",self.my_property()), 
                     SnakType::Value , 
                     Some(DataValue::new(
                         DataValueType::StringType, 
