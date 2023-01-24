@@ -93,6 +93,7 @@ impl MergeDiff {
                     for snaks in refgroup["snaks"].as_object_mut().unwrap() {
                         for value in snaks.1.as_array_mut().unwrap() {
                             let _ = value.as_object_mut().unwrap().remove("datatype");
+                            let _ = value["datavalue"].as_object_mut().unwrap().remove("type");
                         }
                     }
                 }
