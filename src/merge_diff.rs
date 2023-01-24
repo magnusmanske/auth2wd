@@ -85,15 +85,17 @@ impl MergeDiff {
             .iter()
             .chain(self.altered_statements.values())
             .cloned()
-            .map(|c|{
-                let mut c = c;
-                //c.set_references(vec![]); // TESTING CLEAR REFS
-                c
-            })
             .map(|c|json!(c))
             .map(|c|{
                 let mut c = c;
                 let _ = c["mainsnak"].as_object_mut().unwrap().remove("datatype");
+                for refgroup in c["references"].as_array_mut().unwrap() {
+                    for snaks in refgroup["snaks"].as_object_mut().unwrap() {
+                        for value in snaks.1.as_array_mut().unwrap() {
+                            let _ = value.as_object_mut().unwrap().remove("datatype");
+                        }
+                    }
+                }
                 c
             })
             .collect();
