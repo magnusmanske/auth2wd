@@ -177,7 +177,7 @@ impl MetaItem {
         let mut new_ones: Vec<LocaleString> = other.item.descriptions()
             .iter()
             .filter_map(|x|
-                match self.item.labels().iter().filter(|y|x.language()==y.language()).next() {
+                match self.item.descriptions().iter().filter(|y|x.language()==y.language()).next() {
                     Some(_) => None,
                     None => Some(x.clone())
                 }
