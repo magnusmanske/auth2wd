@@ -154,10 +154,7 @@ impl MetaItem {
                 match mine.iter().filter(|y|x.language()==y.language()).next() {
                     Some(y) => {
                         if x.value()!=y.value() {
-                            println!("Adding as alias {:?}",x);
                             ret.push(x.clone()); // Labels for which a language already exists, as aliases
-                        } else {
-                            println!("Skipping {:?}",x);
                         }
                         None    
                     }
@@ -175,7 +172,21 @@ impl MetaItem {
     pub fn merge(&mut self, other: &MetaItem) -> MergeDiff {
         let mut diff = MergeDiff::new();
         let mut new_aliases = Self::merge_locale_strings(self.item.labels_mut(),other.item.labels(), &mut diff.labels);
-        let _ = Self::merge_locale_strings(self.item.descriptions_mut(),other.item.descriptions(), &mut diff.descriptions);
+
+        // Descriptions
+        let mut new_ones: Vec<LocaleString> = other.item.descriptions()
+            .iter()
+            .filter_map(|x|
+                match self.item.labels().iter().filter(|y|x.language()==y.language()).next() {
+                    Some(_) => None,
+                    None => Some(x.clone())
+                }
+            )
+            .filter(|d|!self.item.labels().contains(d))
+            .collect();
+        diff.descriptions.append(&mut new_ones.clone());
+        self.item.descriptions_mut().append(&mut new_ones);
+
 
         new_aliases.append(&mut other.item.aliases().clone());
         new_aliases.sort_by(Self::compare_locale_string);
