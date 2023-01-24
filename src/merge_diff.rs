@@ -80,6 +80,17 @@ impl MergeDiff {
         }
     }
 
+    fn clean_snak(&self, snak: &mut serde_json::Value) {
+        if let Some(o) = snak.as_object_mut() {
+            o.remove("datatype");
+            if o.contains_key("datavalue") {
+                if let Some(o) = o["datavalue"].as_object_mut() {
+                    o.remove("type");
+                }
+            }
+        }
+    }
+
     fn serialize_claims(&self) -> Option<serde_json::Value> {
         let ret: Vec<serde_json::Value> = self.added_statements
             .iter()
@@ -88,12 +99,13 @@ impl MergeDiff {
             .map(|c|json!(c))
             .map(|c|{
                 let mut c = c;
-                let _ = c["mainsnak"].as_object_mut().unwrap().remove("datatype");
+                if let Some(snak) = c.get_mut("mainsnak") {
+                    self.clean_snak(snak)
+                }
                 for refgroup in c["references"].as_array_mut().unwrap() {
-                    for snaks in refgroup["snaks"].as_object_mut().unwrap() {
-                        for value in snaks.1.as_array_mut().unwrap() {
-                            let _ = value.as_object_mut().unwrap().remove("datatype");
-                            let _ = value["datavalue"].as_object_mut().unwrap().remove("type");
+                    for prop_snaks in refgroup["snaks"].as_object_mut().unwrap() {
+                        for snak in prop_snaks.1.as_array_mut().unwrap() {
+                            self.clean_snak(snak);
                         }
                     }
                 }
