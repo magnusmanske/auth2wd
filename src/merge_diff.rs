@@ -81,9 +81,17 @@ impl MergeDiff {
     }
 
     fn serialize_claims(&self) -> Option<serde_json::Value> {
-        let mut ret: Vec<serde_json::Value> = vec![] ;
-        ret.append(&mut self.added_statements.iter().map(|c|json!(c)).collect());
-        ret.append(&mut self.altered_statements.iter().map(|c|json!(c)).collect());
+        let ret: Vec<serde_json::Value> = self.added_statements
+            .iter()
+            .chain(self.altered_statements.values())
+            .cloned()
+            .map(|c|{
+                let mut c = c;
+                c.set_references(vec![]); // TESTING CLEAR REFS
+                c
+            })
+            .map(|c|json!(c))
+            .collect();
         match ret.is_empty() {
             true => None,
             false => Some(json!(ret[0])) // tEStING FIXME [0]
