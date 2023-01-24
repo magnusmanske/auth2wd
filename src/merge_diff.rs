@@ -93,7 +93,7 @@ impl MergeDiff {
             .map(|c|json!(c))
             .map(|c|{
                 let mut c = c;
-                let _ = c.as_object_mut().unwrap().remove("datatype");
+                let _ = c["mainsnak"].as_object_mut().unwrap().remove("datatype");
                 c
             })
             .collect();
