@@ -87,10 +87,15 @@ impl MergeDiff {
             .cloned()
             .map(|c|{
                 let mut c = c;
-                c.set_references(vec![]); // TESTING CLEAR REFS
+                //c.set_references(vec![]); // TESTING CLEAR REFS
                 c
             })
             .map(|c|json!(c))
+            .map(|c|{
+                let mut c = c;
+                let _ = c.as_object_mut().unwrap().remove("datatype");
+                c
+            })
             .collect();
         match ret.is_empty() {
             true => None,
