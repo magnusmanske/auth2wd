@@ -86,7 +86,7 @@ impl MergeDiff {
         ret.append(&mut self.altered_statements.iter().map(|c|json!(c)).collect());
         match ret.is_empty() {
             true => None,
-            false => Some(json!(ret))
+            false => Some(json!(ret[0])) // tEStING FIXME [0]
         }
     }
 }
@@ -101,7 +101,7 @@ impl Serialize for MergeDiff {
         data.insert("descriptions",self.serialize_labels(&self.descriptions));
         data.insert("aliases",self.serialize_aliases());
         data.insert("sitelinks",self.serialize_sitelinks());
-        //data.insert("claims",self.serialize_claims());
+        data.insert("claims",self.serialize_claims());
         let data: HashMap<&str,serde_json::Value> = data
             .iter()
             .filter(|(_,v)|v.is_some())
