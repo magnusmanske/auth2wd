@@ -84,9 +84,10 @@ impl MergeDiff {
         if let Some(o) = snak.as_object_mut() {
             o.remove("datatype");
             if o.contains_key("datavalue") {
+                /*
                 if let Some(o) = o["datavalue"].as_object_mut() {
                     o.remove("type");
-                }
+                } */
             }
         }
     }
