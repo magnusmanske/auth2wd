@@ -181,6 +181,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let mut parser = Combinator::get_parser_for_ext_id(&ext_id)?;
             parser.dump_graph();
         }
+        Some("extend") => {
+            let item = argv.get(2).expect("Item argument required");
+            let mut base_item = meta_item::MetaItem::from_entity(&item).await.expect("Problem getting item");
+            let ext_ids: Vec<ExternalId> = base_item
+                .extract_external_ids()
+                .iter()
+                .filter(|ext_id|Combinator::get_parser_for_ext_id(ext_id).ok().is_some())
+                .cloned()
+                .collect();
+            let mut combinator = Combinator::new();
+            combinator.import(ext_ids).expect("Oh no!");
+            let other = match combinator.combine() {
+                Some(other) => other,
+                None => panic!("No items to combine")
+            };
+            let diff = base_item.merge(&other);
+            println!("{:?}",&json!(diff));
+        }
         _ => run_server().await?
     }
     Ok(())

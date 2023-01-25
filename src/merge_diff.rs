@@ -107,10 +107,19 @@ impl MergeDiff {
                 if let Some(snak) = c.get_mut("mainsnak") {
                     self.clean_snak(snak)
                 }
-                for refgroup in c["references"].as_array_mut().unwrap() {
-                    for prop_snaks in refgroup["snaks"].as_object_mut().unwrap() {
-                        for snak in prop_snaks.1.as_array_mut().unwrap() {
-                            self.clean_snak(snak);
+                match c["references"].as_array_mut() {
+                    Some(references) => {
+                        for refgroup in references {
+                            for prop_snaks in refgroup["snaks"].as_object_mut().unwrap() {
+                                for snak in prop_snaks.1.as_array_mut().unwrap() {
+                                    self.clean_snak(snak);
+                                }
+                            }
+                        }
+                    }
+                    None => {
+                        if let Some(x) = c.as_object_mut() {
+                            x.remove("references");
                         }
                     }
                 }
