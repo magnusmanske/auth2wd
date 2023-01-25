@@ -97,11 +97,11 @@ impl MergeDiff {
             .iter()
             .chain(self.altered_statements.values())
             .cloned()
-            .map(|c|{
+            /*.map(|c|{
                 let mut c = c;
                 c.set_references(vec![]); // TESTING remove references
                 c
-            })
+            }) */
             .map(|c|json!(c))
             .map(|c|{
                 let mut c = c;
