@@ -118,6 +118,14 @@ async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
     Json(json!(diff))
 }
 
+async fn supported_properties() -> Json<serde_json::Value> {
+    let ret: Vec<String> = Combinator::get_supported_properties()
+        .iter()
+        .map(|prop|format!("P{prop}"))
+        .collect();
+        Json(json!(ret))
+}
+
 async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
 
@@ -125,6 +133,7 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = Router::new()
         .route("/", get(root))
+        .route("/supported_properties", get(supported_properties))
         .route("/item/:prop/:id", get(item))
         .route("/meta_item/:prop/:id", get(meta_item))
         .route("/graph/:prop/:id", get(graph))
