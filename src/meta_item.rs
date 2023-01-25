@@ -92,6 +92,36 @@ impl MetaItem {
             .collect()
     }
 
+    fn get_external_ids_from_reference(reference: &Reference) -> Vec<ExternalId> {
+        reference
+            .snaks()
+            .iter()
+            .filter(|snak|*snak.datatype()==SnakDataType::ExternalId)
+            .map(|snak|(ExternalId::prop_numeric(snak.property()),snak.data_value()))
+            .filter(|(prop,dv)|prop.is_some()&&dv.is_some())
+            .map(|(prop,dv)|(prop.unwrap(),dv.to_owned().unwrap()))
+            .map(|(prop,dv)|(prop,dv.value().to_owned()))
+            .filter_map(|(prop,value)|match value {
+                Value::StringValue(s) => Some(ExternalId::new(prop,&s)),
+                _ => None
+            })
+            .collect()
+    }
+
+    fn reference_exists(existing_references: &Vec<Reference>, new_reference: &Reference) -> bool {
+        if existing_references.contains(new_reference) {
+            return true;
+        }
+
+        // Check if any external ID in the new reference is present in any existing reference
+        let ext_ids = Self::get_external_ids_from_reference(new_reference);
+        existing_references
+            .iter()
+            .map(|reference|Self::get_external_ids_from_reference(reference))
+            .filter(|existing_external_ids|!existing_external_ids.is_empty())
+            .any(|existing_external_ids|ext_ids.iter().any(|ext_id|existing_external_ids.contains(ext_id)))
+    }
+
     pub fn add_claim(&mut self, s: Statement) -> Option<Statement>{
         for s2 in self.item.claims_mut() {
             if s.main_snak()==s2.main_snak() && s.qualifiers()==s2.qualifiers() {
@@ -102,7 +132,8 @@ impl MetaItem {
                 let mut new_references = s.references().clone();
                 let mut reference_changed = false;
                 for r in s.references() {
-                    if !s2.references().contains(r) {
+                    let existing_references = s2.references();
+                    if !Self::reference_exists(existing_references,&r) {
                         new_references.push(r.to_owned());
                         reference_changed = true;
                     }
