@@ -83,12 +83,6 @@ impl MergeDiff {
     fn clean_snak(&self, snak: &mut serde_json::Value) {
         if let Some(o) = snak.as_object_mut() {
             o.remove("datatype");
-            if o.contains_key("datavalue") {
-                /*
-                if let Some(o) = o["datavalue"].as_object_mut() {
-                    o.remove("type");
-                } */
-            }
         }
     }
 
@@ -97,11 +91,6 @@ impl MergeDiff {
             .iter()
             .chain(self.altered_statements.values())
             .cloned()
-            /*.map(|c|{
-                let mut c = c;
-                c.set_references(vec![]); // TESTING remove references
-                c
-            }) */
             .map(|c|json!(c))
             .map(|c|{
                 let mut c = c;
@@ -129,7 +118,7 @@ impl MergeDiff {
             .collect();
         match ret.is_empty() {
             true => None,
-            false => Some(json!(vec![ret[0].to_owned()])) // tEStING FIXME [0]
+            false => Some(json!(ret))
         }
     }
 }
