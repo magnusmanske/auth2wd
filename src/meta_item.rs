@@ -108,11 +108,13 @@ impl MetaItem {
             .collect()
     }
 
+    /// Checks if a reference already exists in a list of references.
+    /// Uses direct equal, or the presence of any external ID from the new reference.
+    /// Returns `true` if the reference exists, `false` otherwise.
     fn reference_exists(existing_references: &Vec<Reference>, new_reference: &Reference) -> bool {
-        if existing_references.contains(new_reference) {
+        if existing_references.contains(new_reference) { // Easy case
             return true;
         }
-
         // Check if any external ID in the new reference is present in any existing reference
         let ext_ids = Self::get_external_ids_from_reference(new_reference);
         println!("{:?}",&ext_ids);
@@ -123,30 +125,36 @@ impl MetaItem {
             .any(|existing_external_ids|ext_ids.iter().any(|ext_id|existing_external_ids.contains(ext_id)))
     }
 
+    /// Adds a new claim to the item claims.
+    /// If a claim with the same value and qualifiers (TBD) already exists, it will try and add any new references.
+    /// Returns `Some(claim)` if the claim was added or changed, `None` otherwise.
     pub fn add_claim(&mut self, new_claim: Statement) -> Option<Statement>{
-        for existing_claim in self.item.claims_mut() {
-            if new_claim.main_snak()==existing_claim.main_snak() && new_claim.qualifiers()==existing_claim.qualifiers() {
-                if *new_claim.main_snak().datatype() == SnakDataType::ExternalId {
-                    // Don't add reference to external IDs
-                    return None
-                }
-                let mut new_references = existing_claim.references().clone();
-                let mut reference_changed = false;
-                for r in new_claim.references() {
-                    //let existing_references = existing_claim.references();
-                    if !Self::reference_exists(&new_references,&r) {
-                        new_references.push(r.to_owned());
-                        reference_changed = true;
-                    }
-                }
-                if reference_changed {
-                    existing_claim.set_references(new_references);
-                    return Some(existing_claim.to_owned());
-                } else {
-                    return None
+        let existing_claims_iter = self
+            .item
+            .claims_mut()
+            .iter_mut()
+            .filter(|existing_claim|new_claim.main_snak()==existing_claim.main_snak())
+            .filter(|existing_claim|new_claim.qualifiers()==existing_claim.qualifiers());
+        for existing_claim in existing_claims_iter {
+            if *new_claim.main_snak().datatype() == SnakDataType::ExternalId {
+                return None // Claim already exisrts, don't add reference to external IDs
+            }
+            let mut new_references = existing_claim.references().clone();
+            let mut reference_changed = false;
+            for r in new_claim.references() {
+                if !Self::reference_exists(&new_references,&r) {
+                    new_references.push(r.to_owned());
+                    reference_changed = true;
                 }
             }
+            if reference_changed {
+                existing_claim.set_references(new_references);
+                return Some(existing_claim.to_owned()); // Claim has changed (references added)
+            } else {
+                return None // Claim already exists, including references
+            }
         }
+        // Claim does not exist, adding
         self.item.add_claim(new_claim.clone());
         Some(new_claim)
     }
