@@ -256,6 +256,7 @@ pub trait ExternalImporter {
             "http://www.w3.org/2002/07/owl#sameAs",
             "http://www.w3.org/2004/02/skos/core#exactMatch",
             "https://id.kb.se/vocab/sameAs",
+            "http://schema.org/sameAs",
         ];
         for iri in iris {
             for url in self.triples_iris(iri)? {
