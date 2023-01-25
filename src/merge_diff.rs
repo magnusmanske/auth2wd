@@ -128,7 +128,7 @@ impl MergeDiff {
             .collect();
         match ret.is_empty() {
             true => None,
-            false => Some(json!(ret[0])) // tEStING FIXME [0]
+            false => Some(json!(vec![ret[0].to_owned()])) // tEStING FIXME [0]
         }
     }
 }
