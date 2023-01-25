@@ -197,7 +197,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 None => panic!("No items to combine")
             };
             let diff = base_item.merge(&other);
-            println!("{:?}",&json!(diff));
+            println!("{}",&serde_json::to_string_pretty(&diff).unwrap());
         }
         _ => run_server().await?
     }

@@ -115,6 +115,7 @@ impl MetaItem {
 
         // Check if any external ID in the new reference is present in any existing reference
         let ext_ids = Self::get_external_ids_from_reference(new_reference);
+        println!("{:?}",&ext_ids);
         existing_references
             .iter()
             .map(|reference|Self::get_external_ids_from_reference(reference))
@@ -122,33 +123,32 @@ impl MetaItem {
             .any(|existing_external_ids|ext_ids.iter().any(|ext_id|existing_external_ids.contains(ext_id)))
     }
 
-    pub fn add_claim(&mut self, s: Statement) -> Option<Statement>{
-        for s2 in self.item.claims_mut() {
-            if s.main_snak()==s2.main_snak() && s.qualifiers()==s2.qualifiers() {
-                if *s.main_snak().datatype() == SnakDataType::ExternalId {
+    pub fn add_claim(&mut self, new_claim: Statement) -> Option<Statement>{
+        for existing_claim in self.item.claims_mut() {
+            if new_claim.main_snak()==existing_claim.main_snak() && new_claim.qualifiers()==existing_claim.qualifiers() {
+                if *new_claim.main_snak().datatype() == SnakDataType::ExternalId {
                     // Don't add reference to external IDs
                     return None
                 }
-                let mut new_references = s.references().clone();
+                let mut new_references = existing_claim.references().clone();
                 let mut reference_changed = false;
-                for r in s.references() {
-                    let existing_references = s2.references();
-                    if !Self::reference_exists(existing_references,&r) {
+                for r in new_claim.references() {
+                    //let existing_references = existing_claim.references();
+                    if !Self::reference_exists(&new_references,&r) {
                         new_references.push(r.to_owned());
                         reference_changed = true;
                     }
                 }
                 if reference_changed {
-                    s2.set_references(new_references);
-                    // TODO merge references
-                    return Some(s2.to_owned());
+                    existing_claim.set_references(new_references);
+                    return Some(existing_claim.to_owned());
                 } else {
                     return None
                 }
             }
         }
-        self.item.add_claim(s.clone());
-        Some(s)
+        self.item.add_claim(new_claim.clone());
+        Some(new_claim)
     }
 
     pub fn add_prop_text(&mut self, ext_id: ExternalId) -> Option<wikibase::Statement> {
