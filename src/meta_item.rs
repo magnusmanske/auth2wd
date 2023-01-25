@@ -125,6 +125,25 @@ impl MetaItem {
             .any(|existing_external_ids|ext_ids.iter().any(|ext_id|existing_external_ids.contains(ext_id)))
     }
 
+    fn is_snak_identical(snak1: &Snak, snak2: &Snak) -> bool {
+        snak1.property()==snak2.property() &&
+        snak1.data_value()==snak2.data_value()
+    }
+
+    fn are_qualifiers_identical(q1: &Vec<Snak>, q2: &Vec<Snak>) -> bool {
+        if q1.is_empty() && q2.is_empty() {
+            return true;
+        }
+        if q1.len()!=q2.len() {
+            return false;
+        }
+        let mut q1 = q1.clone();
+        let mut q2= q2.clone();
+        q1.sort_by(Self::compare_snak);
+        q2.sort_by(Self::compare_snak);
+        !q1.iter().zip(q2.iter()).any(|(snak1,snak2)|!Self::is_snak_identical(&snak1, &snak2))
+    }
+
     /// Adds a new claim to the item claims.
     /// If a claim with the same value and qualifiers (TBD) already exists, it will try and add any new references.
     /// Returns `Some(claim)` if the claim was added or changed, `None` otherwise.
@@ -133,11 +152,11 @@ impl MetaItem {
             .item
             .claims_mut()
             .iter_mut()
-            .filter(|existing_claim|new_claim.main_snak()==existing_claim.main_snak())
-            .filter(|existing_claim|new_claim.qualifiers()==existing_claim.qualifiers());
+            .filter(|existing_claim|Self::is_snak_identical(&new_claim.main_snak(),&existing_claim.main_snak()))
+            .filter(|existing_claim|Self::are_qualifiers_identical(&new_claim.qualifiers(),&existing_claim.qualifiers()));
         for existing_claim in existing_claims_iter {
             if *new_claim.main_snak().datatype() == SnakDataType::ExternalId {
-                return None // Claim already exisrts, don't add reference to external IDs
+                return None // Claim already exists, don't add reference to external IDs
             }
             let mut new_references = existing_claim.references().clone();
             let mut reference_changed = false;
@@ -181,6 +200,19 @@ impl MetaItem {
     fn compare_locale_string(a: &LocaleString, b: &LocaleString) -> Ordering {
         match a.language().cmp(b.language()) {
             Ordering::Equal => a.value().cmp(b.value()),
+            other => other,
+        }
+    }
+
+    fn compare_snak(snak1: &Snak, snak2: &Snak) -> Ordering {
+        match snak1.property().cmp(snak2.property()) {
+            Ordering::Equal => {
+                let j1 = json!(snak1.data_value());
+                let j2 = json!(snak2.data_value());
+                let j1 = j1.to_string();
+                let j2 = j2.to_string();
+                j1.cmp(&j2)
+            },
             other => other,
         }
     }
