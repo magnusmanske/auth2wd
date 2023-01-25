@@ -117,7 +117,6 @@ impl MetaItem {
         }
         // Check if any external ID in the new reference is present in any existing reference
         let ext_ids = Self::get_external_ids_from_reference(new_reference);
-        println!("{:?}",&ext_ids);
         existing_references
             .iter()
             .map(|reference|Self::get_external_ids_from_reference(reference))
