@@ -88,14 +88,47 @@ mod tests {
     #[test]
     fn test_to_string() {
         let ext_id = ExternalId::new(123,"ABC456DEF");
-        assert_eq!(ext_id.property,123);
-        assert_eq!(ext_id.id,"ABC456DEF");
+        assert_eq!(ext_id.to_string(),"P123:ABC456DEF".to_string());
     }
 
     #[test]
     fn test_prop_numeric() {
         assert_eq!(ExternalId::prop_numeric("  P123  "),Some(123));
         assert_eq!(ExternalId::prop_numeric("  FOO  "),None);
+    }
+
+    #[test]
+    fn test_from_external_id_claim() {
+        // Test OK
+        let statement = Statement::new("statement", StatementRank::Normal, Snak::new(SnakDataType::ExternalId, "P214", SnakType::Value, Some(DataValue::new(DataValueType::StringType, Value::StringValue("ABCDEF".to_string())))), vec![], vec![]);
+        assert_eq!(ExternalId::from_string("P214:ABCDEF"),ExternalId::from_external_id_claim(&statement));
+
+        // Test wrong value type
+        let statement = Statement::new("statement", StatementRank::Normal, Snak::new(SnakDataType::ExternalId, "P214", SnakType::Value, Some(DataValue::new(DataValueType::StringType, Value::Entity(EntityValue::new(EntityType::Item, "Q123"))))), vec![], vec![]);
+        assert_eq!(None,ExternalId::from_external_id_claim(&statement));
+
+        // Test wrong snak type
+        let statement = Statement::new("statement", StatementRank::Normal, Snak::new(SnakDataType::CommonsMedia, "P214", SnakType::Value, Some(DataValue::new(DataValueType::StringType, Value::StringValue("ABCDEF".to_string())))), vec![], vec![]);
+        assert_eq!(None,ExternalId::from_external_id_claim(&statement));
+    }
+
+    #[test]
+    fn test_get_item_for_external_id() {
+        // Test OK
+        let ext_id = ExternalId::new(214,"30701597");
+        assert_eq!(ext_id.get_item_for_external_id_value(),Some("Q13520818".to_string()));
+
+        // Test OK
+        assert_eq!(ext_id.get_item_for_string_external_id_value("Magnus"),Some("Q13520818".to_string()));
+
+        // Test wrong string
+        assert_eq!(ext_id.get_item_for_string_external_id_value("ocshs87gvdsu6gsdi7vchkuchs"),None);
+
+        // Test wrong ID
+        let ext_id = ExternalId::new(214,"3070159777777");
+        assert_eq!(ext_id.get_item_for_external_id_value(),None);
+
+        // TODOO multiple items
     }
 
 }

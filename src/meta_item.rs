@@ -14,7 +14,7 @@ lazy_static! {
         vec.push((Regex::new(r"^(\d{3,})$").unwrap(),"+${1}-01-01T00:00:00Z".to_string(),9));
         vec.push((Regex::new(r"^(\d{3,})-(\d{2})$").unwrap(),"+${1}-${2}-01T00:00:00Z".to_string(),10));
         vec.push((Regex::new(r"^(\d{3,})-(\d{2})-(\d{2})$").unwrap(),"+${1}-${2}-${3}T00:00:00Z".to_string(),11));
-        vec.push((Regex::new(r"^https?://data.bnf.fr/date/(\d+)/$").unwrap(),"+${1}-01-01T00:00:00Z".to_string(),9));
+        vec.push((Regex::new(r"^https?://data.bnf.fr/date/(\d+)/?$").unwrap(),"+${1}-01-01T00:00:00Z".to_string(),9));
         vec
     };
 }
@@ -49,11 +49,9 @@ impl MetaItem {
     }
 
     pub async fn from_entity(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        //let config = Configuration::new("AC2WD/0.1").await?;
         let api = mediawiki::api::Api::new("https://www.wikidata.org/w/api.php").await?;
         let entity_container = wikibase::entity_container::EntityContainer::new();
         let entity = entity_container.load_entity(&api,id).await?;
-        //let entity = wikibase::Entity::new_from_id(id,&config).await?;
         let item = match entity {
             Entity::Item(item) => item,
             _ => return Err(format!("Not an item: '{id}'").into())
@@ -301,6 +299,29 @@ impl MetaItem {
         self.prop_text.sort();
         self.prop_text.dedup();
         diff
+    }
+
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_date() {
+        let mi = MetaItem::new();
+        assert_eq!(mi.parse_date("1987"),Some(("+1987-01-01T00:00:00Z".to_string(),9)));
+        assert_eq!(mi.parse_date("1987-12"),Some(("+1987-12-01T00:00:00Z".to_string(),10)));
+        assert_eq!(mi.parse_date("1987-12-27"),Some(("+1987-12-27T00:00:00Z".to_string(),11)));
+        assert_eq!(mi.parse_date("http://data.bnf.fr/date/1978"),Some(("+1978-01-01T00:00:00Z".to_string(),9)));
+    }
+
+    #[test]
+    fn test_add_prop_text() {
+        let mut mi = MetaItem::new();
+        let ext_id = ExternalId::new(214,"12345");
+        mi.add_prop_text(ext_id.clone());
+        assert_eq!(mi.prop_text,vec![ext_id]);
     }
 
 }
