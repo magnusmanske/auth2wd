@@ -216,4 +216,7 @@ cargo run -- combinator P950 XX990809
 TODO:
 P244
 P213
+P349
+P1015
+
 */

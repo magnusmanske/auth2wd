@@ -26,6 +26,8 @@ lazy_static! {
         vec.push((Regex::new(r"^https?://data.bnf.fr/(\d{8,9}).*$").unwrap(),"${1}".to_string(),268));
         vec.push((Regex::new(r"^https?://data.bnf.fr/ark:/12148/cb(\d{8,9}[0-9bcdfghjkmnpqrstvwxz]).*$").unwrap(),"${1}".to_string(),268));
         vec.push((Regex::new(r"^https?://www.idref.fr/(\d{8}[\dX]).*$").unwrap(),"${1}".to_string(),269));
+        vec.push((Regex::new(r"^https?://id.ndl.go.jp/auth/entity/([a1s]*\d+{7,9})$").unwrap(),"${1}".to_string(),349));
+        vec.push((Regex::new(r"^https?://id.ndl.go.jp/auth/ndlna/([a1s]*\d+{7,9})$").unwrap(),"${1}".to_string(),349));
         vec.push((Regex::new(r"^https?://libris.kb.se/resource/auth/([1-9]\d{4,5})$").unwrap(),"${1}".to_string(),906));
         vec.push((Regex::new(r"^https?://datos.bne.es/resource/(.+?)$").unwrap(),"${1}".to_string(),950));
         vec.push((Regex::new(r"^https?://data.bibsys.no/data/notrbib/authorityentry/x([1-9]\d*)$").unwrap(),"${1}".to_string(),1015));
