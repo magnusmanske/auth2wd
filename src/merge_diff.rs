@@ -131,7 +131,7 @@ impl Serialize for MergeDiff {
         let mut data: HashMap<&str,Option<serde_json::Value>> = HashMap::new();
         data.insert("label",self.serialize_labels(&self.labels));
         data.insert("descriptions",self.serialize_labels(&self.descriptions));
-        data.insert("aliases",self.serialize_aliases());
+        //data.insert("aliases",self.serialize_aliases()); // DEACTIVATED too much noise
         data.insert("sitelinks",self.serialize_sitelinks());
         data.insert("claims",self.serialize_claims());
         let data: HashMap<&str,serde_json::Value> = data
