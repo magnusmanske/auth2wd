@@ -70,26 +70,6 @@ impl MetaItem {
         }).next()
     }
 
-    pub fn extract_external_ids(&self) -> Vec<ExternalId> {
-        self
-            .item
-            .claims()
-            .iter()
-            .filter(|s|*s.main_snak().datatype() == SnakDataType::ExternalId)
-            .filter(|s|s.main_snak().data_value().is_some())
-            .map(|s|(s.property().to_string(),s.main_snak().data_value().to_owned().unwrap()))
-            .filter_map(|(prop,dv)|{
-                match dv.value() {
-                    Value::StringValue(s) => {
-                        let prop_numeric = ExternalId::prop_numeric(&prop).unwrap();
-                        Some(ExternalId::new(prop_numeric,s))
-                    }
-                    _ => None
-                }
-            })
-            .collect()
-    }
-
     fn get_external_ids_from_reference(reference: &Reference) -> Vec<ExternalId> {
         reference
             .snaks()
@@ -322,6 +302,18 @@ mod tests {
         let ext_id = ExternalId::new(214,"12345");
         mi.add_prop_text(ext_id.clone());
         assert_eq!(mi.prop_text,vec![ext_id]);
+    }
+
+    #[test]
+    fn test_cleanup() {
+        let mut mi = MetaItem::new();
+        let ext_id1 = ExternalId::new(214,"12345");
+        let ext_id2 = ExternalId::new(123,"456");
+        mi.add_prop_text(ext_id1.clone());
+        mi.add_prop_text(ext_id2.clone());
+        mi.add_prop_text(ext_id1.clone());
+        mi.cleanup();
+        assert_eq!(mi.prop_text,vec![ext_id2,ext_id1]);
     }
 
 }

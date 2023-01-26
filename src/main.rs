@@ -98,7 +98,7 @@ async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
         Err(e) => return Json(json!({"status":e.to_string()}))
     };
     let ext_ids: Vec<ExternalId> = base_item
-        .extract_external_ids()
+        .get_external_ids()
         .iter()
         .filter(|ext_id|Combinator::get_parser_for_ext_id(ext_id).ok().is_some())
         .cloned()
@@ -191,7 +191,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let item = argv.get(2).expect("Item argument required");
             let mut base_item = meta_item::MetaItem::from_entity(&item).await.expect("Problem getting item");
             let ext_ids: Vec<ExternalId> = base_item
-                .extract_external_ids()
+                .get_external_ids()
                 .iter()
                 .filter(|ext_id|Combinator::get_parser_for_ext_id(ext_id).ok().is_some())
                 .cloned()
