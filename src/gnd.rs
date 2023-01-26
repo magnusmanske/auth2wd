@@ -7,7 +7,7 @@ use crate::meta_item::*;
 
 
 lazy_static! {
-    static ref RE_COUNTRY: Regex = Regex::new(r"^https{0,1}://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-(.+)$").expect("Regexp error");
+    static ref RE_COUNTRY: Regex = Regex::new(r"^https?://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-(.+)$").expect("Regexp error");
 }
 
 pub struct GND {
