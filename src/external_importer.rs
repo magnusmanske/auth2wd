@@ -35,7 +35,7 @@ lazy_static! {
     static ref DO_NOT_USE_EXTERNAL_URL_REGEXPS : Vec<Regex> = {
         let mut vec : Vec<Regex> = vec![] ;
         // NOTE: The pattern always needs to cover the whole string, so use ^$
-        vec.push(Regex::new(r"^https{0,1}://www.wikidata.org/*$").unwrap());
+        vec.push(Regex::new(r"^https{0,1}://www.wikidata.org/.*$").unwrap());
         vec
     };
 }
@@ -483,4 +483,18 @@ pub trait ExternalImporter {
         Ok(())
     }
 
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_do_not_use_external_url() {
+        let t = crate::viaf::VIAF::new("312603351").unwrap(); // Any ID will do
+        assert!(t.do_not_use_external_url("https://www.wikidata.org/entity/Q2071541"));
+        assert!(t.do_not_use_external_url("https://www.wikidata.org/item/Q2071541"));
+        assert!(t.do_not_use_external_url("http://www.wikidata.org/entity/Q2071541"));
+        assert!(!t.do_not_use_external_url("https://www.wikidatarrr.org/entity/Q2071541"));
+    }
 }
