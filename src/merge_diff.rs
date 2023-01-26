@@ -49,7 +49,7 @@ impl MergeDiff {
         }
     }
 
-    fn serialize_aliases(&self) -> Option<serde_json::Value> {
+    fn _serialize_aliases(&self) -> Option<serde_json::Value> {
         match self.aliases.is_empty() {
             true => None,
             false => {

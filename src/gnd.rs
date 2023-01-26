@@ -1,9 +1,14 @@
+use regex::Regex;
 use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
 use crate::external_importer::*;
 use crate::external_id::*;
 use crate::meta_item::*;
 
+
+lazy_static! {
+    static ref RE_COUNTRY: Regex = Regex::new(r"^https{0,1}://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-(.+)$").expect("Regexp error");
+}
 
 pub struct GND {
     id: String,
@@ -52,12 +57,29 @@ impl ExternalImporter for GND {
         let mut ret = MetaItem::new();
         self.add_the_usual(&mut ret)?;
 
-        /*
-        // Nationality
-        for text in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
-            ret.add_prop_text((27,text))
+        // P31
+        let p31s = [
+            ("https://d-nb.info/standards/elementset/gnd#DifferentiatedPerson","Q5"),
+        ];
+        for url in self.triples_subject_iris(&self.get_id_url(), "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")? {
+            let item = p31s.iter().filter(|(url2,_)|url==url2.to_string()).map(|(_,q)|q.to_string()).next();
+            let _ = match item {
+                Some(item) => ret.add_claim(self.new_statement_item(31,&item)),
+                None => ret.add_prop_text(ExternalId::new(31,&url)),
+            };
         }
- */
+
+        // Nationality
+        for url in self.triples_subject_iris(&self.get_id_url(), "https://d-nb.info/standards/elementset/gnd#geographicAreaCode")? {
+            let country_code = RE_COUNTRY.replace(&url,"${1}");
+            if country_code!=url {
+                let ext_id = ExternalId::new(297, &country_code);
+                let _ = match ext_id.get_item_for_external_id_value() {
+                    Some(item) => ret.add_claim(self.new_statement_item(27,&item)),
+                    None => ret.add_prop_text(ext_id),
+                };
+            }
+        }
 
         // Born/died
         let birth_death = [
@@ -77,8 +99,10 @@ impl ExternalImporter for GND {
         let key_prop = [
             ("https://d-nb.info/standards/elementset/gnd#placeOfBirth",19),
             ("https://d-nb.info/standards/elementset/gnd#placeOfDeath",20),
-            ("https://d-nb.info/standards/elementset/gnd#professionOrOccupation",106),
             ("https://d-nb.info/standards/elementset/agrelon#hasChild",40),
+            ("https://d-nb.info/standards/elementset/gnd#fieldOfStudy",101),
+            ("https://d-nb.info/standards/elementset/gnd#professionOrOccupation",106),
+            ("https://d-nb.info/standards/elementset/gnd#placeOfActivity",937),
             // TODO parent
         ];
         for kp in key_prop {
