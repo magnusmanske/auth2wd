@@ -4,6 +4,47 @@ use crate::external_importer::*;
 use crate::external_id::*;
 
 
+lazy_static! {
+    pub static ref SUPPORTED_PROPERTIES : Vec<SupportedProperty> = vec![
+        SupportedProperty::new( 214,"VIAF","Virtual International Authority File","27063124",Box::new(|id:&str| {Ok(Box::new(crate::viaf::VIAF::new(&id)?))})),
+        SupportedProperty::new( 227,"GND","Deutsche Nationalbibliothek","118523813",Box::new(|id:&str| {Ok(Box::new(crate::gnd::GND::new(&id)?))})),
+        SupportedProperty::new( 268,"BnF","Bibliothèque nationale de France","11898689q",Box::new(|id:&str| {Ok(Box::new(crate::bnf::BNF::new(&id)?))})),
+        SupportedProperty::new( 269,"IdRef","IdRef/SUDOC","026812304",Box::new(|id:&str| {Ok(Box::new(crate::id_ref::IdRef::new(&id)?))})),
+        SupportedProperty::new( 906,"SELIBR","National Library of Sweden","231727",Box::new(|id:&str| {Ok(Box::new(crate::selibr::SELIBR::new(&id)?))})),
+        SupportedProperty::new( 950,"BNE","Biblioteca Nacional de España","XX990809",Box::new(|id:&str| {Ok(Box::new(crate::bne::BNE::new(&id)?))})),
+        SupportedProperty::new(1006,"NB","Nationale Thesaurus voor Auteurs ID","068364229",Box::new(|id:&str| {Ok(Box::new(crate::nb::NB::new(&id)?))})),
+    ];
+}
+
+type EnternalImporterGenerator = dyn Fn(&str) ->  Result<Box<dyn ExternalImporter>,Box<dyn std::error::Error>>;
+
+pub struct SupportedProperty {
+    pub property: usize,
+    pub name: String,
+    pub source: String,
+    pub demo_id: String,
+    pub generator: Box<EnternalImporterGenerator>,
+}
+
+unsafe impl Send for SupportedProperty {}
+unsafe impl Sync for SupportedProperty {}
+
+impl SupportedProperty {
+    fn new(property:usize, name: &str, source: &str, demo_id: &str, generator: Box<EnternalImporterGenerator>) -> Self {
+        Self{property,name:name.into(),source:source.into(),demo_id:demo_id.into(),generator}
+    }
+
+    pub fn as_li(&self) -> String {
+        format!(r#"<li><a href="/item/P{}/{}">{}</a> ("Charles Darwin" from {})</li>"#,
+            self.property,
+            &self.demo_id,
+            &self.name,
+            &self.source,
+        )
+    }
+}
+
+
 #[derive(Debug, Clone)]
 pub struct Combinator {
     pub items: HashMap<String,MetaItem>,
@@ -25,20 +66,14 @@ impl Combinator {
         Self::get_parser_for_ext_id(&ext_id)
     }
 
-    pub fn get_supported_properties() -> &'static [usize] {
-        &[214,227,268,269,906,950,1006]
+    pub fn get_supported_properties() -> Vec<usize> {
+        SUPPORTED_PROPERTIES.iter().map(|sp|sp.property).collect()
     }
 
     pub fn get_parser_for_ext_id(id: &ExternalId) -> Result<Box<dyn ExternalImporter>,Box<dyn std::error::Error>> {
-        match id.property {
-             214 => Ok(Box::new(crate::viaf::VIAF::new(&id.id)?)),
-             227 => Ok(Box::new(crate::gnd::GND::new(&id.id)?)),
-             268 => Ok(Box::new(crate::bnf::BNF::new(&id.id)?)),
-             269 => Ok(Box::new(crate::id_ref::IdRef::new(&id.id)?)),
-             906 => Ok(Box::new(crate::selibr::SELIBR::new(&id.id)?)),
-             950 => Ok(Box::new(crate::bne::BNE::new(&id.id)?)),
-            1006 => Ok(Box::new(crate::nb::NB::new(&id.id)?)),
-            _ => Err(format!("unsupported property: '{}'",id.property).into())
+        match SUPPORTED_PROPERTIES.iter().filter(|sp|sp.property==id.property).next() {
+            Some(sp) => (sp.generator)(&id.id),
+            None => Err(format!("unsupported property: '{}'",id.property).into())
         }
     }
 

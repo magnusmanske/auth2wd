@@ -42,8 +42,6 @@ pub trait ExternalImporter {
     fn my_stated_in(&self) -> &str;
     fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>>;
 
-
-
     fn get_id_url(&self) -> String {
         self.get_key_url("id")
     }
