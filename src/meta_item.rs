@@ -316,4 +316,15 @@ mod tests {
         assert_eq!(mi.prop_text,vec![ext_id2,ext_id1]);
     }
 
+    #[test]
+    fn test_compare_locale_string() {
+        let ls1 = LocaleString::new("en", "foo");
+        let ls2 = LocaleString::new("en", "bar");
+        let ls3 = LocaleString::new("de", "foo");
+        assert_eq!(Ordering::Equal,MetaItem::compare_locale_string(&ls1,&ls1));
+        assert_eq!(Ordering::Less,MetaItem::compare_locale_string(&ls2,&ls1));
+        assert_eq!(Ordering::Greater,MetaItem::compare_locale_string(&ls1,&ls2));
+        assert_eq!(Ordering::Greater,MetaItem::compare_locale_string(&ls1,&ls3));
+    }
+
 }
