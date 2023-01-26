@@ -31,6 +31,13 @@ lazy_static! {
         vec.push((Regex::new(r"^https{0,1}://sws.geonames.org/([1-9][0-9]{0,8}).*$").unwrap(),"${1}".to_string(),1566));
         vec
     };
+
+    static ref DO_NOT_USE_EXTERNAL_URL_REGEXPS : Vec<Regex> = {
+        let mut vec : Vec<Regex> = vec![] ;
+        // NOTE: The pattern always needs to cover the whole string, so use ^$
+        vec.push(Regex::new(r"^https{0,1}://www.wikidata.org/*$").unwrap());
+        vec
+    };
 }
 
 pub trait ExternalImporter {
@@ -61,21 +68,27 @@ pub trait ExternalImporter {
         println!("{}", self.get_graph_text());
     }
 
+    fn do_not_use_external_url(&self, url: &str) -> bool {
+        DO_NOT_USE_EXTERNAL_URL_REGEXPS
+            .iter()
+            .any(|re|re.is_match(url))
+    }
+
     fn url2external_id(&self, url: &str) -> Option<ExternalId> {
         EXTERNAL_ID_REGEXPS
-        .iter()
-        .filter_map(|e|{
-            let replaced = e.0.replace_all(&url,&e.1);
-            if url==replaced {
-                None
-            } else {
-                Some(ExternalId{
-                    property: e.2,
-                    id: replaced.to_string()
-                })
-            }
-        })
-        .next()
+            .iter()
+            .filter_map(|e|{
+                let replaced = e.0.replace_all(&url,&e.1);
+                if url==replaced {
+                    None
+                } else {
+                    Some(ExternalId{
+                        property: e.2,
+                        id: replaced.to_string()
+                    })
+                }
+            })
+            .next()
     }
 
     fn triples_subject_iris(&self, id_url: &str, p: &str) ->  Result<Vec<String>, Box<dyn std::error::Error>> {
@@ -260,6 +273,9 @@ pub trait ExternalImporter {
         ];
         for iri in iris {
             for url in self.triples_iris(iri)? {
+                if self.do_not_use_external_url(&url) {
+                    continue;
+                }
                 let _ = match self.url2external_id(&url) {
                     Some(extid) => ret.add_claim(self.new_statement_string(extid.property, &extid.id)),
                     None => ret.add_claim(self.new_statement_url(973, &url))
