@@ -57,18 +57,6 @@ impl ExternalImporter for GND {
         let mut ret = MetaItem::new();
         self.add_the_usual(&mut ret)?;
 
-        // P31
-        let p31s = [
-            ("https://d-nb.info/standards/elementset/gnd#DifferentiatedPerson","Q5"),
-        ];
-        for url in self.triples_subject_iris(&self.get_id_url(), "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")? {
-            let item = p31s.iter().filter(|(url2,_)|url==url2.to_string()).map(|(_,q)|q.to_string()).next();
-            let _ = match item {
-                Some(item) => ret.add_claim(self.new_statement_item(31,&item)),
-                None => ret.add_prop_text(ExternalId::new(31,&url)),
-            };
-        }
-
         // Nationality
         for url in self.triples_subject_iris(&self.get_id_url(), "https://d-nb.info/standards/elementset/gnd#geographicAreaCode")? {
             let country_code = RE_COUNTRY.replace(&url,"${1}");

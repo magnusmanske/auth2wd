@@ -442,6 +442,7 @@ pub trait ExternalImporter {
                 "http://schema.org/Person" => ret.add_claim(self.new_statement_item(31,"Q5")),
                 "http://xmlns.com/foaf/0.1/Person" => ret.add_claim(self.new_statement_item(31,"Q5")),
                 "https://id.kb.se/vocab/Person" => ret.add_claim(self.new_statement_item(31,"Q5")),
+                "https://d-nb.info/standards/elementset/gnd#DifferentiatedPerson" => ret.add_claim(self.new_statement_item(31,"Q5")),
                 s => ret.add_prop_text(ExternalId::new(31,s))
             };
         }
