@@ -17,9 +17,9 @@ lazy_static! {
         let mut vec : Vec<(Regex,String,usize)> = vec![] ;
         // NOTE: The pattern always needs to cover the whole string, so use ^$
         vec.push((Regex::new(r"^https?://viaf.org/viaf/(\d+)$").unwrap(),"${1}".to_string(),214));
-        vec.push((Regex::new(r"^https?://isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{4})$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
-        vec.push((Regex::new(r"^https?://www.isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{4})$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
-        vec.push((Regex::new(r"^https?://isni-url.oclc.nl/isni/(\d{4})(\d{4})(\d{4})(\d{4})$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
+        vec.push((Regex::new(r"^https?://isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
+        vec.push((Regex::new(r"^https?://www.isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
+        vec.push((Regex::new(r"^https?://isni-url.oclc.nl/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
         vec.push((Regex::new(r"^https?://d-nb.info/gnd/(1[012]?\d{7}[0-9X]|[47]\d{6}-\d|[1-9]\d{0,7}-[0-9X]|3\d{7}[0-9X])$").unwrap(),"${1}".to_string(),227));
         vec.push((Regex::new(r"^https?://id.loc.gov/authorities/names/(gf|n|nb|nr|no|ns|sh|sj)([4-9][0-9]|00|20[0-2][0-9])([0-9]{6})$").unwrap(),"${1}${2}${3}".to_string(),244));
         vec.push((Regex::new(r"^https?://id.loc.gov/rwo/agents/(gf|n|nb|nr|no|ns|sh|sj)([4-9][0-9]|00|20[0-2][0-9])([0-9]{6})(\.html)?$").unwrap(),"${1}${2}${3}".to_string(),244));
