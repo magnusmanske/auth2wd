@@ -40,6 +40,7 @@ lazy_static! {
         let mut vec : Vec<Regex> = vec![] ;
         // NOTE: The pattern always needs to cover the whole string, so use ^$
         vec.push(Regex::new(r"^https?://www.wikidata.org/.*$").unwrap());
+        vec.push(Regex::new(r"^https?://viaf.org/viaf/sourceID/.*#skos:Concept$").unwrap());
         vec
     };
 }
