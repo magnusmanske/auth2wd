@@ -274,6 +274,7 @@ pub trait ExternalImporter {
             "http://www.w3.org/2004/02/skos/core#exactMatch",
             "https://id.kb.se/vocab/sameAs",
             "http://schema.org/sameAs",
+            "http://www.loc.gov/mads/rdf/v1#identifiesRWO",
         ];
         for iri in iris {
             for url in self.triples_iris(iri)? {
@@ -415,6 +416,7 @@ pub trait ExternalImporter {
             "http://rdvocab.info/ElementsGr2/biographicalInformation",
             "http://www.w3.org/2004/02/skos/core#altLabel",
             "https://id.kb.se/vocab/description",
+            "http://www.loc.gov/mads/rdf/v1#authoritativeLabel",
         ];
         for iri in iris {
             for s in self.triples_literals(iri)? {

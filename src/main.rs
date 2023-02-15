@@ -13,6 +13,7 @@ pub mod viaf;
 pub mod bne ;
 pub mod bnf ;
 pub mod gnd ;
+pub mod loc ;
 pub mod nb ;
 
 use axum::{

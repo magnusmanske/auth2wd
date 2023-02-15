@@ -8,6 +8,7 @@ lazy_static! {
     pub static ref SUPPORTED_PROPERTIES : Vec<SupportedProperty> = vec![
         SupportedProperty::new( 214,"VIAF","Virtual International Authority File","27063124",Box::new(|id:&str| {Ok(Box::new(crate::viaf::VIAF::new(&id)?))})),
         SupportedProperty::new( 227,"GND","Deutsche Nationalbibliothek","118523813",Box::new(|id:&str| {Ok(Box::new(crate::gnd::GND::new(&id)?))})),
+        SupportedProperty::new( 244,"LoC","Library of Congress","n78095637",Box::new(|id:&str| {Ok(Box::new(crate::loc::LOC::new(&id)?))})),
         SupportedProperty::new( 268,"BnF","Bibliothèque nationale de France","11898689q",Box::new(|id:&str| {Ok(Box::new(crate::bnf::BNF::new(&id)?))})),
         SupportedProperty::new( 269,"IdRef","IdRef/SUDOC","026812304",Box::new(|id:&str| {Ok(Box::new(crate::id_ref::IdRef::new(&id)?))})),
         SupportedProperty::new( 906,"SELIBR","National Library of Sweden","231727",Box::new(|id:&str| {Ok(Box::new(crate::selibr::SELIBR::new(&id)?))})),
