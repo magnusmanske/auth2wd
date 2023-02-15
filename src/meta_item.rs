@@ -12,12 +12,14 @@ lazy_static! {
     static ref DATES : Vec<(Regex,String,u64)> = {
         let mut vec : Vec<(Regex,String,u64)> = vec![] ;
         // NOTE: The pattern always needs to cover the whole string, so use ^$
-        vec.push((Regex::new(r"^(\d{3,})$").unwrap(),"+${1}-01-01T00:00:00Z".to_string(),9));
-        vec.push((Regex::new(r"^(\d{3,})-(\d{2})$").unwrap(),"+${1}-${2}-01T00:00:00Z".to_string(),10));
+        vec.push((Regex::new(r"^(\d{3,})$").unwrap(),"+${1}-00-00T00:00:00Z".to_string(),9));
+        vec.push((Regex::new(r"^(\d{3,})-(\d{2})$").unwrap(),"+${1}-${2}-00T00:00:00Z".to_string(),10));
         vec.push((Regex::new(r"^(\d{3,})-(\d{2})-(\d{2})$").unwrap(),"+${1}-${2}-${3}T00:00:00Z".to_string(),11));
-        vec.push((Regex::new(r"^https?://data.bnf.fr/date/(\d+)/?$").unwrap(),"+${1}-01-01T00:00:00Z".to_string(),9));
+        vec.push((Regex::new(r"^https?://data.bnf.fr/date/(\d+)/?$").unwrap(),"+${1}-00-00T00:00:00Z".to_string(),9));
         vec
     };
+    static ref YEAR_FIX: Regex = Regex::new(r"-\d\d-\d\dT").unwrap();
+    static ref MONTH_FIX: Regex = Regex::new(r"-\d\dT").unwrap();
 }
 
 
@@ -105,7 +107,40 @@ impl MetaItem {
 
     fn is_snak_identical(snak1: &Snak, snak2: &Snak) -> bool {
         snak1.property()==snak2.property() &&
-        snak1.data_value()==snak2.data_value()
+        Self::is_data_value_identical(snak1.data_value(),snak2.data_value())
+    }
+
+    fn is_data_value_identical(dv1:&Option<DataValue>,dv2:&Option<DataValue>) -> bool {
+        if let (Some(dv1),Some(dv2)) = (dv1,dv2) {
+            if let (Value::Time(t1), Value::Time(t2)) = (dv1.value(),dv2.value()) {
+                return Self::is_time_value_identical(t1,t2);
+            }
+        }
+        dv1==dv2
+    }
+
+    fn is_time_value_identical(t1: &TimeValue, t2: &TimeValue) -> bool {
+        if t1.precision()!=t2.precision() ||
+            t1.calendarmodel()!=t1.calendarmodel() ||
+            t1.before()!=t1.before() ||
+            t1.after()!=t1.after() ||
+            t1.timezone()!=t1.timezone()
+            {
+                return false
+        }
+        match t1.precision() {
+            9 => {
+                let t1s = YEAR_FIX.replace_all(t1.time(),"-00-00T");
+                let t2s = YEAR_FIX.replace_all(t2.time(),"-00-00T");
+                t1s==t2s
+            }
+            10 => {
+                let t1s = MONTH_FIX.replace_all(t1.time(),"-00T");
+                let t2s = MONTH_FIX.replace_all(t2.time(),"-00T");
+                t1s==t2s
+            }
+            _ => *t1==*t2
+        }
     }
 
     fn are_qualifiers_identical(q1: &Vec<Snak>, q2: &Vec<Snak>) -> bool {
@@ -290,6 +325,21 @@ impl MetaItem {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_time_compare() {
+        // Year, ignore month and day
+        let t1 = TimeValue::new(0, 0, "http://www.wikidata.org/entity/Q1985727", 9, "+1650-00-00T00:00:00Z", 0);
+        let t2 = TimeValue::new(0, 0, "http://www.wikidata.org/entity/Q1985727", 9, "+1650-12-29T00:00:00Z", 0);
+        assert!(MetaItem::is_time_value_identical(&t1,&t1));
+        assert!(MetaItem::is_time_value_identical(&t1,&t2));
+
+        // Month, ignore day
+        let t1 = TimeValue::new(0, 0, "http://www.wikidata.org/entity/Q1985727", 10, "+1650-12-00T00:00:00Z", 0);
+        let t2 = TimeValue::new(0, 0, "http://www.wikidata.org/entity/Q1985727", 10, "+1650-12-29T00:00:00Z", 0);
+        assert!(MetaItem::is_time_value_identical(&t1,&t1));
+        assert!(MetaItem::is_time_value_identical(&t1,&t2));
+    }
 
     #[test]
     fn test_parse_date() {
