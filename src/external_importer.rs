@@ -17,14 +17,20 @@ lazy_static! {
         let mut vec : Vec<(Regex,String,usize)> = vec![] ;
         // NOTE: The pattern always needs to cover the whole string, so use ^$
         vec.push((Regex::new(r"^https?://viaf.org/viaf/(\d+)$").unwrap(),"${1}".to_string(),214));
+        vec.push((Regex::new(r"^https?://www.viaf.org/viaf/(\d+)$").unwrap(),"${1}".to_string(),214));
+        vec.push((Regex::new(r"^https?://isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
         vec.push((Regex::new(r"^https?://isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
         vec.push((Regex::new(r"^https?://www.isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
         vec.push((Regex::new(r"^https?://isni-url.oclc.nl/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),"${1} ${2} ${3} ${4}".to_string(),213));
         vec.push((Regex::new(r"^https?://d-nb.info/gnd/(1[012]?\d{7}[0-9X]|[47]\d{6}-\d|[1-9]\d{0,7}-[0-9X]|3\d{7}[0-9X])$").unwrap(),"${1}".to_string(),227));
         vec.push((Regex::new(r"^https?://id.loc.gov/authorities/names/(gf|n|nb|nr|no|ns|sh|sj)([4-9][0-9]|00|20[0-2][0-9])([0-9]{6})$").unwrap(),"${1}${2}${3}".to_string(),244));
         vec.push((Regex::new(r"^https?://id.loc.gov/rwo/agents/(gf|n|nb|nr|no|ns|sh|sj)([4-9][0-9]|00|20[0-2][0-9])([0-9]{6})(\.html)?$").unwrap(),"${1}${2}${3}".to_string(),244));
+        vec.push((Regex::new(r"^https?://vocab.getty.edu/ulan/(\d+).*$").unwrap(),"${1}".to_string(),245));
+        vec.push((Regex::new(r"^https?://www.getty.edu/vow/ULANFullDisplay\?find=&role=&nation=&subjectid=(\d+)$").unwrap(),"${1}".to_string(),245));
+        vec.push((Regex::new(r"^https?://viaf.org/processed/JPG|(\d+)$").unwrap(),"${1}".to_string(),245));
         vec.push((Regex::new(r"^https?://data.bnf.fr/(\d{8,9}).*$").unwrap(),"${1}".to_string(),268));
         vec.push((Regex::new(r"^https?://data.bnf.fr/ark:/12148/cb(\d{8,9}[0-9bcdfghjkmnpqrstvwxz]).*$").unwrap(),"${1}".to_string(),268));
+        vec.push((Regex::new(r"^https?://idref.fr/(\d{8}[\dX]).*$").unwrap(),"${1}".to_string(),269));
         vec.push((Regex::new(r"^https?://www.idref.fr/(\d{8}[\dX]).*$").unwrap(),"${1}".to_string(),269));
         vec.push((Regex::new(r"^https?://id.ndl.go.jp/auth/entity/([a1s]*\d+{7,9})$").unwrap(),"${1}".to_string(),349));
         vec.push((Regex::new(r"^https?://id.ndl.go.jp/auth/ndlna/([a1s]*\d+{7,9})$").unwrap(),"${1}".to_string(),349));
@@ -32,9 +38,9 @@ lazy_static! {
         vec.push((Regex::new(r"^https?://datos.bne.es/resource/(.+?)$").unwrap(),"${1}".to_string(),950));
         vec.push((Regex::new(r"^https?://data.bibsys.no/data/notrbib/authorityentry/x([1-9]\d*)$").unwrap(),"${1}".to_string(),1015));
         vec.push((Regex::new(r"^https?://authority.bibsys.no/authority/rest/authorities/html/([1-9]\d*)$").unwrap(),"${1}".to_string(),1015));
-        vec.push((Regex::new(r"^https?://data\.cerl\.org/thesaurus/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),"${1}".to_string(),1871));
-        vec.push((Regex::new(r"^https?://data\.cerl\.org/thesaurus/(.*)$").unwrap(),"${1}".to_string(),1871));
-        vec.push((Regex::new(r"^http://thesaurus.cerl.org/record/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),"${1}".to_string(),1871));
+        vec.push((Regex::new(r"^https?://data.cerl.org/thesaurus/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),"${1}".to_string(),1871));
+        vec.push((Regex::new(r"^https?://data.cerl.org/thesaurus/(.*)$").unwrap(),"${1}".to_string(),1871));
+        vec.push((Regex::new(r"^https?://thesaurus.cerl.org/record/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),"${1}".to_string(),1871));
         vec
     };
 
@@ -43,6 +49,8 @@ lazy_static! {
         // NOTE: The pattern always needs to cover the whole string, so use ^$
         vec.push(Regex::new(r"^https?://www.wikidata.org/.*$").unwrap());
         vec.push(Regex::new(r"^https?://viaf.org/viaf/sourceID/.*#skos:Concept$").unwrap());
+        vec.push(Regex::new(r"^http://www.loc.gov/mads/rdf/v1#.*$").unwrap());
+        vec.push(Regex::new(r"^http://www.w3.org/2004/02/skos/core#.*$").unwrap());
         vec
     };
 }

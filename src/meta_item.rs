@@ -5,6 +5,7 @@ use std::vec::Vec;
 use std::cmp::Ordering;
 use wikibase::*;
 use crate::external_id::*;
+use crate::external_importer::ExternalImporter;
 use crate::merge_diff::*;
 
 lazy_static! {
@@ -156,7 +157,10 @@ impl MetaItem {
     }
 
     pub fn add_prop_text(&mut self, ext_id: ExternalId) -> Option<wikibase::Statement> {
-        self.prop_text.push(ext_id);
+        let ei = crate::viaf::VIAF::new("312603351").unwrap(); // Any prop/ID will do
+        if !ei.do_not_use_external_url(&ext_id.id) {
+            self.prop_text.push(ext_id);
+        }
         None
     }
 
