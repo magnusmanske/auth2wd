@@ -22,6 +22,7 @@ use axum::{
     extract::Path
 };
 use serde_json::json;
+use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::env;
 use tracing;
@@ -31,7 +32,9 @@ use external_id::*;
 use combinator::*;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
-
+use std::fs::File;
+use std::io::{BufRead, BufReader};
+use wikibase::mediawiki::api::Api;
 
 async fn root() -> Html<String> {
     let sources: Vec<String> = SUPPORTED_PROPERTIES
@@ -156,6 +159,64 @@ fn get_extid_from_argv(argv: &Vec<String>) -> Result<ExternalId, Box<dyn std::er
     Ok(ExternalId::new(property,&id))
 }
 
+async fn get_extend(item: &str) -> Result<merge_diff::MergeDiff,Box<dyn std::error::Error>> {
+    let mut base_item = meta_item::MetaItem::from_entity(&item).await?;
+    let ext_ids: Vec<ExternalId> = base_item
+        .get_external_ids()
+        .iter()
+        .filter(|ext_id|Combinator::get_parser_for_ext_id(ext_id).ok().is_some())
+        .cloned()
+        .collect();
+    let mut combinator = Combinator::new();
+    combinator.import(ext_ids)?;
+    let other = match combinator.combine() {
+        Some(other) => other,
+        None => return Err(format!("No items to combine").into())
+    };
+    Ok(base_item.merge(&other))
+}
+
+async fn apply_diff(item: &str, diff:&merge_diff::MergeDiff, api: &mut Api) -> Result<(),Box<dyn std::error::Error>> {
+    let json_string = json!(diff).to_string();
+    // println!("{item}: {json_string}");
+    if json_string=="{}" {
+        return Ok(());
+    }
+    let token = api.get_edit_token().await?;
+    let params: HashMap<String, String> = vec![
+        ("action", "wbeditentity"),
+        ("id", item),
+        ("data", &json_string),
+        ("summary", "AC2WD"),
+        ("token", &token),
+        ("bot","1"),
+    ]
+    .into_iter()
+    .map(|(k, v)| (k.to_string(), v.to_string()))
+    .collect();
+    let j = api
+        .post_query_api_json(&params)
+        .await
+        .map_err(|e| e.to_string())?;
+    match j["error"].as_object() {
+        Some(o) => {
+            let s = format!("{o:?}");
+            Err(s.into())
+        }
+        None => Ok(()),
+    }
+}
+
+async fn get_wikidata_api(path: &str) -> Result<Api,Box<dyn std::error::Error>> {
+    let file = File::open(path).map_err(|e| format!("{:?}", e))?;
+    let reader = BufReader::new(file);
+    let j: serde_json::Value = serde_json::from_reader(reader).map_err(|e| format!("{:?}", e))?;
+    let oauth2_token = j["oauth2_token"].as_str().expect("No oauth2_token in {path}");
+    let mut api = Api::new("https://www.wikidata.org/w/api.php").await?;
+    api.set_oauth2(&oauth2_token);
+    Ok(api)
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let argv: Vec<String> = env::args().collect();
@@ -187,22 +248,29 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let mut parser = Combinator::get_parser_for_ext_id(&ext_id)?;
             parser.dump_graph();
         }
+        Some("list") => { // List
+            let filename = argv.get(2).expect("USAGE: list LIST_FILE [START_ROW]");
+            let start = match argv.get(3) {
+                Some(s) => s.parse::<usize>().unwrap(),
+                None => 0,
+            };
+            let file = File::open(filename).unwrap();
+            let reader = BufReader::new(file);
+            let mut api = get_wikidata_api("config.json").await?;
+            for (index, line) in reader.lines().enumerate() {
+                if index>=start {
+                    if let Ok(item) = line {
+                        println!("{index}: {item}");
+                        if let Ok(diff) = get_extend(&item).await {
+                            let _ = apply_diff(&item,&diff,&mut api).await; // Ignore result
+                        }
+                    }
+                }
+            }
+        }
         Some("extend") => {
             let item = argv.get(2).expect("Item argument required");
-            let mut base_item = meta_item::MetaItem::from_entity(&item).await.expect("Problem getting item");
-            let ext_ids: Vec<ExternalId> = base_item
-                .get_external_ids()
-                .iter()
-                .filter(|ext_id|Combinator::get_parser_for_ext_id(ext_id).ok().is_some())
-                .cloned()
-                .collect();
-            let mut combinator = Combinator::new();
-            combinator.import(ext_ids).expect("Oh no!");
-            let other = match combinator.combine() {
-                Some(other) => other,
-                None => panic!("No items to combine")
-            };
-            let diff = base_item.merge(&other);
+            let diff = get_extend(&item).await.unwrap();
             println!("{}",&serde_json::to_string_pretty(&diff).unwrap());
         }
         _ => run_server().await?
@@ -215,6 +283,7 @@ cargo run -- combinator P950 XX990809
 
 TODO:
 P244
+P7859
 P213
 P349
 P1015
