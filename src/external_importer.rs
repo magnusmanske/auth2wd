@@ -53,7 +53,7 @@ lazy_static! {
         vec.push(Regex::new(r"^https?://viaf.org/viaf/sourceID/.*#skos:Concept$").unwrap());
         vec.push(Regex::new(r"^https?://www.loc.gov/mads/rdf/v1#.*$").unwrap());
         vec.push(Regex::new(r"^https?://www.w3.org/2004/02/skos/core#.*$").unwrap());
-        vec.push(Regex::new(r"^https?://(www.)orcid.org/.*-\d{0,3}-.*$").unwrap());
+        vec.push(Regex::new(r"^https?://(www.)?orcid.org/.*-\d{0,3}-.*$").unwrap());
         vec
     };
 }
