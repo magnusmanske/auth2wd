@@ -32,7 +32,9 @@ lazy_static! {
         vec.push((Regex::new(r"^https?://datos.bne.es/resource/(.+?)$").unwrap(),"${1}".to_string(),950));
         vec.push((Regex::new(r"^https?://data.bibsys.no/data/notrbib/authorityentry/x([1-9]\d*)$").unwrap(),"${1}".to_string(),1015));
         vec.push((Regex::new(r"^https?://authority.bibsys.no/authority/rest/authorities/html/([1-9]\d*)$").unwrap(),"${1}".to_string(),1015));
-        vec.push((Regex::new(r"^https?://sws.geonames.org/([1-9][0-9]{0,8}).*$").unwrap(),"${1}".to_string(),1566));
+        vec.push((Regex::new(r"^https?://data\.cerl\.org/thesaurus/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),"${1}".to_string(),1871));
+        vec.push((Regex::new(r"^https?://data\.cerl\.org/thesaurus/(.*)$").unwrap(),"${1}".to_string(),1871));
+        vec.push((Regex::new(r"^http://thesaurus.cerl.org/record/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),"${1}".to_string(),1871));
         vec
     };
 
