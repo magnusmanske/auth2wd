@@ -381,16 +381,16 @@ pub trait ExternalImporter {
             }
         }
 
-        let family_names = [
-            "http://schema.org/familyName",
-            "http://xmlns.com/foaf/0.1/familyName",
-            "https://id.kb.se/vocab/familyName",
-        ];
-        for family_name in family_names {
-            self.add_item_statement_or_prop_text(ret, 734, family_name, "Q101352")?;
-        }
-
         // Unreliable
+        // let family_names = [
+        //     "http://schema.org/familyName",
+        //     "http://xmlns.com/foaf/0.1/familyName",
+        //     "https://id.kb.se/vocab/familyName",
+        // ];
+        // for family_name in family_names {
+        //     self.add_item_statement_or_prop_text(ret, 734, family_name, "Q101352")?;
+        // }
+
         // let given_names = [
         //     "http://schema.org/givenName",
         //     "http://xmlns.com/foaf/0.1/givenName",
@@ -411,6 +411,7 @@ pub trait ExternalImporter {
         for s in self.triples_literals(p_iri)? {
             let ext_id = ExternalId::new(prop, &s);
             let query = format!("{s} haswbstatement:P31={p31}");
+            // TODO check all returned items for label/alias instead of just returning item if a single one was found
             match ext_id.search_wikidata_single_item(&query) {
                 Some(item) => {
                     ret.add_claim(self.new_statement_item(prop,&item));
