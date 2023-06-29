@@ -344,10 +344,10 @@ mod tests {
     #[test]
     fn test_parse_date() {
         let mi = MetaItem::new();
-        assert_eq!(mi.parse_date("1987"),Some(("+1987-01-01T00:00:00Z".to_string(),9)));
-        assert_eq!(mi.parse_date("1987-12"),Some(("+1987-12-01T00:00:00Z".to_string(),10)));
+        assert_eq!(mi.parse_date("1987"),Some(("+1987-00-00T00:00:00Z".to_string(),9)));
+        assert_eq!(mi.parse_date("1987-12"),Some(("+1987-12-00T00:00:00Z".to_string(),10)));
         assert_eq!(mi.parse_date("1987-12-27"),Some(("+1987-12-27T00:00:00Z".to_string(),11)));
-        assert_eq!(mi.parse_date("http://data.bnf.fr/date/1978"),Some(("+1978-01-01T00:00:00Z".to_string(),9)));
+        assert_eq!(mi.parse_date("http://data.bnf.fr/date/1978"),Some(("+1978-00-00T00:00:00Z".to_string(),9)));
     }
 
     #[test]

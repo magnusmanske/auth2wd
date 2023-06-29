@@ -55,6 +55,7 @@ lazy_static! {
         vec.push(Regex::new(r"^https?://www.loc.gov/mads/rdf/v1#.*$").unwrap());
         vec.push(Regex::new(r"^https?://www.w3.org/2004/02/skos/core#.*$").unwrap());
         vec.push(Regex::new(r"^https?://(www.)?orcid.org/.*-\d{0,3}-.*$").unwrap());
+        vec.push(Regex::new(r"^https?://data.bnf.fr/#foaf:Person$").unwrap());
         vec
     };
 }
@@ -518,6 +519,7 @@ mod tests {
         assert!(t.do_not_use_external_url("https://www.wikidata.org/item/Q2071541"));
         assert!(t.do_not_use_external_url("http://www.wikidata.org/entity/Q2071541"));
         assert!(!t.do_not_use_external_url("https://www.wikidatarrr.org/entity/Q2071541"));
+        assert!(t.do_not_use_external_url("http://data.bnf.fr/#foaf:Person"));
     }
 
     #[test]
