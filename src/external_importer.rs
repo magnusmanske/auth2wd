@@ -390,17 +390,18 @@ pub trait ExternalImporter {
             self.add_item_statement_or_prop_text(ret, 734, family_name, "Q101352")?;
         }
 
-        let given_names = [
-            "http://schema.org/givenName",
-            "http://xmlns.com/foaf/0.1/givenName",
-            "https://id.kb.se/vocab/givenName",
-        ];
-        for given_name in given_names {
-            if self.add_item_statement_or_prop_text(ret, 735, given_name, "Q202444")? { continue }
-            if self.add_item_statement_or_prop_text(ret, 735, given_name, "Q3409032")? { continue }
-            if self.add_item_statement_or_prop_text(ret, 735, given_name, "Q12308941")? { continue }
-            if self.add_item_statement_or_prop_text(ret, 735, given_name, "Q11879590")? { continue }
-        }
+        // Unreliable
+        // let given_names = [
+        //     "http://schema.org/givenName",
+        //     "http://xmlns.com/foaf/0.1/givenName",
+        //     "https://id.kb.se/vocab/givenName",
+        // ];
+        // for given_name in given_names {
+        //     if self.add_item_statement_or_prop_text(ret, 735, given_name, "Q202444")? { continue }
+        //     if self.add_item_statement_or_prop_text(ret, 735, given_name, "Q3409032")? { continue }
+        //     if self.add_item_statement_or_prop_text(ret, 735, given_name, "Q12308941")? { continue }
+        //     if self.add_item_statement_or_prop_text(ret, 735, given_name, "Q11879590")? { continue }
+        // }
 
         Ok(())
     }
