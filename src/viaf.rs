@@ -43,3 +43,71 @@ impl VIAF {
     }
 
 }
+
+
+#[cfg(test)]
+mod tests {
+    use wikibase::{EntityTrait, LocaleString};
+
+    use super::*;
+
+    const TEST_ID: &str = "30701597";
+
+    #[test]
+    fn test_new() {
+        assert!(VIAF::new(TEST_ID).is_ok());
+    }
+
+    #[test]
+    fn test_my_property() {
+        let viaf = VIAF::new(TEST_ID).unwrap();
+        assert_eq!(viaf.my_property(),214);
+    }
+
+    #[test]
+    fn test_my_stated_in() {
+        let viaf = VIAF::new(TEST_ID).unwrap();
+        assert_eq!(viaf.my_stated_in(),"Q54919");
+    }
+
+    #[test]
+    fn test_primary_language() {
+        let viaf = VIAF::new(TEST_ID).unwrap();
+        assert_eq!(viaf.primary_language(),"en");
+    }
+
+    #[test]
+    fn test_get_key_url() {
+        let viaf = VIAF::new(TEST_ID).unwrap();
+        assert_eq!(viaf.get_key_url(TEST_ID),"http://viaf.org/viaf/30701597");
+    }
+
+    #[test]
+    fn test_my_id() {
+        let viaf = VIAF::new(TEST_ID).unwrap();
+        assert_eq!(viaf.my_id(),TEST_ID);
+    }
+
+    #[test]
+    fn test_transform_label() {
+        let viaf = VIAF::new(TEST_ID).unwrap();
+        assert_eq!(viaf.transform_label("Manske, Magnus"),"Magnus Manske");
+        assert_eq!(viaf.transform_label("Manske,Magnus"),"Manske,Magnus");
+        assert_eq!(viaf.transform_label("Magnus Manske"),"Magnus Manske");
+    }
+
+    #[test]
+    fn test_run() {
+        let viaf = VIAF::new(TEST_ID).unwrap();
+        let meta_item = viaf.run().unwrap();
+        assert_eq!(*meta_item.item.labels(),vec![LocaleString::new("en","Magnus Manske")]);
+    }
+
+    #[test]
+    fn test_graph() {
+        let mut viaf = VIAF::new(TEST_ID).unwrap();
+        let _graph = viaf.graph();
+        let _graph = viaf.graph_mut();
+    }
+
+}

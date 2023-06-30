@@ -133,3 +133,71 @@ impl GND {
         Ok(ret)
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use wikibase::{EntityTrait, LocaleString};
+
+    use super::*;
+
+    const TEST_ID: &str = "132539691";
+
+    #[test]
+    fn test_new() {
+        assert!(GND::new(TEST_ID).is_ok());
+    }
+
+    #[test]
+    fn test_my_property() {
+        let gnd = GND::new(TEST_ID).unwrap();
+        assert_eq!(gnd.my_property(),227);
+    }
+
+    #[test]
+    fn test_my_stated_in() {
+        let gnd = GND::new(TEST_ID).unwrap();
+        assert_eq!(gnd.my_stated_in(),"Q36578");
+    }
+
+    #[test]
+    fn test_primary_language() {
+        let gnd = GND::new(TEST_ID).unwrap();
+        assert_eq!(gnd.primary_language(),"de");
+    }
+
+    #[test]
+    fn test_get_key_url() {
+        let gnd = GND::new(TEST_ID).unwrap();
+        assert_eq!(gnd.get_key_url(TEST_ID),"https://d-nb.info/gnd/132539691");
+    }
+
+    #[test]
+    fn test_my_id() {
+        let gnd = GND::new(TEST_ID).unwrap();
+        assert_eq!(gnd.my_id(),TEST_ID);
+    }
+
+    #[test]
+    fn test_transform_label() {
+        let gnd = GND::new(TEST_ID).unwrap();
+        assert_eq!(gnd.transform_label("Manske, Magnus"),"Magnus Manske");
+        assert_eq!(gnd.transform_label("Manske,Magnus"),"Manske,Magnus");
+        assert_eq!(gnd.transform_label("Magnus Manske"),"Magnus Manske");
+    }
+
+    #[test]
+    fn test_run() {
+        let gnd = GND::new(TEST_ID).unwrap();
+        let meta_item = gnd.run().unwrap();
+        assert_eq!(*meta_item.item.labels(),vec![LocaleString::new("de","Magnus Manske")]);
+    }
+
+    #[test]
+    fn test_graph() {
+        let mut gnd = GND::new(TEST_ID).unwrap();
+        let _graph = gnd.graph();
+        let _graph = gnd.graph_mut();
+    }
+
+}
