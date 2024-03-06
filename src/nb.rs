@@ -1,14 +1,13 @@
+use crate::external_id::*;
+use crate::external_importer::*;
+use crate::meta_item::*;
 use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
-use crate::external_importer::*;
-use crate::external_id::*;
-use crate::meta_item::*;
 
 pub struct NB {
     id: String,
     graph: FastGraph,
 }
-
 
 unsafe impl Send for NB {}
 unsafe impl Sync for NB {}
@@ -39,13 +38,12 @@ impl ExternalImporter for NB {
     }
 
     fn get_key_url(&self, _key: &str) -> String {
-        format!("http://data.bibliotheken.nl/id/thes/p{}",self.id)
+        format!("http://data.bibliotheken.nl/id/thes/p{}", self.id)
     }
 
     fn transform_label(&self, s: &str) -> String {
         self.transform_label_last_first_name(s)
     }
-
 
     fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>> {
         let mut ret = MetaItem::new();
@@ -53,20 +51,21 @@ impl ExternalImporter for NB {
 
         // Nationality
         for text in self.triples_literals("http://schema.org/nationality")? {
-            let _ = ret.add_prop_text(ExternalId::new(27,&text));
+            let _ = ret.add_prop_text(ExternalId::new(27, &text));
         }
-        
 
         // Born/died
         let birth_death = [
-            ("http://schema.org/birthDate",569),
-            ("http://schema.org/deathDate",570),
+            ("http://schema.org/birthDate", 569),
+            ("http://schema.org/deathDate", 570),
         ];
         for bd in birth_death {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
                 let _ = match ret.parse_date(&s) {
-                    Some((time,precision)) => ret.add_claim(self.new_statement_time(bd.1,&time,precision)),
-                    None => ret.add_prop_text(ExternalId::new(bd.1,&s))
+                    Some((time, precision)) => {
+                        ret.add_claim(self.new_statement_time(bd.1, &time, precision))
+                    }
+                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
                 };
             }
         }
@@ -79,11 +78,13 @@ impl ExternalImporter for NB {
 
 impl NB {
     pub fn new(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let rdf_url = format!("http://data.bibliotheken.nl/doc/thes/p{}.rdf",id);
+        let rdf_url = format!("http://data.bibliotheken.nl/doc/thes/p{}.rdf", id);
         let resp = ureq::get(&rdf_url).call()?.into_string()?;
         let mut graph: FastGraph = FastGraph::new();
         let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
-        Ok(Self { id:id.to_string(), graph })
+        Ok(Self {
+            id: id.to_string(),
+            graph,
+        })
     }
-
 }

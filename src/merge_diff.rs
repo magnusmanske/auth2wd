@@ -1,31 +1,23 @@
+use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_json::json;
-use serde::ser::{Serialize, Serializer, SerializeStruct};
 use std::collections::HashMap;
 use std::vec::Vec;
 use wikibase::*;
 
-
 /// This contains the wbeditentiry payload to ADD data to a base item, generated from a merge
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct MergeDiff {
     pub labels: Vec<LocaleString>,
     pub aliases: Vec<LocaleString>,
     pub descriptions: Vec<LocaleString>,
     pub sitelinks: Vec<SiteLink>,
-    pub altered_statements: HashMap<String,Statement>,
+    pub altered_statements: HashMap<String, Statement>,
     pub added_statements: Vec<Statement>,
 }
 
 impl MergeDiff {
     pub fn new() -> Self {
-        Self {
-            labels: vec!(), 
-            aliases: vec!(), 
-            descriptions: vec!(), 
-            sitelinks: vec!(), 
-            altered_statements: HashMap::new(), 
-            added_statements: vec!()
-        }
+        Self::default()
     }
 
     pub fn add_statement(&mut self, s: Statement) {
@@ -36,13 +28,18 @@ impl MergeDiff {
         }
     }
 
-    fn serialize_labels(&self, list: &Vec<LocaleString>) -> Option<serde_json::Value> {
+    fn serialize_labels(&self, list: &[LocaleString]) -> Option<serde_json::Value> {
         match list.is_empty() {
             true => None,
             false => {
-                let labels : HashMap<String,serde_json::Value> = list
+                let labels: HashMap<String, serde_json::Value> = list
                     .iter()
-                    .map(|l|(l.language().to_owned(),json!({"language":l.language(),"value":l.value(), "add": ""})))
+                    .map(|l| {
+                        (
+                            l.language().to_owned(),
+                            json!({"language":l.language(),"value":l.value(), "add": ""}),
+                        )
+                    })
                     .collect();
                 Some(json!(labels))
             }
@@ -53,12 +50,11 @@ impl MergeDiff {
         match self.aliases.is_empty() {
             true => None,
             false => {
-                let mut ret: HashMap<String,Vec<serde_json::Value>> = HashMap::new();
+                let mut ret: HashMap<String, Vec<serde_json::Value>> = HashMap::new();
                 for alias in &self.aliases {
                     let v = json!({"language":alias.language(),"value":alias.value(), "add": ""});
-                    ret
-                        .entry(alias.language().into())
-                        .and_modify(|vec|vec.push(v.to_owned()))
+                    ret.entry(alias.language().into())
+                        .and_modify(|vec| vec.push(v.to_owned()))
                         .or_insert(vec![v]);
                 }
                 Some(json!(ret))
@@ -70,10 +66,15 @@ impl MergeDiff {
         match self.sitelinks.is_empty() {
             true => None,
             false => {
-                let labels : HashMap<String,serde_json::Value> = self
+                let labels: HashMap<String, serde_json::Value> = self
                     .sitelinks
                     .iter()
-                    .map(|l|(l.site().to_owned(),json!({"site":l.site(),"title":l.title()})))
+                    .map(|l| {
+                        (
+                            l.site().to_owned(),
+                            json!({"site":l.site(),"title":l.title()}),
+                        )
+                    })
                     .collect();
                 Some(json!(labels))
             }
@@ -87,12 +88,13 @@ impl MergeDiff {
     }
 
     fn serialize_claims(&self) -> Option<serde_json::Value> {
-        let ret: Vec<serde_json::Value> = self.added_statements
+        let ret: Vec<serde_json::Value> = self
+            .added_statements
             .iter()
             .chain(self.altered_statements.values())
             .cloned()
-            .map(|c|json!(c))
-            .map(|c|{
+            .map(|c| json!(c))
+            .map(|c| {
                 let mut c = c;
                 if let Some(snak) = c.get_mut("mainsnak") {
                     self.clean_snak(snak)
@@ -118,7 +120,7 @@ impl MergeDiff {
             .collect();
         match ret.is_empty() {
             true => None,
-            false => Some(json!(ret))
+            false => Some(json!(ret)),
         }
     }
 }
@@ -128,21 +130,21 @@ impl Serialize for MergeDiff {
     where
         S: Serializer,
     {
-        let mut data: HashMap<&str,Option<serde_json::Value>> = HashMap::new();
-        data.insert("label",self.serialize_labels(&self.labels));
-        data.insert("descriptions",self.serialize_labels(&self.descriptions));
+        let mut data: HashMap<&str, Option<serde_json::Value>> = HashMap::new();
+        data.insert("label", self.serialize_labels(&self.labels));
+        data.insert("descriptions", self.serialize_labels(&self.descriptions));
         //data.insert("aliases",self.serialize_aliases()); // DEACTIVATED too much noise
-        data.insert("sitelinks",self.serialize_sitelinks());
-        data.insert("claims",self.serialize_claims());
-        let data: HashMap<&str,serde_json::Value> = data
+        data.insert("sitelinks", self.serialize_sitelinks());
+        data.insert("claims", self.serialize_claims());
+        let data: HashMap<&str, serde_json::Value> = data
             .iter()
-            .filter(|(_,v)|v.is_some())
-            .map(|(k,v)|(k.to_owned(),v.to_owned().unwrap()))
+            .filter(|(_, v)| v.is_some())
+            .map(|(k, v)| (k.to_owned(), v.to_owned().unwrap()))
             .collect();
 
         let mut state = serializer.serialize_struct("MergeDiff", data.len())?;
-        for (k,v) in data {
-            state.serialize_field(&k, &v)?
+        for (k, v) in data {
+            state.serialize_field(k, &v)?
         }
         state.end()
     }
