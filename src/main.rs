@@ -136,7 +136,14 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
         .layer(CompressionLayer::new())
         .layer(cors);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
+    let port: u16 = match env::var("AC2WD_PORT") {
+        Ok(port) => port.as_str().parse::<u16>().unwrap_or(8000),
+        Err(_) => 8000,
+    };
+
+    let address = [0, 0, 0, 0]; // TODOO env::var("AC2WD_ADDRESS")
+
+    let addr = SocketAddr::from((address, port));
     tracing::debug!("listening on {}", addr);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
