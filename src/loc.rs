@@ -12,6 +12,8 @@ pub struct LOC {
     graph: Rc<FastGraph>,
 }
 
+const HTTP_USER_AGENT : &str = "Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405";
+
 unsafe impl Send for LOC {}
 unsafe impl Sync for LOC {}
 
@@ -55,12 +57,43 @@ impl ExternalImporter for LOC {
 impl LOC {
     pub async fn new(id: &str) -> Result<Self> {
         let rdf_url = format!("https://id.loc.gov/authorities/names/{id}.rdf");
-        let resp = reqwest::get(&rdf_url).await?.text().await?;
+        let client = reqwest::ClientBuilder::new()
+            .redirect(reqwest::redirect::Policy::limited(10))
+            .user_agent(HTTP_USER_AGENT)
+            .build()?;
+        let resp = client.get(&rdf_url).send().await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
         let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
             graph: Rc::new(graph),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const TEST_ID: &str = "n78095637";
+
+    #[tokio::test]
+    async fn test_new() {
+        assert!(LOC::new(TEST_ID).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_run() {
+        let loc = LOC::new(TEST_ID).await.unwrap();
+        let _meta = loc.run().await.unwrap();
+        // assert_eq!(item.id, "n78095637");
+        // assert_eq!(item.label, "Shakespeare, William, 1564-1616");
+        // assert_eq!(item.aliases, vec!["Shakespeare, William", "1564-1616"]);
+        // assert_eq!(item.descriptions, vec!["English playwright and poet"]);
+        // assert_eq!(item.claims.len(), 1);
+        // assert_eq!(item.claims[0].mainsnak.datavalue.value, "1564-04-23");
+        // assert_eq!(item.claims[0].mainsnak.property, "P569");
+        // assert_eq!(item.claims[0].mainsnak.snaktype, "value");
+        // assert_eq!(item.claims[0].mainsnak.datavalue.datatype, "time");
     }
 }

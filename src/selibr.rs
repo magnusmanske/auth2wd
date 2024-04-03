@@ -62,16 +62,19 @@ impl ExternalImporter for SELIBR {
 impl SELIBR {
     pub async fn new(id: &str) -> Result<Self> {
         let rdf_url = format!("http://libris.kb.se/resource/auth/{}/data.rdf", id);
-        // let resp = ureq::builder()
-        //     .redirects(10)
-        //     .build()
-        //     .get(&rdf_url)
-        //     .call()?
-        //     .into_string()?;
-        let resp = reqwest::get(&rdf_url).await?.text().await?;
-        // TODO check if redirect thing works
+        let client = reqwest::ClientBuilder::new()
+            .redirect(reqwest::redirect::Policy::limited(10))
+            .build()?;
+        let resp = client
+            .get(&rdf_url)
+            .header(reqwest::header::ACCEPT, "application/rdf+xml")
+            .send()
+            .await?
+            .text()
+            .await?;
         let mut graph: FastGraph = FastGraph::new();
-        let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
+        let x = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
+        println!("SELIBR: {x}");
         let mut ret = Self {
             id: id.to_string(),
             key: String::new(),
@@ -88,5 +91,73 @@ impl SELIBR {
         }
 
         Ok(ret)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const TEST_ID: &str = "231727";
+
+    #[tokio::test]
+    async fn test_new() {
+        assert!(SELIBR::new(TEST_ID).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_my_property() {
+        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        assert_eq!(selibr.my_property(), 906);
+    }
+
+    #[tokio::test]
+    async fn test_my_stated_in() {
+        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        assert_eq!(selibr.my_stated_in(), "Q1798125");
+    }
+
+    #[tokio::test]
+    async fn test_primary_language() {
+        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        assert_eq!(selibr.primary_language(), "sv");
+    }
+
+    #[tokio::test]
+    async fn test_get_key_url() {
+        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        assert_eq!(
+            selibr.get_key_url(TEST_ID),
+            "https://libris.kb.se/pm135sp73dmxqcf#it"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_my_id() {
+        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        assert_eq!(selibr.my_id(), TEST_ID);
+    }
+
+    #[tokio::test]
+    async fn test_transform_label() {
+        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        assert_eq!(selibr.transform_label("Månsson, Magnus"), "Magnus Månsson");
+        assert_eq!(selibr.transform_label("Månsson,Magnus"), "Månsson,Magnus");
+        assert_eq!(selibr.transform_label("Magnus Månsson"), "Magnus Månsson");
+    }
+
+    #[tokio::test]
+    async fn test_run() {
+        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        let _meta = selibr.run().await.unwrap();
+        // TODO
+        // println!("!!{:?}", meta.item);
+        // assert_eq!(meta.id(), TEST_ID);
+        // assert_eq!(meta.label, "Magnus Månsson");
+        // assert_eq!(meta.description, "svensk författare");
+        // assert_eq!(meta.aliases, vec!["Magnus Månsson"]);
+        // assert_eq!(meta.props.len(), 1);
+        // assert_eq!(meta.props[0].id, 27);
+        // assert_eq!(meta.props[0].value, "http://id.loc.gov/authorities/names/nr2002016894");
     }
 }
