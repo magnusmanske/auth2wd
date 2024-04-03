@@ -74,8 +74,7 @@ impl SELIBR {
             .text()
             .await?;
         let mut graph: FastGraph = FastGraph::new();
-        let x = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
-        println!("SELIBR: {x}");
+        let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         let mut ret = Self {
             id: id.to_string(),
             key: String::new(),

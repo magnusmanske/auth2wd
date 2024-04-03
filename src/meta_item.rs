@@ -209,9 +209,41 @@ impl MetaItem {
             return None; // Claim already exists, including references
         }
 
+        let mut new_claim = new_claim.clone();
+        self.check_new_claim_for_dates(&mut new_claim);
+
         // Claim does not exist, adding
         self.item.add_claim(new_claim.clone());
         Some(new_claim)
+    }
+
+    fn check_new_claim_for_dates(&self, new_claim: &mut Statement) {
+        let prop = new_claim.property();
+        if prop != "P569" && prop != "P570" {
+            return;
+        }
+        if let Some(dv) = new_claim.main_snak().data_value() {
+            let new_claim_precision = match dv.value() {
+                Value::Time(t) => *t.precision(),
+                _ => return,
+            };
+
+            let best_existing_precision = self
+                .item
+                .claims()
+                .iter()
+                .filter(|c| c.property() == prop)
+                .filter_map(|c| c.main_snak().data_value().to_owned())
+                .filter_map(|dv| match dv.value() {
+                    Value::Time(t) => Some(*t.precision()),
+                    _ => None,
+                })
+                .max()
+                .unwrap_or(0);
+            if new_claim_precision < best_existing_precision {
+                new_claim.set_rank(StatementRank::Deprecated);
+            }
+        }
     }
 
     pub async fn add_prop_text(&mut self, ext_id: ExternalId) -> Option<wikibase::Statement> {
