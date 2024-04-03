@@ -365,7 +365,7 @@ pub trait ExternalImporter {
     }
 
     fn limit_string_length(&self, s: &str) -> String {
-        match s.get(..250) {
+        match s.trim().get(..250) {
             Some(s) => s.to_string(),
             None => s.to_string(),
         }
@@ -463,6 +463,14 @@ pub trait ExternalImporter {
         Ok(found)
     }
 
+    fn lowercase_first_letter(&self, input: &str) -> String {
+        let mut chars = input.chars();
+        match chars.next() {
+            None => String::new(),
+            Some(c) => c.to_lowercase().collect::<String>() + chars.as_str(),
+        }
+    }
+
     fn add_description(&self, ret: &mut MetaItem) -> Result<()> {
         let language = self.primary_language();
         let iris = [
@@ -477,7 +485,11 @@ pub trait ExternalImporter {
         for iri in iris {
             for s in self.triples_literals(iri)? {
                 if ret.item.description_in_locale(&language).is_none() {
-                    let s = self.limit_string_length(&s);
+                    let mut s = self.limit_string_length(&s);
+                    if language == "fr" {
+                        // https://github.com/magnusmanske/auth2wd/issues/2
+                        s = self.lowercase_first_letter(&s);
+                    }
                     ret.item
                         .descriptions_mut()
                         .push(LocaleString::new(&language, &s));
@@ -585,5 +597,13 @@ mod tests {
             Some(ExternalId::new(214, "12345")),
             t.url2external_id("https://viaff.org/viaf/12345")
         );
+    }
+
+    #[tokio::test]
+    async fn test_lowercase_first_letter() {
+        let t = crate::viaf::VIAF::new("312603351").await.unwrap(); // Any ID will do
+        assert_eq!("foo", t.lowercase_first_letter("Foo"));
+        assert_eq!("foo", t.lowercase_first_letter("foo"));
+        assert_eq!("", t.lowercase_first_letter(""));
     }
 }
