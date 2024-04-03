@@ -24,9 +24,14 @@ impl fmt::Display for ExternalId {
 
 impl ExternalId {
     pub fn new(property: usize, id: &str) -> Self {
-        Self {
-            property,
-            id: id.to_string(),
+        let id = Self::fix_property_value(property, id);
+        Self { property, id }
+    }
+
+    fn fix_property_value(property: usize, id: &str) -> String {
+        match property {
+            213 => id.replace(' ', ""), // P213 (ISNI) has no spaces
+            _ => id.to_string(),
         }
     }
 
@@ -43,10 +48,6 @@ impl ExternalId {
             .parse::<usize>()
             .ok()
     }
-
-    // pub fn to_string(&self) -> String {
-    //     format!("P{}:{}", self.property, self.id)
-    // }
 
     pub fn from_external_id_claim(claim: &Statement) -> Option<Self> {
         if *claim.main_snak().datatype() != SnakDataType::ExternalId {
@@ -94,6 +95,12 @@ mod tests {
         let ext_id = ExternalId::from_string("P123:ABC456DEF").unwrap();
         assert_eq!(ext_id.property, 123);
         assert_eq!(ext_id.id, "ABC456DEF");
+    }
+
+    #[test]
+    fn test_isni() {
+        let ext_id = ExternalId::new(213, "0000 0001 2184 9233");
+        assert_eq!(ext_id.id, "0000000121849233");
     }
 
     #[test]
