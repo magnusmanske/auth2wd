@@ -1,17 +1,22 @@
+use std::sync::Arc;
+
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use anyhow::Result;
+use axum::async_trait;
 use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
 
 pub struct NB {
     id: String,
-    graph: FastGraph,
+    graph: Arc<FastGraph>,
 }
 
 unsafe impl Send for NB {}
 unsafe impl Sync for NB {}
 
+#[async_trait]
 impl ExternalImporter for NB {
     fn my_property(&self) -> usize {
         1006
@@ -29,7 +34,7 @@ impl ExternalImporter for NB {
         &self.graph
     }
 
-    fn graph_mut(&mut self) -> &mut FastGraph {
+    fn graph_mut(&mut self) -> &mut Arc<FastGraph> {
         &mut self.graph
     }
 
@@ -45,13 +50,13 @@ impl ExternalImporter for NB {
         self.transform_label_last_first_name(s)
     }
 
-    fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>> {
+    async fn run(&self) -> Result<MetaItem> {
         let mut ret = MetaItem::new();
-        self.add_the_usual(&mut ret)?;
+        self.add_the_usual(&mut ret).await?;
 
         // Nationality
         for text in self.triples_literals("http://schema.org/nationality")? {
-            let _ = ret.add_prop_text(ExternalId::new(27, &text));
+            let _ = ret.add_prop_text(ExternalId::new(27, &text)).await;
         }
 
         // Born/died
@@ -65,26 +70,26 @@ impl ExternalImporter for NB {
                     Some((time, precision)) => {
                         ret.add_claim(self.new_statement_time(bd.1, &time, precision))
                     }
-                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
+                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)).await,
                 };
             }
         }
 
-        self.try_rescue_prop_text(&mut ret)?;
+        self.try_rescue_prop_text(&mut ret).await?;
         ret.cleanup();
         Ok(ret)
     }
 }
 
 impl NB {
-    pub fn new(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
+    pub async fn new(id: &str) -> Result<Self> {
         let rdf_url = format!("http://data.bibliotheken.nl/doc/thes/p{}.rdf", id);
-        let resp = ureq::get(&rdf_url).call()?.into_string()?;
+        let resp = reqwest::get(&rdf_url).await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
         let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
-            graph,
+            graph: Arc::new(graph),
         })
     }
 }

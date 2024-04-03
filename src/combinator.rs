@@ -1,98 +1,67 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use anyhow::{anyhow, Result};
 use std::collections::HashMap;
 
 lazy_static! {
-    pub static ref SUPPORTED_PROPERTIES: Vec<SupportedProperty> = vec![
-        SupportedProperty::new(
-            214,
-            "VIAF",
-            "Virtual International Authority File",
-            "27063124",
-            Box::new(|id: &str| { Ok(Box::new(crate::viaf::VIAF::new(id)?)) })
-        ),
-        SupportedProperty::new(
-            227,
-            "GND",
-            "Deutsche Nationalbibliothek",
-            "118523813",
-            Box::new(|id: &str| { Ok(Box::new(crate::gnd::GND::new(id)?)) })
-        ),
-        SupportedProperty::new(
-            244,
-            "LoC",
-            "Library of Congress",
-            "n78095637",
-            Box::new(|id: &str| { Ok(Box::new(crate::loc::LOC::new(id)?)) })
-        ),
-        SupportedProperty::new(
-            268,
-            "BnF",
-            "Bibliothèque nationale de France",
-            "11898689q",
-            Box::new(|id: &str| { Ok(Box::new(crate::bnf::BNF::new(id)?)) })
-        ),
-        SupportedProperty::new(
-            269,
-            "IdRef",
-            "IdRef/SUDOC",
-            "026812304",
-            Box::new(|id: &str| { Ok(Box::new(crate::id_ref::IdRef::new(id)?)) })
-        ),
-        SupportedProperty::new(
-            906,
-            "SELIBR",
-            "National Library of Sweden",
-            "231727",
-            Box::new(|id: &str| { Ok(Box::new(crate::selibr::SELIBR::new(id)?)) })
-        ),
-        SupportedProperty::new(
-            950,
-            "BNE",
-            "Biblioteca Nacional de España",
-            "XX990809",
-            Box::new(|id: &str| { Ok(Box::new(crate::bne::BNE::new(id)?)) })
-        ),
-        SupportedProperty::new(
-            1006,
-            "NB",
-            "Nationale Thesaurus voor Auteurs ID",
-            "068364229",
-            Box::new(|id: &str| { Ok(Box::new(crate::nb::NB::new(id)?)) })
-        ),
-    ];
+    pub static ref SUPPORTED_PROPERTIES: Vec<SupportedProperty> = {
+        vec![
+            SupportedProperty::new(
+                214,
+                "VIAF",
+                "Virtual International Authority File",
+                "27063124",
+            ),
+            SupportedProperty::new(227, "GND", "Deutsche Nationalbibliothek", "118523813"),
+            SupportedProperty::new(244, "LoC", "Library of Congress", "n78095637"),
+            SupportedProperty::new(268, "BnF", "Bibliothèque nationale de France", "11898689q"),
+            SupportedProperty::new(269, "IdRef", "IdRef/SUDOC", "026812304"),
+            SupportedProperty::new(906, "SELIBR", "National Library of Sweden", "231727"),
+            SupportedProperty::new(950, "BNE", "Biblioteca Nacional de España", "XX990809"),
+            SupportedProperty::new(
+                1006,
+                "NB",
+                "Nationale Thesaurus voor Auteurs ID",
+                "068364229",
+            ),
+        ]
+    };
 }
-
-type EnternalImporterGenerator =
-    dyn Fn(&str) -> Result<Box<dyn ExternalImporter>, Box<dyn std::error::Error>>;
 
 pub struct SupportedProperty {
     pub property: usize,
     pub name: String,
     pub source: String,
     pub demo_id: String,
-    pub generator: Box<EnternalImporterGenerator>,
 }
 
 unsafe impl Send for SupportedProperty {}
 unsafe impl Sync for SupportedProperty {}
 
 impl SupportedProperty {
-    fn new(
-        property: usize,
-        name: &str,
-        source: &str,
-        demo_id: &str,
-        generator: Box<EnternalImporterGenerator>,
-    ) -> Self {
+    fn new(property: usize, name: &str, source: &str, demo_id: &str) -> Self {
         Self {
             property,
             name: name.into(),
             source: source.into(),
             demo_id: demo_id.into(),
-            generator,
         }
+    }
+
+    pub async fn generator(&self, id: &str) -> Result<Box<dyn ExternalImporter + Send + Sync>> {
+        let ret: Box<dyn ExternalImporter + Send + Sync> = match self.property {
+            214 => Box::new(crate::viaf::VIAF::new(id).await?),
+            227 => Box::new(crate::gnd::GND::new(id).await?),
+            244 => Box::new(crate::loc::LOC::new(id).await?),
+            268 => Box::new(crate::bnf::BNF::new(id).await?),
+            269 => Box::new(crate::id_ref::IdRef::new(id).await?),
+            906 => Box::new(crate::selibr::SELIBR::new(id).await?),
+            950 => Box::new(crate::bne::BNE::new(id).await?),
+            1006 => Box::new(crate::nb::NB::new(id).await?),
+            _ => panic!("no generator for property: 'P{}'", self.property),
+        };
+        Ok(ret)
     }
 
     pub fn as_li(&self) -> String {
@@ -113,35 +82,42 @@ impl Combinator {
         Self::default()
     }
 
-    pub fn get_parser_for_property(
+    pub async fn get_parser_for_property(
         property: &str,
         id: &str,
-    ) -> Result<Box<dyn ExternalImporter>, Box<dyn std::error::Error>> {
+    ) -> Result<Box<dyn ExternalImporter + Send + Sync>> {
         let property = match ExternalId::prop_numeric(property) {
             Some(property) => property,
-            None => return Err(format!("malformed property: '{property}'").into()),
+            None => return Err(anyhow!("malformed property: '{property}'")),
         };
         let ext_id = ExternalId::new(property, id);
-        Self::get_parser_for_ext_id(&ext_id)
+        Self::get_parser_for_ext_id(&ext_id).await
     }
 
     pub fn get_supported_properties() -> Vec<usize> {
         SUPPORTED_PROPERTIES.iter().map(|sp| sp.property).collect()
     }
 
-    pub fn get_parser_for_ext_id(
+    pub async fn get_parser_for_ext_id(
         id: &ExternalId,
-    ) -> Result<Box<dyn ExternalImporter>, Box<dyn std::error::Error>> {
+    ) -> Result<Box<dyn ExternalImporter + Send + Sync>> {
         match SUPPORTED_PROPERTIES
             .iter()
             .find(|sp| sp.property == id.property)
         {
-            Some(sp) => (sp.generator)(&id.id),
-            None => Err(format!("unsupported property: '{}'", id.property).into()),
+            Some(sp) => sp.generator(&id.id).await,
+            None => Err(anyhow!("unsupported property: '{}'", id.property)),
         }
     }
 
-    pub fn import(&mut self, ids: Vec<ExternalId>) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn has_parser_for_ext_id(id: &ExternalId) -> bool {
+        SUPPORTED_PROPERTIES
+            .iter()
+            .find(|sp| sp.property == id.property)
+            .is_some()
+    }
+
+    pub async fn import(&mut self, ids: Vec<ExternalId>) -> Result<()> {
         let mut ids_used: Vec<ExternalId> = vec![];
         let mut ids = ids.to_owned();
         while !ids.is_empty() {
@@ -150,15 +126,16 @@ impl Combinator {
                 None => break,
             };
             ids_used.push(id.to_owned());
-            let parser = match Self::get_parser_for_property(&format!("P{}", id.property), &id.id) {
-                Ok(parser) => parser,
-                _ => continue,
-            };
+            let parser =
+                match Self::get_parser_for_property(&format!("P{}", id.property), &id.id).await {
+                    Ok(parser) => parser,
+                    _ => continue,
+                };
             let key = ExternalId::new(id.property, &parser.my_id()).to_string();
             if self.items.contains_key(&key) {
                 continue;
             }
-            let item = parser.run()?;
+            let item = parser.run().await?;
             let external_ids = item.get_external_ids();
             self.items.insert(key, item);
             for external_id in external_ids {

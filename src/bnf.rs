@@ -1,6 +1,10 @@
+use std::sync::Arc;
+
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use anyhow::{anyhow, Result};
+use axum::async_trait;
 use regex::Regex;
 use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
@@ -15,12 +19,13 @@ lazy_static! {
 
 pub struct BNF {
     id: String,
-    graph: FastGraph,
+    graph: Arc<FastGraph>,
 }
 
 unsafe impl Send for BNF {}
 unsafe impl Sync for BNF {}
 
+#[async_trait]
 impl ExternalImporter for BNF {
     fn my_property(&self) -> usize {
         268
@@ -38,7 +43,7 @@ impl ExternalImporter for BNF {
         &self.graph
     }
 
-    fn graph_mut(&mut self) -> &mut FastGraph {
+    fn graph_mut(&mut self) -> &mut Arc<FastGraph> {
         &mut self.graph
     }
 
@@ -54,9 +59,9 @@ impl ExternalImporter for BNF {
         self.transform_label_last_first_name(s)
     }
 
-    fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>> {
+    async fn run(&self) -> Result<MetaItem> {
         let mut ret = MetaItem::new();
-        self.add_the_usual(&mut ret)?;
+        self.add_the_usual(&mut ret).await?;
 
         // Born/died
         let birth_death = [
@@ -69,7 +74,7 @@ impl ExternalImporter for BNF {
                     Some((time, precision)) => {
                         ret.add_claim(self.new_statement_time(bd.1, &time, precision))
                     }
-                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
+                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)).await,
                 };
             }
         }
@@ -84,43 +89,43 @@ impl ExternalImporter for BNF {
                     Some((time, precision)) => {
                         ret.add_claim(self.new_statement_time(bd.1, &time, precision))
                     }
-                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
+                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)).await,
                 };
             }
         }
 
-        self.try_rescue_prop_text(&mut ret)?;
+        self.try_rescue_prop_text(&mut ret).await?;
         ret.cleanup();
         Ok(ret)
     }
 }
 
 impl BNF {
-    pub fn new(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
+    pub async fn new(id: &str) -> Result<Self> {
         if !RE_NUMERIC_ID.is_match(id) {
-            return Err(format!("ID format error for '{id}'").into());
+            return Err(anyhow!("ID format error for '{id}'"));
         }
         let numeric_id = RE_NUMERIC_ID.replace_all(id, "${1}");
 
-        let name = match Self::get_name_for_id(&numeric_id) {
+        let name = match Self::get_name_for_id(&numeric_id).await {
             Some(name) => name,
-            None => return Err(format!("Name retrieval error for '{id}'").into()),
+            None => return Err(anyhow!("Name retrieval error for '{id}'")),
         };
 
         let rdf_url = format!("https://data.bnf.fr/{numeric_id}/{name}/rdf.xml");
-        let resp = ureq::get(&rdf_url).call()?.into_string()?;
+        let resp = reqwest::get(&rdf_url).await?.text().await?;
 
         let mut graph: FastGraph = FastGraph::new();
         let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
-            graph,
+            graph: Arc::new(graph),
         })
     }
 
-    fn get_name_for_id(numeric_id: &str) -> Option<String> {
+    async fn get_name_for_id(numeric_id: &str) -> Option<String> {
         let rdf_url = format!("https://data.bnf.fr/en/{numeric_id}");
-        let resp = ureq::get(&rdf_url).call().ok()?.into_string().ok()?;
+        let resp = reqwest::get(&rdf_url).await.ok()?.text().await.ok()?;
         Some(RE_URL.captures(&resp)?.get(1)?.as_str().to_string())
     }
 }

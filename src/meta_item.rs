@@ -214,8 +214,8 @@ impl MetaItem {
         Some(new_claim)
     }
 
-    pub fn add_prop_text(&mut self, ext_id: ExternalId) -> Option<wikibase::Statement> {
-        let ei = crate::viaf::VIAF::new("312603351").unwrap(); // Any prop/ID will do
+    pub async fn add_prop_text(&mut self, ext_id: ExternalId) -> Option<wikibase::Statement> {
+        let ei = crate::viaf::VIAF::new("312603351").await.unwrap(); // Any prop/ID will do
         if !ei.do_not_use_external_url(&ext_id.id) {
             self.prop_text.push(ext_id);
         }
@@ -423,22 +423,22 @@ mod tests {
         );
     }
 
-    #[test]
-    fn test_add_prop_text() {
+    #[tokio::test]
+    async fn test_add_prop_text() {
         let mut mi = MetaItem::new();
         let ext_id = ExternalId::new(214, "12345");
-        mi.add_prop_text(ext_id.clone());
+        mi.add_prop_text(ext_id.clone()).await;
         assert_eq!(mi.prop_text, vec![ext_id]);
     }
 
-    #[test]
-    fn test_cleanup() {
+    #[tokio::test]
+    async fn test_cleanup() {
         let mut mi = MetaItem::new();
         let ext_id1 = ExternalId::new(214, "12345");
         let ext_id2 = ExternalId::new(123, "456");
-        mi.add_prop_text(ext_id1.clone());
-        mi.add_prop_text(ext_id2.clone());
-        mi.add_prop_text(ext_id1.clone());
+        mi.add_prop_text(ext_id1.clone()).await;
+        mi.add_prop_text(ext_id2.clone()).await;
+        mi.add_prop_text(ext_id1.clone()).await;
         mi.cleanup();
         assert_eq!(mi.prop_text, vec![ext_id2, ext_id1]);
     }

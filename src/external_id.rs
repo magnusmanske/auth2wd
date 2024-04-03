@@ -62,11 +62,11 @@ impl ExternalId {
         Some(Self::new(prop_numeric, id))
     }
 
-    pub fn search_wikidata_single_item(&self, query: &str) -> Option<String> {
+    pub async fn search_wikidata_single_item(&self, query: &str) -> Option<String> {
         // TODO urlencode query?
         let url = format!("https://www.wikidata.org/w/api.php?action=query&list=search&srnamespace=0&format=json&srsearch={}",&query);
-        //let text = reqwest::get(url).await.ok()?.text().await.ok()?;
-        let text = ureq::get(&url).call().ok()?.into_string().ok()?;
+        let text = reqwest::get(url).await.ok()?.text().await.ok()?;
+        // let text = ureq::get(&url).call().ok()?.into_string().ok()?;
         let j: serde_json::Value = serde_json::from_str(&text).ok()?;
         if j["query"]["searchinfo"]["totalhits"].as_i64()? == 1 {
             return Some(j["query"]["search"][0]["title"].as_str()?.to_string());
@@ -74,14 +74,14 @@ impl ExternalId {
         None
     }
 
-    pub fn get_item_for_external_id_value(&self) -> Option<String> {
+    pub async fn get_item_for_external_id_value(&self) -> Option<String> {
         let query = format!("haswbstatement:\"P{}={}\"", self.property, self.id);
-        self.search_wikidata_single_item(&query)
+        self.search_wikidata_single_item(&query).await
     }
 
-    pub fn get_item_for_string_external_id_value(&self, s: &str) -> Option<String> {
+    pub async fn get_item_for_string_external_id_value(&self, s: &str) -> Option<String> {
         let query = format!("{s} haswbstatement:\"P{}={}\"", self.property, &self.id);
-        self.search_wikidata_single_item(&query)
+        self.search_wikidata_single_item(&query).await
     }
 }
 
@@ -168,30 +168,32 @@ mod tests {
         assert_eq!(None, ExternalId::from_external_id_claim(&statement));
     }
 
-    #[test]
-    fn test_get_item_for_external_id() {
+    #[tokio::test]
+    async fn test_get_item_for_external_id() {
         // Test OK
         let ext_id = ExternalId::new(214, "30701597");
         assert_eq!(
-            ext_id.get_item_for_external_id_value(),
+            ext_id.get_item_for_external_id_value().await,
             Some("Q13520818".to_string())
         );
 
         // Test OK
         assert_eq!(
-            ext_id.get_item_for_string_external_id_value("Magnus"),
+            ext_id.get_item_for_string_external_id_value("Magnus").await,
             Some("Q13520818".to_string())
         );
 
         // Test wrong string
         assert_eq!(
-            ext_id.get_item_for_string_external_id_value("ocshs87gvdsu6gsdi7vchkuchs"),
+            ext_id
+                .get_item_for_string_external_id_value("ocshs87gvdsu6gsdi7vchkuchs")
+                .await,
             None
         );
 
         // Test wrong ID
         let ext_id = ExternalId::new(214, "3070159777777");
-        assert_eq!(ext_id.get_item_for_external_id_value(), None);
+        assert_eq!(ext_id.get_item_for_external_id_value().await, None);
 
         // TODOO multiple items
     }

@@ -51,12 +51,12 @@ async fn root() -> Html<String> {
 }
 
 async fn item(Path((property, id)): Path<(String, String)>) -> Json<serde_json::Value> {
-    let parser: Box<dyn ExternalImporter> =
-        match Combinator::get_parser_for_property(&property, &id) {
+    let parser: Box<dyn ExternalImporter + Send + Sync> =
+        match Combinator::get_parser_for_property(&property, &id).await {
             Ok(parser) => parser,
             Err(e) => return Json(json!({"status":e.to_string()})),
         };
-    let mi = match parser.run() {
+    let mi = match parser.run().await {
         Ok(mi) => mi,
         Err(e) => return Json(json!({"status":e.to_string()})),
     };
@@ -66,12 +66,12 @@ async fn item(Path((property, id)): Path<(String, String)>) -> Json<serde_json::
 }
 
 async fn meta_item(Path((property, id)): Path<(String, String)>) -> Json<serde_json::Value> {
-    let parser: Box<dyn ExternalImporter> =
-        match Combinator::get_parser_for_property(&property, &id) {
+    let parser: Box<dyn ExternalImporter + Send + Sync> =
+        match Combinator::get_parser_for_property(&property, &id).await {
             Ok(parser) => parser,
             Err(e) => return Json(json!({"status":e.to_string()})),
         };
-    let mi = match parser.run() {
+    let mi = match parser.run().await {
         Ok(mi) => mi,
         Err(e) => return Json(json!({"status":e.to_string()})),
     };
@@ -82,7 +82,7 @@ async fn meta_item(Path((property, id)): Path<(String, String)>) -> Json<serde_j
 
 async fn graph(Path((property, id)): Path<(String, String)>) -> String {
     let mut parser: Box<dyn ExternalImporter> =
-        match Combinator::get_parser_for_property(&property, &id) {
+        match Combinator::get_parser_for_property(&property, &id).await {
             Ok(parser) => parser,
             Err(e) => return e.to_string(),
         };
@@ -97,11 +97,11 @@ async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
     let ext_ids: Vec<ExternalId> = base_item
         .get_external_ids()
         .iter()
-        .filter(|ext_id| Combinator::get_parser_for_ext_id(ext_id).ok().is_some())
+        .filter(|ext_id| Combinator::has_parser_for_ext_id(ext_id))
         .cloned()
         .collect();
     let mut combinator = Combinator::new();
-    if let Err(e) = combinator.import(ext_ids) {
+    if let Err(e) = combinator.import(ext_ids).await {
         return Json(json!({"status":e.to_string()}));
     }
     let other = match combinator.combine() {
@@ -145,10 +145,8 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 
     let addr = SocketAddr::from((address, port));
     tracing::debug!("listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    axum::serve(listener, app).await.unwrap();
 
     Ok(())
 }
@@ -165,11 +163,11 @@ async fn get_extend(item: &str) -> Result<merge_diff::MergeDiff, Box<dyn std::er
     let ext_ids: Vec<ExternalId> = base_item
         .get_external_ids()
         .iter()
-        .filter(|ext_id| Combinator::get_parser_for_ext_id(ext_id).ok().is_some())
+        .filter(|ext_id| Combinator::has_parser_for_ext_id(ext_id))
         .cloned()
         .collect();
     let mut combinator = Combinator::new();
-    combinator.import(ext_ids)?;
+    combinator.import(ext_ids).await?;
     let other = match combinator.combine() {
         Some(other) => other,
         None => return Err("No items to combine".into()),
@@ -234,7 +232,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             //println!("{:?}",&base_item);
             let ext_id = get_extid_from_argv(&argv)?;
             let mut combinator = Combinator::new();
-            combinator.import(vec![ext_id])?;
+            combinator.import(vec![ext_id]).await?;
             println!(
                 "{} items: {:?}",
                 combinator.items.len(),
@@ -260,14 +258,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some("parser") => {
             // Single parser
             let ext_id = get_extid_from_argv(&argv)?;
-            let parser = Combinator::get_parser_for_ext_id(&ext_id)?;
-            let item = parser.run()?;
+            let parser = Combinator::get_parser_for_ext_id(&ext_id).await?;
+            let item = parser.run().await?;
             println!("{:?}", item);
         }
         Some("graph") => {
             // Single graph
             let ext_id = get_extid_from_argv(&argv)?;
-            let mut parser = Combinator::get_parser_for_ext_id(&ext_id)?;
+            let mut parser = Combinator::get_parser_for_ext_id(&ext_id).await?;
             parser.dump_graph();
         }
         Some("list") => {

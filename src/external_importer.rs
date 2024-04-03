@@ -1,5 +1,7 @@
 use crate::external_id::*;
 use crate::meta_item::*;
+use anyhow::Result;
+use axum::async_trait;
 use chrono::prelude::*;
 use regex::Regex;
 use sophia::graph::{inmem::FastGraph, *};
@@ -9,6 +11,7 @@ use sophia::term::SimpleIri;
 use sophia::term::Term;
 use sophia::triple::stream::TripleSource;
 use sophia::triple::Triple;
+use std::sync::Arc;
 use std::vec::Vec;
 use wikibase::*;
 
@@ -60,16 +63,17 @@ lazy_static! {
     };
 }
 
+#[async_trait]
 pub trait ExternalImporter {
     // NEEDS TO OVERLOAD
     fn get_key_url(&self, key: &str) -> String;
     fn graph(&self) -> &FastGraph;
-    fn graph_mut(&mut self) -> &mut FastGraph;
+    fn graph_mut(&mut self) -> &mut Arc<FastGraph>;
     fn primary_language(&self) -> String;
     fn my_property(&self) -> usize;
     fn my_id(&self) -> String;
     fn my_stated_in(&self) -> &str;
-    fn run(&self) -> Result<MetaItem, Box<dyn std::error::Error>>;
+    async fn run(&self) -> Result<MetaItem>;
 
     fn get_id_url(&self) -> String {
         self.get_key_url("id")
@@ -77,8 +81,8 @@ pub trait ExternalImporter {
 
     fn get_graph_text(&mut self) -> String {
         let mut nt_stringifier = NtSerializer::new_stringifier();
-        let graph: &mut FastGraph = self.graph_mut();
-        match nt_stringifier.serialize_graph(graph) {
+        let graph: &mut Arc<FastGraph> = self.graph_mut();
+        match nt_stringifier.serialize_graph(graph.as_ref()) {
             Ok(s) => s.to_string(),
             Err(_) => String::new(),
         }
@@ -111,11 +115,7 @@ pub trait ExternalImporter {
             .next()
     }
 
-    fn triples_subject_iris(
-        &self,
-        id_url: &str,
-        p: &str,
-    ) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    fn triples_subject_iris(&self, id_url: &str, p: &str) -> Result<Vec<String>> {
         let mut ret = vec![];
         let iri_id = SimpleIri::new(id_url, None)?;
         let iri_p = SimpleIri::new(p, None)?;
@@ -131,15 +131,11 @@ pub trait ExternalImporter {
         Ok(ret)
     }
 
-    fn triples_iris(&self, p: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    fn triples_iris(&self, p: &str) -> Result<Vec<String>> {
         self.triples_subject_iris(&self.get_id_url(), p)
     }
 
-    fn triples_subject_literals(
-        &self,
-        id_url: &str,
-        p: &str,
-    ) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    fn triples_subject_literals(&self, id_url: &str, p: &str) -> Result<Vec<String>> {
         let mut ret = vec![];
         let iri_id = SimpleIri::new(id_url, None)?;
         let iri_p = SimpleIri::new(p, None)?;
@@ -155,15 +151,11 @@ pub trait ExternalImporter {
         Ok(ret)
     }
 
-    fn triples_literals(&self, p: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    fn triples_literals(&self, p: &str) -> Result<Vec<String>> {
         self.triples_subject_literals(&self.get_id_url(), p)
     }
 
-    fn triples_property_object_iris(
-        &self,
-        p: &str,
-        o: &str,
-    ) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    fn triples_property_object_iris(&self, p: &str, o: &str) -> Result<Vec<String>> {
         let mut ret = vec![];
         let iri_p = SimpleIri::new(p, None)?;
         let iri_o = SimpleIri::new(o, None)?;
@@ -179,10 +171,7 @@ pub trait ExternalImporter {
         Ok(ret)
     }
 
-    fn triples_property_literals(
-        &self,
-        p: &str,
-    ) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    fn triples_property_literals(&self, p: &str) -> Result<Vec<String>> {
         let mut ret = vec![];
         let iri_p = SimpleIri::new(p, None)?;
         self.graph().triples_with_p(&iri_p).for_each_triple(|t| {
@@ -315,7 +304,7 @@ pub trait ExternalImporter {
         )
     }
 
-    fn add_same_as(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
+    fn add_same_as(&self, ret: &mut MetaItem) -> Result<()> {
         let iris = [
             "http://www.w3.org/2002/07/owl#sameAs",
             "http://www.w3.org/2002/07/owl#sameAs",
@@ -340,12 +329,12 @@ pub trait ExternalImporter {
         Ok(())
     }
 
-    fn add_gender(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
+    async fn add_gender(&self, ret: &mut MetaItem) -> Result<()> {
         for s in self.triples_literals("http://xmlns.com/foaf/0.1/gender")? {
             let _ = match s.as_str() {
                 "male" => ret.add_claim(self.new_statement_item(21, "Q6581097")),
                 "female" => ret.add_claim(self.new_statement_item(21, "Q6581072")),
-                _ => ret.add_prop_text(ExternalId::new(21, &s)),
+                _ => ret.add_prop_text(ExternalId::new(21, &s)).await,
             };
         }
 
@@ -353,7 +342,7 @@ pub trait ExternalImporter {
             let _ = match s.as_str() {
                 "Masculino" => ret.add_claim(self.new_statement_item(21, "Q6581097")),
                 "Femenino" => ret.add_claim(self.new_statement_item(21, "Q6581072")),
-                _ => ret.add_prop_text(ExternalId::new(21, &s)),
+                _ => ret.add_prop_text(ExternalId::new(21, &s)).await,
             };
         }
 
@@ -365,7 +354,7 @@ pub trait ExternalImporter {
                 "https://d-nb.info/standards/vocab/gnd/gender#female" => {
                     ret.add_claim(self.new_statement_item(21, "Q6581072"))
                 }
-                _ => ret.add_prop_text(ExternalId::new(21, &url)),
+                _ => ret.add_prop_text(ExternalId::new(21, &url)).await,
             };
         }
 
@@ -392,7 +381,7 @@ pub trait ExternalImporter {
         }
     }
 
-    fn add_label_aliases(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
+    fn add_label_aliases(&self, ret: &mut MetaItem) -> Result<()> {
         let language = self.primary_language();
 
         let urls = [
@@ -446,19 +435,19 @@ pub trait ExternalImporter {
         Ok(())
     }
 
-    fn add_item_statement_or_prop_text(
+    async fn add_item_statement_or_prop_text(
         &self,
         ret: &mut MetaItem,
         prop: usize,
         p_iri: &str,
         p31: &str,
-    ) -> Result<bool, Box<dyn std::error::Error>> {
+    ) -> Result<bool> {
         let mut found = false;
         for s in self.triples_literals(p_iri)? {
             let ext_id = ExternalId::new(prop, &s);
             let query = format!("{s} haswbstatement:P31={p31}");
             // TODO check all returned items for label/alias instead of just returning item if a single one was found
-            match ext_id.search_wikidata_single_item(&query) {
+            match ext_id.search_wikidata_single_item(&query).await {
                 Some(item) => {
                     ret.add_claim(self.new_statement_item(prop, &item));
                     found = true;
@@ -471,7 +460,7 @@ pub trait ExternalImporter {
         Ok(found)
     }
 
-    fn add_description(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
+    fn add_description(&self, ret: &mut MetaItem) -> Result<()> {
         let language = self.primary_language();
         let iris = [
             "http://www.w3.org/2004/02/skos/core#prefLabel",
@@ -495,18 +484,18 @@ pub trait ExternalImporter {
         Ok(())
     }
 
-    fn add_the_usual(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
+    async fn add_the_usual(&self, ret: &mut MetaItem) -> Result<()> {
         ret.add_claim(self.new_statement_string(self.my_property(), &self.my_id()));
-        self.add_instance_of(ret)?;
+        self.add_instance_of(ret).await?;
         self.add_same_as(ret)?;
-        self.add_gender(ret)?;
+        self.add_gender(ret).await?;
         self.add_label_aliases(ret)?;
         self.add_description(ret)?;
         self.add_language(ret)?;
         Ok(())
     }
 
-    fn add_instance_of(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
+    async fn add_instance_of(&self, ret: &mut MetaItem) -> Result<()> {
         for url in self.triples_iris("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")? {
             let _ = match url.as_str() {
                 "http://schema.org/Person" => ret.add_claim(self.new_statement_item(31, "Q5")),
@@ -517,20 +506,20 @@ pub trait ExternalImporter {
                 "https://d-nb.info/standards/elementset/gnd#DifferentiatedPerson" => {
                     ret.add_claim(self.new_statement_item(31, "Q5"))
                 }
-                s => ret.add_prop_text(ExternalId::new(31, s)),
+                s => ret.add_prop_text(ExternalId::new(31, s)).await,
             };
         }
         Ok(())
     }
 
-    fn add_language(&self, ret: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
+    fn add_language(&self, ret: &mut MetaItem) -> Result<()> {
         for s in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
             let _ = ret.add_prop_text(ExternalId::new(1412, &s));
         }
         Ok(())
     }
 
-    fn try_rescue_prop_text(&self, mi: &mut MetaItem) -> Result<(), Box<dyn std::error::Error>> {
+    async fn try_rescue_prop_text(&self, mi: &mut MetaItem) -> Result<()> {
         let mut new_prop_text = vec![];
         mi.cleanup();
         for ext_id in &mi.prop_text.to_owned() {
@@ -546,7 +535,10 @@ pub trait ExternalImporter {
             let mut found = false;
             for p31 in p31s {
                 let extid = ExternalId::new(ext_id.property, p31);
-                if let Some(item) = extid.get_item_for_string_external_id_value(&ext_id.id) {
+                if let Some(item) = extid
+                    .get_item_for_string_external_id_value(&ext_id.id)
+                    .await
+                {
                     mi.add_claim(self.new_statement_item(ext_id.property, &item));
                     found = true;
                     break;
@@ -565,9 +557,9 @@ pub trait ExternalImporter {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_do_not_use_external_url() {
-        let t = crate::viaf::VIAF::new("312603351").unwrap(); // Any ID will do
+    #[tokio::test]
+    async fn test_do_not_use_external_url() {
+        let t = crate::viaf::VIAF::new("312603351").await.unwrap(); // Any ID will do
         assert!(t.do_not_use_external_url("https://www.wikidata.org/entity/Q2071541"));
         assert!(t.do_not_use_external_url("https://www.wikidata.org/item/Q2071541"));
         assert!(t.do_not_use_external_url("http://www.wikidata.org/entity/Q2071541"));
@@ -575,9 +567,9 @@ mod tests {
         assert!(t.do_not_use_external_url("http://data.bnf.fr/#foaf:Person"));
     }
 
-    #[test]
-    fn test_url2external_id() {
-        let t = crate::viaf::VIAF::new("312603351").unwrap(); // Any ID will do
+    #[tokio::test]
+    async fn test_url2external_id() {
+        let t = crate::viaf::VIAF::new("312603351").await.unwrap(); // Any ID will do
         assert_eq!(
             Some(ExternalId::new(214, "12345")),
             t.url2external_id("http://viaf.org/viaf/12345")
