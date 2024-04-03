@@ -129,3 +129,45 @@ impl BNF {
         Some(RE_URL.captures(&resp)?.get(1)?.as_str().to_string())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use wikibase::{EntityTrait, LocaleString};
+
+    use super::*;
+
+    const TEST_ID: &str = "11898689q";
+
+    #[tokio::test]
+    async fn test_run() {
+        let viaf = BNF::new(TEST_ID).await.unwrap();
+        let meta_item = viaf.run().await.unwrap();
+        assert_eq!(
+            *meta_item.item.labels(),
+            vec![LocaleString::new("fr", "Charles Darwin")]
+        );
+    }
+
+    #[tokio::test]
+    async fn test_new() {
+        assert!(BNF::new(TEST_ID).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_my_property() {
+        let bnf = BNF::new(TEST_ID).await.unwrap();
+        assert_eq!(bnf.my_property(), 268);
+    }
+
+    #[tokio::test]
+    async fn test_my_stated_in() {
+        let bnf = BNF::new(TEST_ID).await.unwrap();
+        assert_eq!(bnf.my_stated_in(), "Q19938912");
+    }
+
+    #[tokio::test]
+    async fn test_my_id() {
+        let bnf = BNF::new(TEST_ID).await.unwrap();
+        assert_eq!(bnf.my_id(), TEST_ID);
+    }
+}

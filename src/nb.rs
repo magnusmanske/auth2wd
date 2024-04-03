@@ -93,3 +93,54 @@ impl NB {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use wikibase::{EntityTrait, LocaleString};
+
+    use super::*;
+
+    const TEST_ID: &str = "068364229";
+
+    #[tokio::test]
+    async fn test_new() {
+        assert!(NB::new(TEST_ID).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_my_property() {
+        let nb = NB::new(TEST_ID).await.unwrap();
+        assert_eq!(nb.my_property(), 1006);
+    }
+
+    #[tokio::test]
+    async fn test_my_stated_in() {
+        let nb = NB::new(TEST_ID).await.unwrap();
+        assert_eq!(nb.my_stated_in(), "Q105488572");
+    }
+
+    #[tokio::test]
+    async fn test_primary_language() {
+        let nb = NB::new(TEST_ID).await.unwrap();
+        assert_eq!(nb.primary_language(), "nl");
+    }
+
+    #[tokio::test]
+    async fn test_get_key_url() {
+        let nb = NB::new(TEST_ID).await.unwrap();
+        assert_eq!(
+            nb.get_key_url(TEST_ID),
+            "http://data.bibliotheken.nl/id/thes/p068364229"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_run() {
+        let viaf = NB::new(TEST_ID).await.unwrap();
+        let meta_item = viaf.run().await.unwrap();
+        assert_eq!(
+            *meta_item.item.labels(),
+            vec![LocaleString::new("nl", "Charles Darwin")]
+        );
+    }
+}

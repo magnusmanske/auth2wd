@@ -145,19 +145,4 @@ mod tests {
         assert_eq!(selibr.transform_label("Månsson,Magnus"), "Månsson,Magnus");
         assert_eq!(selibr.transform_label("Magnus Månsson"), "Magnus Månsson");
     }
-
-    #[tokio::test]
-    async fn test_run() {
-        let selibr = SELIBR::new(TEST_ID).await.unwrap();
-        let _meta = selibr.run().await.unwrap();
-        // TODO
-        // println!("!!{:?}", meta.item);
-        // assert_eq!(meta.id(), TEST_ID);
-        // assert_eq!(meta.label, "Magnus Månsson");
-        // assert_eq!(meta.description, "svensk författare");
-        // assert_eq!(meta.aliases, vec!["Magnus Månsson"]);
-        // assert_eq!(meta.props.len(), 1);
-        // assert_eq!(meta.props[0].id, 27);
-        // assert_eq!(meta.props[0].value, "http://id.loc.gov/authorities/names/nr2002016894");
-    }
 }

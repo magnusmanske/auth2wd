@@ -97,3 +97,45 @@ impl IdRef {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use wikibase::{EntityTrait, LocaleString};
+
+    use super::*;
+
+    const TEST_ID: &str = "026812304";
+
+    #[tokio::test]
+    async fn test_new() {
+        assert!(IdRef::new(TEST_ID).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_my_property() {
+        let idref = IdRef::new(TEST_ID).await.unwrap();
+        assert_eq!(idref.my_property(), 269);
+    }
+
+    #[tokio::test]
+    async fn test_my_stated_in() {
+        let idref = IdRef::new(TEST_ID).await.unwrap();
+        assert_eq!(idref.my_stated_in(), "Q47757534");
+    }
+
+    #[tokio::test]
+    async fn test_my_id() {
+        let idref = IdRef::new(TEST_ID).await.unwrap();
+        assert_eq!(idref.my_id(), TEST_ID);
+    }
+
+    #[tokio::test]
+    async fn test_run() {
+        let viaf = IdRef::new(TEST_ID).await.unwrap();
+        let meta_item = viaf.run().await.unwrap();
+        assert_eq!(
+            *meta_item.item.labels(),
+            vec![LocaleString::new("fr", "Charles Darwin")]
+        );
+    }
+}

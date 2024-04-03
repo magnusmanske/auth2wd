@@ -93,3 +93,39 @@ impl BNE {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use wikibase::{EntityTrait, LocaleString};
+
+    use super::*;
+
+    const TEST_ID: &str = "XX1234567";
+
+    #[tokio::test]
+    async fn test_new() {
+        assert!(BNE::new(TEST_ID).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_my_property() {
+        let bne = BNE::new(TEST_ID).await.unwrap();
+        assert_eq!(bne.my_property(), 950);
+    }
+
+    #[tokio::test]
+    async fn test_my_stated_in() {
+        let bne = BNE::new(TEST_ID).await.unwrap();
+        assert_eq!(bne.my_stated_in(), "Q50358336");
+    }
+
+    #[tokio::test]
+    async fn test_run() {
+        let bne = BNE::new(TEST_ID).await.unwrap();
+        let meta_item = bne.run().await.unwrap();
+        assert_eq!(
+            *meta_item.item.labels(),
+            vec![LocaleString::new("es", "Marcel Coulon")]
+        );
+    }
+}
