@@ -91,7 +91,7 @@ impl MetaItem {
             .filter(|snak| *snak.datatype() == SnakDataType::ExternalId)
             .map(|snak| (ExternalId::prop_numeric(snak.property()), snak.data_value()))
             .filter(|(prop, dv)| prop.is_some() && dv.is_some())
-            .map(|(prop, dv)| (prop.unwrap(), dv.to_owned().unwrap()))
+            .map(|(prop, dv)| (prop.unwrap(), dv.to_owned().unwrap())) // unwrap()s are safe
             .map(|(prop, dv)| (prop, dv.value().to_owned()))
             .filter_map(|(prop, value)| match value {
                 Value::StringValue(s) => Some(ExternalId::new(prop, &s)),
@@ -215,7 +215,7 @@ impl MetaItem {
     }
 
     pub async fn add_prop_text(&mut self, ext_id: ExternalId) -> Option<wikibase::Statement> {
-        let ei = crate::viaf::VIAF::new("312603351").await.unwrap(); // Any prop/ID will do
+        let ei = crate::viaf::VIAF::new("312603351").await.ok()?; // Any prop/ID will do
         if !ei.do_not_use_external_url(&ext_id.id) {
             self.prop_text.push(ext_id);
         }

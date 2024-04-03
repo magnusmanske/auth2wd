@@ -62,7 +62,7 @@ lazy_static! {
 
 #[async_trait]
 pub trait ExternalImporter {
-    // NEEDS TO OVERLOAD
+    // These methods need to be implemented by the importer
     fn get_key_url(&self, key: &str) -> String;
     fn graph(&self) -> &FastGraph;
     fn graph_mut(&mut self) -> &mut Rc<FastGraph>;
@@ -123,7 +123,6 @@ pub trait ExternalImporter {
                     if let Ok(ns) = ns::Namespace::new(iri) {
                         ret.push(ns.to_string());
                     }
-                    // ret.push(iri.ns().to_string());
                 }
             })?;
         ret.sort();
@@ -166,7 +165,6 @@ pub trait ExternalImporter {
                     if let Ok(ns) = ns::Namespace::new(iri) {
                         ret.push(ns.to_string());
                     }
-                    // ret.push(iri.ns().to_string());
                 }
             })?;
         ret.sort();
@@ -183,9 +181,6 @@ pub trait ExternalImporter {
                 if let Some(literal) = t.o().lexical_form() {
                     ret.push(literal.to_string());
                 }
-                // if let Term::Literal(iri) = t.o() {
-                //     ret.push(iri.txt().to_string());
-                // }
             })?;
         ret.sort();
         ret.dedup();

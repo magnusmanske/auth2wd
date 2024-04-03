@@ -102,6 +102,7 @@ impl MergeDiff {
                 match c["references"].as_array_mut() {
                     Some(references) => {
                         for refgroup in references {
+                            // TODO fix unwrap()s
                             for prop_snaks in refgroup["snaks"].as_object_mut().unwrap() {
                                 for snak in prop_snaks.1.as_array_mut().unwrap() {
                                     self.clean_snak(snak);
@@ -139,7 +140,7 @@ impl Serialize for MergeDiff {
         let data: HashMap<&str, serde_json::Value> = data
             .iter()
             .filter(|(_, v)| v.is_some())
-            .map(|(k, v)| (k.to_owned(), v.to_owned().unwrap()))
+            .map(|(k, v)| (k.to_owned(), v.to_owned().unwrap())) // unwrap() is safe
             .collect();
 
         let mut state = serializer.serialize_struct("MergeDiff", data.len())?;

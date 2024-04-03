@@ -151,8 +151,8 @@ impl Combinator {
             let keys: Vec<String> = self.items.keys().cloned().collect();
             let k1 = &keys[0];
             let k2 = &keys[1];
-            let other = self.items.get(k2).unwrap().to_owned();
-            let _ = self.items.get_mut(k1).unwrap().merge(&other);
+            let other = self.items.get(k2)?.to_owned();
+            let _ = self.items.get_mut(k1)?.merge(&other);
             self.items.remove(k2);
         }
         self.items.iter().next().map(|(_, v)| v.to_owned())

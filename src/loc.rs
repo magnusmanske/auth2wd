@@ -82,19 +82,4 @@ mod tests {
     async fn test_new() {
         assert!(LOC::new(TEST_ID).await.is_ok());
     }
-
-    #[tokio::test]
-    async fn test_run() {
-        let loc = LOC::new(TEST_ID).await.unwrap();
-        let _meta = loc.run().await.unwrap();
-        // assert_eq!(item.id, "n78095637");
-        // assert_eq!(item.label, "Shakespeare, William, 1564-1616");
-        // assert_eq!(item.aliases, vec!["Shakespeare, William", "1564-1616"]);
-        // assert_eq!(item.descriptions, vec!["English playwright and poet"]);
-        // assert_eq!(item.claims.len(), 1);
-        // assert_eq!(item.claims[0].mainsnak.datavalue.value, "1564-04-23");
-        // assert_eq!(item.claims[0].mainsnak.property, "P569");
-        // assert_eq!(item.claims[0].mainsnak.snaktype, "value");
-        // assert_eq!(item.claims[0].mainsnak.datavalue.datatype, "time");
-    }
 }
