@@ -4,8 +4,9 @@ use crate::external_importer::*;
 use crate::meta_item::*;
 use anyhow::Result;
 use axum::async_trait;
-use sophia::graph::inmem::FastGraph;
-use sophia::triple::stream::TripleSource;
+use sophia::api::prelude::*;
+use sophia::inmem::graph::FastGraph;
+use sophia::xml;
 
 pub struct LOC {
     id: String,
@@ -63,7 +64,7 @@ impl LOC {
             .build()?;
         let resp = client.get(&rdf_url).send().await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
-        let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
+        let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
             graph: Rc::new(graph),

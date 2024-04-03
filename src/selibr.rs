@@ -5,8 +5,9 @@ use crate::external_importer::*;
 use crate::meta_item::*;
 use anyhow::{anyhow, Result};
 use axum::async_trait;
-use sophia::graph::inmem::FastGraph;
-use sophia::triple::stream::TripleSource;
+use sophia::api::prelude::*;
+use sophia::inmem::graph::FastGraph;
+use sophia::xml;
 
 pub struct SELIBR {
     id: String,
@@ -73,7 +74,7 @@ impl SELIBR {
             .text()
             .await?;
         let mut graph: FastGraph = FastGraph::new();
-        let x = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
+        let x = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         println!("SELIBR: {x}");
         let mut ret = Self {
             id: id.to_string(),

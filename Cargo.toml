@@ -6,8 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-#marc = "2.0.0"
-sophia = { version = "0.7", features = ["xml"] }
+sophia = { version = "*", features = ["xml"] }
 reqwest = { version = "*", features = ["blocking", "json"] }
 tokio = { version = "1", features = ["full"] }
 lazy_static = "1"

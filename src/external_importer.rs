@@ -4,13 +4,10 @@ use anyhow::Result;
 use axum::async_trait;
 use chrono::prelude::*;
 use regex::Regex;
-use sophia::graph::{inmem::FastGraph, *};
-use sophia::serializer::nt::NtSerializer;
-use sophia::serializer::*;
-use sophia::term::SimpleIri;
-use sophia::term::Term;
-use sophia::triple::stream::TripleSource;
-use sophia::triple::Triple;
+use sophia::api::ns;
+use sophia::api::prelude::*;
+use sophia::inmem::graph::FastGraph;
+use sophia::turtle::serializer::nt::NtSerializer;
 use std::rc::Rc;
 use std::vec::Vec;
 use wikibase::*;
@@ -117,13 +114,16 @@ pub trait ExternalImporter {
 
     fn triples_subject_iris(&self, id_url: &str, p: &str) -> Result<Vec<String>> {
         let mut ret = vec![];
-        let iri_id = SimpleIri::new(id_url, None)?;
-        let iri_p = SimpleIri::new(p, None)?;
+        let iri_id = Iri::new(id_url)?;
+        let iri_p = Iri::new(p)?;
         self.graph()
-            .triples_with_sp(&iri_id, &iri_p)
+            .triples_matching([&iri_id], [&iri_p], Any)
             .for_each_triple(|t| {
-                if let Term::Iri(iri) = t.o() {
-                    ret.push(iri.ns().to_string());
+                if let Some(iri) = t.o().iri() {
+                    if let Ok(ns) = ns::Namespace::new(iri) {
+                        ret.push(ns.to_string());
+                    }
+                    // ret.push(iri.ns().to_string());
                 }
             })?;
         ret.sort();
@@ -137,13 +137,13 @@ pub trait ExternalImporter {
 
     fn triples_subject_literals(&self, id_url: &str, p: &str) -> Result<Vec<String>> {
         let mut ret = vec![];
-        let iri_id = SimpleIri::new(id_url, None)?;
-        let iri_p = SimpleIri::new(p, None)?;
+        let iri_id = Iri::new(id_url)?;
+        let iri_p = Iri::new(p)?;
         self.graph()
-            .triples_with_sp(&iri_id, &iri_p)
+            .triples_matching([&iri_id], [&iri_p], Any)
             .for_each_triple(|t| {
-                if let Term::Literal(iri) = t.o() {
-                    ret.push(iri.txt().to_string());
+                if let Some(literal) = t.o().lexical_form() {
+                    ret.push(literal.to_string());
                 }
             })?;
         ret.sort();
@@ -157,13 +157,16 @@ pub trait ExternalImporter {
 
     fn triples_property_object_iris(&self, p: &str, o: &str) -> Result<Vec<String>> {
         let mut ret = vec![];
-        let iri_p = SimpleIri::new(p, None)?;
-        let iri_o = SimpleIri::new(o, None)?;
+        let iri_p = Iri::new(p)?;
+        let iri_o = Iri::new(o)?;
         self.graph()
-            .triples_with_po(&iri_p, &iri_o)
+            .triples_matching(Any, [&iri_p], [&iri_o])
             .for_each_triple(|t| {
-                if let Term::Iri(iri) = t.s() {
-                    ret.push(iri.ns().to_string());
+                if let Some(iri) = t.s().iri() {
+                    if let Ok(ns) = ns::Namespace::new(iri) {
+                        ret.push(ns.to_string());
+                    }
+                    // ret.push(iri.ns().to_string());
                 }
             })?;
         ret.sort();
@@ -173,12 +176,17 @@ pub trait ExternalImporter {
 
     fn triples_property_literals(&self, p: &str) -> Result<Vec<String>> {
         let mut ret = vec![];
-        let iri_p = SimpleIri::new(p, None)?;
-        self.graph().triples_with_p(&iri_p).for_each_triple(|t| {
-            if let Term::Literal(iri) = t.o() {
-                ret.push(iri.txt().to_string());
-            }
-        })?;
+        let iri_p = Iri::new(p)?;
+        self.graph()
+            .triples_matching(Any, [&iri_p], Any)
+            .for_each_triple(|t| {
+                if let Some(literal) = t.o().lexical_form() {
+                    ret.push(literal.to_string());
+                }
+                // if let Term::Literal(iri) = t.o() {
+                //     ret.push(iri.txt().to_string());
+                // }
+            })?;
         ret.sort();
         ret.dedup();
         Ok(ret)

@@ -4,8 +4,9 @@ use crate::external_importer::*;
 use crate::meta_item::*;
 use anyhow::Result;
 use axum::async_trait;
-use sophia::graph::inmem::FastGraph;
-use sophia::triple::stream::TripleSource;
+use sophia::api::prelude::*;
+use sophia::inmem::graph::FastGraph;
+use sophia::xml;
 
 #[derive(Clone)]
 pub struct VIAF {
@@ -59,7 +60,7 @@ impl VIAF {
         // let resp = ureq::get(&rdf_url).call()?.into_string()?;
         let resp = reqwest::get(&rdf_url).await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
-        let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
+        let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
             graph: Rc::new(graph),

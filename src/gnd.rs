@@ -4,8 +4,9 @@ use crate::meta_item::*;
 use anyhow::Result;
 use axum::async_trait;
 use regex::Regex;
-use sophia::graph::inmem::FastGraph;
-use sophia::triple::stream::TripleSource;
+use sophia::api::prelude::*;
+use sophia::inmem::graph::FastGraph;
+use sophia::xml;
 use std::rc::Rc;
 
 lazy_static! {
@@ -165,7 +166,7 @@ impl GND {
         let rdf_url = format!("https://d-nb.info/gnd/{}/about/lds.rdf", id);
         let resp = reqwest::get(&rdf_url).await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
-        let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
+        let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         let mut ret = Self {
             id: id.to_string(),
             graph: Rc::new(graph),

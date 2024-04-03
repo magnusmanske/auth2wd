@@ -6,8 +6,9 @@ use crate::meta_item::*;
 use anyhow::{anyhow, Result};
 use axum::async_trait;
 use regex::Regex;
-use sophia::graph::inmem::FastGraph;
-use sophia::triple::stream::TripleSource;
+use sophia::api::prelude::*;
+use sophia::inmem::graph::FastGraph;
+use sophia::xml;
 
 lazy_static! {
     static ref RE_NUMERIC_ID: Regex =
@@ -116,7 +117,7 @@ impl BNF {
         let resp = reqwest::get(&rdf_url).await?.text().await?;
 
         let mut graph: FastGraph = FastGraph::new();
-        let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
+        let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
             graph: Rc::new(graph),
