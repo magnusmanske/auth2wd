@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
 use crate::external_id::*;
 use crate::external_importer::*;
@@ -10,7 +10,7 @@ use sophia::triple::stream::TripleSource;
 
 pub struct NB {
     id: String,
-    graph: Arc<FastGraph>,
+    graph: Rc<FastGraph>,
 }
 
 unsafe impl Send for NB {}
@@ -34,7 +34,7 @@ impl ExternalImporter for NB {
         &self.graph
     }
 
-    fn graph_mut(&mut self) -> &mut Arc<FastGraph> {
+    fn graph_mut(&mut self) -> &mut Rc<FastGraph> {
         &mut self.graph
     }
 
@@ -89,7 +89,7 @@ impl NB {
         let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
-            graph: Arc::new(graph),
+            graph: Rc::new(graph),
         })
     }
 }

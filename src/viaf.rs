@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
 use crate::external_importer::*;
 use crate::meta_item::*;
@@ -10,7 +10,7 @@ use sophia::triple::stream::TripleSource;
 #[derive(Clone)]
 pub struct VIAF {
     id: String,
-    graph: Arc<FastGraph>,
+    graph: Rc<FastGraph>,
 }
 
 unsafe impl Send for VIAF {}
@@ -37,7 +37,7 @@ impl ExternalImporter for VIAF {
     fn graph(&self) -> &FastGraph {
         &self.graph
     }
-    fn graph_mut(&mut self) -> &mut Arc<FastGraph> {
+    fn graph_mut(&mut self) -> &mut Rc<FastGraph> {
         &mut self.graph
     }
     fn transform_label(&self, s: &str) -> String {
@@ -62,7 +62,7 @@ impl VIAF {
         let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
-            graph: Arc::new(graph),
+            graph: Rc::new(graph),
         })
     }
 }

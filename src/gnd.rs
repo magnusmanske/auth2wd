@@ -6,7 +6,7 @@ use axum::async_trait;
 use regex::Regex;
 use sophia::graph::inmem::FastGraph;
 use sophia::triple::stream::TripleSource;
-use std::sync::Arc;
+use std::rc::Rc;
 
 lazy_static! {
     static ref RE_COUNTRY: Regex =
@@ -17,7 +17,7 @@ lazy_static! {
 #[derive(Clone)]
 pub struct GND {
     id: String,
-    graph: Arc<FastGraph>,
+    graph: Rc<FastGraph>,
 }
 
 unsafe impl Send for GND {}
@@ -41,7 +41,7 @@ impl ExternalImporter for GND {
         &self.graph
     }
 
-    fn graph_mut(&mut self) -> &mut Arc<FastGraph> {
+    fn graph_mut(&mut self) -> &mut Rc<FastGraph> {
         &mut self.graph
     }
 
@@ -168,7 +168,7 @@ impl GND {
         let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
         let mut ret = Self {
             id: id.to_string(),
-            graph: Arc::new(graph),
+            graph: Rc::new(graph),
         };
         ret.fix_own_id()?;
         Ok(ret)

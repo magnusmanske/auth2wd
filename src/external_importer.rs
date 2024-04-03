@@ -11,7 +11,7 @@ use sophia::term::SimpleIri;
 use sophia::term::Term;
 use sophia::triple::stream::TripleSource;
 use sophia::triple::Triple;
-use std::sync::Arc;
+use std::rc::Rc;
 use std::vec::Vec;
 use wikibase::*;
 
@@ -68,7 +68,7 @@ pub trait ExternalImporter {
     // NEEDS TO OVERLOAD
     fn get_key_url(&self, key: &str) -> String;
     fn graph(&self) -> &FastGraph;
-    fn graph_mut(&mut self) -> &mut Arc<FastGraph>;
+    fn graph_mut(&mut self) -> &mut Rc<FastGraph>;
     fn primary_language(&self) -> String;
     fn my_property(&self) -> usize;
     fn my_id(&self) -> String;
@@ -81,7 +81,7 @@ pub trait ExternalImporter {
 
     fn get_graph_text(&mut self) -> String {
         let mut nt_stringifier = NtSerializer::new_stringifier();
-        let graph: &mut Arc<FastGraph> = self.graph_mut();
+        let graph = self.graph_mut();
         match nt_stringifier.serialize_graph(graph.as_ref()) {
             Ok(s) => s.to_string(),
             Err(_) => String::new(),

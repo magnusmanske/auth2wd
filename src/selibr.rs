@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
 use crate::external_id::*;
 use crate::external_importer::*;
@@ -11,7 +11,7 @@ use sophia::triple::stream::TripleSource;
 pub struct SELIBR {
     id: String,
     key: String,
-    graph: Arc<FastGraph>,
+    graph: Rc<FastGraph>,
 }
 
 unsafe impl Send for SELIBR {}
@@ -38,7 +38,7 @@ impl ExternalImporter for SELIBR {
     fn graph(&self) -> &FastGraph {
         &self.graph
     }
-    fn graph_mut(&mut self) -> &mut Arc<FastGraph> {
+    fn graph_mut(&mut self) -> &mut Rc<FastGraph> {
         &mut self.graph
     }
     fn transform_label(&self, s: &str) -> String {
@@ -75,7 +75,7 @@ impl SELIBR {
         let mut ret = Self {
             id: id.to_string(),
             key: String::new(),
-            graph: Arc::new(graph),
+            graph: Rc::new(graph),
         };
 
         let ids = ret.triples_property_object_iris(
