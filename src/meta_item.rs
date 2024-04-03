@@ -280,6 +280,48 @@ impl MetaItem {
         ret
     }
 
+    /// Fixes birth and death dates by deprecating less precise ones.
+    /// https://github.com/magnusmanske/auth2wd/issues/1
+    pub fn fix_dates(&mut self) {
+        for prop in ["P569", "P570"] {
+            let mut best_precision = 0;
+            let mut worst_precision = 255;
+            self.item
+                .claims()
+                .iter()
+                .filter(|c| c.main_snak().property() == prop)
+                .for_each(|c| {
+                    if let Some(dv) = c.main_snak().data_value() {
+                        if let Value::Time(t) = dv.value() {
+                            if *t.precision() > best_precision {
+                                best_precision = *t.precision();
+                            }
+                            if *t.precision() < worst_precision {
+                                worst_precision = *t.precision();
+                            }
+                        }
+                    }
+                });
+            if best_precision <= worst_precision {
+                continue;
+            }
+            self.item
+                .claims_mut()
+                .iter_mut()
+                .filter(|c| c.main_snak().property() == prop)
+                .filter(|c| *c.rank() == StatementRank::Normal)
+                .for_each(|c| {
+                    if let Some(dv) = c.main_snak().data_value() {
+                        if let Value::Time(t) = dv.value() {
+                            if *t.precision() < best_precision {
+                                c.set_rank(StatementRank::Deprecated);
+                            }
+                        }
+                    }
+                });
+        }
+    }
+
     pub fn merge(&mut self, other: &MetaItem) -> MergeDiff {
         let mut diff = MergeDiff::new();
         let mut new_aliases = Self::merge_locale_strings(
@@ -458,5 +500,33 @@ mod tests {
             Ordering::Greater,
             MetaItem::compare_locale_string(&ls1, &ls3)
         );
+    }
+
+    #[test]
+    fn test_fix_dates() {
+        let mut mi = MetaItem::new();
+        let s1 = Statement::new_normal(
+            Snak::new_time("P569", "+1650-12-00T00:00:00Z", 10),
+            vec![],
+            vec![],
+        );
+        let s2 = Statement::new_normal(
+            Snak::new_time("P569", "+1650-00-00T00:00:00Z", 9),
+            vec![],
+            vec![],
+        );
+        let s3 = Statement::new_normal(
+            Snak::new_time("P569", "+1650-12-29T00:00:00Z", 11),
+            vec![],
+            vec![],
+        );
+        mi.item.add_claim(s1);
+        mi.item.add_claim(s3);
+        mi.item.add_claim(s2);
+        mi.fix_dates();
+        assert_eq!(mi.item.claims().len(), 3);
+        assert_eq!(*mi.item.claims()[0].rank(), StatementRank::Deprecated);
+        assert_eq!(*mi.item.claims()[1].rank(), StatementRank::Normal);
+        assert_eq!(*mi.item.claims()[2].rank(), StatementRank::Deprecated);
     }
 }
