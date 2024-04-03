@@ -168,11 +168,11 @@ async fn get_extend(item: &str) -> Result<merge_diff::MergeDiff, Box<dyn std::er
         .collect();
     let mut combinator = Combinator::new();
     combinator.import(ext_ids).await?;
-    let other = match combinator.combine() {
+    let mut other = match combinator.combine() {
         Some(other) => other,
         None => return Err("No items to combine".into()),
     };
-    base_item.fix_dates();
+    other.fix_dates();
     Ok(base_item.merge(&other))
 }
 
