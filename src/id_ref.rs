@@ -59,7 +59,7 @@ impl ExternalImporter for IdRef {
                     };
                 }
                 None => {
-                    let _ = ret.add_prop_text(ExternalId::new(27, &url));
+                    let _ = ret.add_prop_text(ExternalId::new(27, &url)).await;
                 }
             }
         }

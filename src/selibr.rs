@@ -69,7 +69,7 @@ impl SELIBR {
         //     .call()?
         //     .into_string()?;
         let resp = reqwest::get(&rdf_url).await?.text().await?;
-        // TODO check if redirect ting works
+        // TODO check if redirect thing works
         let mut graph: FastGraph = FastGraph::new();
         let _ = sophia::parser::xml::parse_str(&resp).add_to_graph(&mut graph)?;
         let mut ret = Self {

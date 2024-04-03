@@ -113,8 +113,7 @@ impl Combinator {
     pub fn has_parser_for_ext_id(id: &ExternalId) -> bool {
         SUPPORTED_PROPERTIES
             .iter()
-            .find(|sp| sp.property == id.property)
-            .is_some()
+            .any(|sp| sp.property == id.property)
     }
 
     pub async fn import(&mut self, ids: Vec<ExternalId>) -> Result<()> {

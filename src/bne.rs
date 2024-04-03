@@ -56,7 +56,7 @@ impl ExternalImporter for BNE {
 
         // Nationality
         for text in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
-            let _ = ret.add_prop_text(ExternalId::new(27, &text));
+            let _ = ret.add_prop_text(ExternalId::new(27, &text)).await;
         }
 
         // Born/died

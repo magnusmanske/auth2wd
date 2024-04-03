@@ -453,7 +453,7 @@ pub trait ExternalImporter {
                     found = true;
                 }
                 None => {
-                    let _ = ret.add_prop_text(ExternalId::new(prop, &s));
+                    let _ = ret.add_prop_text(ExternalId::new(prop, &s)).await;
                 }
             }
         }
@@ -491,7 +491,7 @@ pub trait ExternalImporter {
         self.add_gender(ret).await?;
         self.add_label_aliases(ret)?;
         self.add_description(ret)?;
-        self.add_language(ret)?;
+        self.add_language(ret).await?;
         Ok(())
     }
 
@@ -512,9 +512,9 @@ pub trait ExternalImporter {
         Ok(())
     }
 
-    fn add_language(&self, ret: &mut MetaItem) -> Result<()> {
+    async fn add_language(&self, ret: &mut MetaItem) -> Result<()> {
         for s in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
-            let _ = ret.add_prop_text(ExternalId::new(1412, &s));
+            let _ = ret.add_prop_text(ExternalId::new(1412, &s)).await;
         }
         Ok(())
     }
