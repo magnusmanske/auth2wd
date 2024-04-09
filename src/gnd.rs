@@ -58,6 +58,17 @@ impl ExternalImporter for GND {
         self.transform_label_last_first_name(s)
     }
 
+    fn add_own_id(&self, ret: &mut MetaItem) -> Result<()> {
+        let mut statement = self.new_statement_string(self.my_property(), &self.my_id());
+
+        if self.is_undifferentiated_person()? {
+            statement.set_rank(wikibase::StatementRank::Deprecated);
+        }
+
+        ret.add_claim(statement);
+        Ok(())
+    }
+
     async fn run(&self) -> Result<MetaItem> {
         let mut ret = MetaItem::new();
         self.add_the_usual(&mut ret).await?;
@@ -173,6 +184,16 @@ impl GND {
         };
         ret.fix_own_id()?;
         Ok(ret)
+    }
+
+    fn is_undifferentiated_person(&self) -> Result<bool> {
+        Ok(self
+            .triples_subject_iris(
+                &self.get_id_url(),
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            )?
+            .iter()
+            .any(|x| x == "https://d-nb.info/standards/elementset/gnd#UndifferentiatedPerson"))
     }
 }
 

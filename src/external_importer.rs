@@ -499,8 +499,13 @@ pub trait ExternalImporter {
         Ok(())
     }
 
-    async fn add_the_usual(&self, ret: &mut MetaItem) -> Result<()> {
+    fn add_own_id(&self, ret: &mut MetaItem) -> Result<()> {
         ret.add_claim(self.new_statement_string(self.my_property(), &self.my_id()));
+        Ok(())
+    }
+
+    async fn add_the_usual(&self, ret: &mut MetaItem) -> Result<()> {
+        self.add_own_id(ret)?;
         self.add_instance_of(ret).await?;
         self.add_same_as(ret)?;
         self.add_gender(ret).await?;
