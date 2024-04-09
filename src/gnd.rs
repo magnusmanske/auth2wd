@@ -63,6 +63,8 @@ impl ExternalImporter for GND {
 
         if self.is_undifferentiated_person()? {
             statement.set_rank(wikibase::StatementRank::Deprecated);
+            let snak = wikibase::Snak::new_item("P2241", "Q68648103");
+            statement.add_qualifier_snak(snak);
         }
 
         ret.add_claim(statement);
