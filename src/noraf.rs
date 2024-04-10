@@ -145,7 +145,8 @@ impl NORAF {
                 .filter_map(|field| field.as_str())
                 .filter_map(|s| self.url2external_id(s))
                 .for_each(|ext_id| {
-                    let statement = self.new_statement_string(ext_id.property(), ext_id.id());
+                    let mut statement = self.new_statement_string(ext_id.property(), ext_id.id());
+                    statement.set_datatype(wikibase::SnakDataType::ExternalId);
                     ret.item.add_claim(statement);
                 });
         };
