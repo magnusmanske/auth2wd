@@ -15,6 +15,7 @@ pub mod meta_item;
 pub mod nb;
 pub mod noraf;
 pub mod selibr;
+pub mod supported_property;
 pub mod viaf;
 
 use axum::{extract::Path, response::Html, routing::get, Json, Router};
@@ -27,6 +28,7 @@ use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::net::SocketAddr;
+use supported_property::SUPPORTED_PROPERTIES;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
 use wikibase::mediawiki::api::Api;
@@ -146,8 +148,12 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 
     let addr = SocketAddr::from((address, port));
     tracing::debug!("listening on {}", addr);
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(addr)
+        .await
+        .expect("Could not create listener");
+    axum::serve(listener, app)
+        .await
+        .expect("Could not start server");
 
     Ok(())
 }

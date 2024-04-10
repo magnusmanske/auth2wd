@@ -115,8 +115,8 @@ impl NORAF {
             static ref RE_BORN_DIED: Regex = Regex::new(r#"^(.*)-(.*)$"#).expect("Regexp error");
         }
         if let Some(caps) = RE_BORN_DIED.captures(date) {
-            let born = ret.parse_date(caps.get(1).unwrap().as_str());
-            let died = ret.parse_date(caps.get(2).unwrap().as_str());
+            let born = ret.parse_date(caps.get(1).unwrap().as_str()); // unwrap is safe
+            let died = ret.parse_date(caps.get(2).unwrap().as_str()); // unwrap is safe
             if let Some((time, precision)) = born {
                 let statement = self.new_statement_time(569, &time, precision);
                 ret.item.claims_mut().push(statement);
