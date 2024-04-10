@@ -1,11 +1,11 @@
 use crate::external_id::*;
 use crate::external_importer::ExternalImporter;
-use crate::merge_diff::*;
 use regex::Regex;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_json::json;
 use std::cmp::Ordering;
 use std::vec::Vec;
+use wikimisc::merge_diff::MergeDiff;
 use wikimisc::wikibase::*;
 
 lazy_static! {

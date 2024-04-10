@@ -10,7 +10,7 @@ pub mod external_importer;
 pub mod gnd;
 pub mod id_ref;
 pub mod loc;
-pub mod merge_diff;
+// pub mod merge_diff;
 pub mod meta_item;
 pub mod nb;
 pub mod noraf;
@@ -32,6 +32,7 @@ use supported_property::SUPPORTED_PROPERTIES;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
 use wikimisc::mediawiki::api::Api;
+use wikimisc::merge_diff::MergeDiff;
 
 async fn root() -> Html<String> {
     let sources: Vec<String> = SUPPORTED_PROPERTIES.iter().map(|sp| sp.as_li()).collect();
@@ -165,7 +166,7 @@ fn get_extid_from_argv(argv: &[String]) -> Result<ExternalId, Box<dyn std::error
     Ok(ExternalId::new(property, id))
 }
 
-async fn get_extend(item: &str) -> Result<merge_diff::MergeDiff, Box<dyn std::error::Error>> {
+async fn get_extend(item: &str) -> Result<MergeDiff, Box<dyn std::error::Error>> {
     let mut base_item = meta_item::MetaItem::from_entity(item).await?;
     let ext_ids: Vec<ExternalId> = base_item
         .get_external_ids()
@@ -185,7 +186,7 @@ async fn get_extend(item: &str) -> Result<merge_diff::MergeDiff, Box<dyn std::er
 
 async fn apply_diff(
     item: &str,
-    diff: &merge_diff::MergeDiff,
+    diff: &MergeDiff,
     api: &mut Api,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let json_string = json!(diff).to_string();
