@@ -109,7 +109,7 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-subscriber",
- "wikibase",
+ "wikimisc",
 ]
 
 [[package]]
@@ -2599,6 +2599,22 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
+]
+
+[[package]]
+name = "wikimisc"
+version = "0.1.0"
+source = "git+https://github.com/magnusmanske/wikimisc#2c5d903042b9199eff67918059f88ea0772d930e"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "lazy_static",
+ "regex",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tokio",
+ "wikibase",
 ]
 
 [[package]]

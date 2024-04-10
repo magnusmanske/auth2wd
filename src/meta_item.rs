@@ -6,7 +6,7 @@ use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_json::json;
 use std::cmp::Ordering;
 use std::vec::Vec;
-use wikibase::*;
+use wikimisc::wikibase::*;
 
 lazy_static! {
     static ref DATES : Vec<(Regex,String,u64)> = {
@@ -58,7 +58,7 @@ impl MetaItem {
 
     pub async fn from_entity(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let api = mediawiki::api::Api::new("https://www.wikidata.org/w/api.php").await?;
-        let entity_container = wikibase::entity_container::EntityContainer::new();
+        let entity_container = entity_container::EntityContainer::new();
         let entity = entity_container.load_entity(&api, id).await?;
         let item = match entity {
             Entity::Item(item) => item,
@@ -246,7 +246,7 @@ impl MetaItem {
         }
     }
 
-    pub async fn add_prop_text(&mut self, ext_id: ExternalId) -> Option<wikibase::Statement> {
+    pub async fn add_prop_text(&mut self, ext_id: ExternalId) -> Option<Statement> {
         let ei = crate::viaf::VIAF::new("312603351").await.ok()?; // Any prop/ID will do
         if !ei.do_not_use_external_url(ext_id.id()) {
             self.prop_text.push(ext_id);

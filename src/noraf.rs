@@ -6,8 +6,7 @@ use regex::Regex;
 use serde_json::Value;
 use sophia::inmem::graph::FastGraph;
 use std::rc::Rc;
-use wikibase::EntityTrait;
-use wikibase::LocaleString;
+use wikimisc::wikibase::{EntityTrait, LocaleString, SnakDataType};
 
 // Was: Bibsys
 
@@ -146,7 +145,7 @@ impl NORAF {
                 .filter_map(|s| self.url2external_id(s))
                 .for_each(|ext_id| {
                     let mut statement = self.new_statement_string(ext_id.property(), ext_id.id());
-                    statement.set_datatype(wikibase::SnakDataType::ExternalId);
+                    statement.set_datatype(SnakDataType::ExternalId);
                     ret.item.add_claim(statement);
                 });
         };

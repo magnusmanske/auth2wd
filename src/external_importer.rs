@@ -10,7 +10,7 @@ use sophia::inmem::graph::FastGraph;
 use sophia::turtle::serializer::nt::NtSerializer;
 use std::rc::Rc;
 use std::vec::Vec;
-use wikibase::*;
+use wikimisc::wikibase::*;
 
 lazy_static! {
     static ref EXTERNAL_ID_REGEXPS : Vec<(Regex,String,usize)> = {

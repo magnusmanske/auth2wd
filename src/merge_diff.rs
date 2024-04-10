@@ -2,7 +2,7 @@ use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_json::json;
 use std::collections::HashMap;
 use std::vec::Vec;
-use wikibase::*;
+use wikimisc::wikibase::*;
 
 /// This contains the wbeditentiry payload to ADD data to a base item, generated from a merge
 #[derive(Debug, Clone, Default)]

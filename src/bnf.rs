@@ -133,7 +133,7 @@ impl BNF {
 
 #[cfg(test)]
 mod tests {
-    use wikibase::{EntityTrait, LocaleString};
+    use wikimisc::wikibase::{EntityTrait, LocaleString};
 
     use super::*;
 

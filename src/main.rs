@@ -31,7 +31,7 @@ use std::net::SocketAddr;
 use supported_property::SUPPORTED_PROPERTIES;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
-use wikibase::mediawiki::api::Api;
+use wikimisc::mediawiki::api::Api;
 
 async fn root() -> Html<String> {
     let sources: Vec<String> = SUPPORTED_PROPERTIES.iter().map(|sp| sp.as_li()).collect();

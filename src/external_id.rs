@@ -1,7 +1,7 @@
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use wikibase::*;
+use wikimisc::wikibase::*;
 
 lazy_static! {
     static ref RE_PROPERTY_NUMERIC: Regex =
