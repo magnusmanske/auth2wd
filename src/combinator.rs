@@ -12,19 +12,39 @@ lazy_static! {
                 "VIAF",
                 "Virtual International Authority File",
                 "27063124",
+                None,
             ),
-            SupportedProperty::new(227, "GND", "Deutsche Nationalbibliothek", "118523813"),
-            SupportedProperty::new(244, "LoC", "Library of Congress", "n78095637"),
-            SupportedProperty::new(268, "BnF", "Bibliothèque nationale de France", "11898689q"),
-            SupportedProperty::new(269, "IdRef", "IdRef/SUDOC", "026812304"),
-            SupportedProperty::new(906, "SELIBR", "National Library of Sweden", "231727"),
-            SupportedProperty::new(950, "BNE", "Biblioteca Nacional de España", "XX990809"),
-            SupportedProperty::new(1015, "NORAF", "Norwegian Authority File", "90053126"),
+            SupportedProperty::new(227, "GND", "Deutsche Nationalbibliothek", "118523813", None),
+            SupportedProperty::new(244, "LoC", "Library of Congress", "n78095637", None),
+            SupportedProperty::new(
+                268,
+                "BnF",
+                "Bibliothèque nationale de France",
+                "11898689q",
+                None,
+            ),
+            SupportedProperty::new(269, "IdRef", "IdRef/SUDOC", "026812304", None),
+            SupportedProperty::new(906, "SELIBR", "National Library of Sweden", "231727", None),
+            SupportedProperty::new(
+                950,
+                "BNE",
+                "Biblioteca Nacional de España",
+                "XX990809",
+                None,
+            ),
+            SupportedProperty::new(
+                1015,
+                "NORAF",
+                "Norwegian Authority File",
+                "90053126",
+                Some("Rainer Maria Rilke".into()),
+            ),
             SupportedProperty::new(
                 1006,
                 "NB",
                 "Nationale Thesaurus voor Auteurs ID",
                 "068364229",
+                None,
             ),
         ]
     };
@@ -35,18 +55,26 @@ pub struct SupportedProperty {
     pub name: String,
     pub source: String,
     pub demo_id: String,
+    pub demo_name: String,
 }
 
 unsafe impl Send for SupportedProperty {}
 unsafe impl Sync for SupportedProperty {}
 
 impl SupportedProperty {
-    fn new(property: usize, name: &str, source: &str, demo_id: &str) -> Self {
+    fn new(
+        property: usize,
+        name: &str,
+        source: &str,
+        demo_id: &str,
+        demo_name: Option<String>,
+    ) -> Self {
         Self {
             property,
             name: name.into(),
             source: source.into(),
             demo_id: demo_id.into(),
+            demo_name: demo_name.unwrap_or("Charles Darwin".into()),
         }
     }
 
@@ -68,8 +96,8 @@ impl SupportedProperty {
 
     pub fn as_li(&self) -> String {
         format!(
-            r#"<li><a href="/item/P{}/{}">{}</a> ("Charles Darwin" from {})</li>"#,
-            self.property, &self.demo_id, &self.name, &self.source,
+            r#"<li><a href="/item/P{}/{}">{}</a> ("{}" from {})</li>"#,
+            self.property, &self.demo_id, &self.name, &self.demo_name, &self.source,
         )
     }
 }
