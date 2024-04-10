@@ -44,6 +44,9 @@ lazy_static! {
             (Regex::new(r"^https?://data.cerl.org/thesaurus/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),"${1}".to_string(),1871),
             (Regex::new(r"^https?://data.cerl.org/thesaurus/(.*)$").unwrap(),"${1}".to_string(),1871),
             (Regex::new(r"^https?://thesaurus.cerl.org/record/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),"${1}".to_string(),1871),
+            (Regex::new(r"^https?://authority\.bibsys\.no/authority/rest/authorities/html/([1-9]\d*).*$").unwrap(),"${1}".to_string(),1015),
+            (Regex::new(r"^https?://(?:www\.)?viaf\.org/processed/BIBSYS%7C([1-9]\d*)$").unwrap(),"${1}".to_string(),1015),
+            (Regex::new(r"^https://authority.bibsys.no/authority/rest/authorities/html/(\d+).*$").unwrap(),"${1}".to_string(),1015),
         ]
     };
 
@@ -103,10 +106,7 @@ pub trait ExternalImporter {
                 if url == replaced {
                     None
                 } else {
-                    Some(ExternalId {
-                        property: e.2,
-                        id: replaced.to_string(),
-                    })
+                    Some(ExternalId::new(e.2, &replaced))
                 }
             })
             .next()
@@ -323,7 +323,7 @@ pub trait ExternalImporter {
                 }
                 let _ = match self.url2external_id(&url) {
                     Some(extid) => {
-                        ret.add_claim(self.new_statement_string(extid.property, &extid.id))
+                        ret.add_claim(self.new_statement_string(extid.property(), extid.id()))
                     }
                     None => ret.add_claim(self.new_statement_url(973, &url)),
                 };
@@ -543,7 +543,7 @@ pub trait ExternalImporter {
         let mut new_prop_text = vec![];
         mi.cleanup();
         for ext_id in &mi.prop_text.to_owned() {
-            let p31s = match ext_id.property {
+            let p31s = match ext_id.property() {
                 1412 => vec!["Q34770"],          // Language spoken or written => laguage
                 131 => vec!["Q1549591", "Q515"], // Located in => city
                 27 => vec!["Q6256"],             // Nationality
@@ -554,12 +554,12 @@ pub trait ExternalImporter {
             };
             let mut found = false;
             for p31 in p31s {
-                let extid = ExternalId::new(ext_id.property, p31);
+                let extid = ExternalId::new(ext_id.property(), p31);
                 if let Some(item) = extid
-                    .get_item_for_string_external_id_value(&ext_id.id)
+                    .get_item_for_string_external_id_value(ext_id.id())
                     .await
                 {
-                    mi.add_claim(self.new_statement_item(ext_id.property, &item));
+                    mi.add_claim(self.new_statement_item(ext_id.property(), &item));
                     found = true;
                     break;
                 }
