@@ -248,7 +248,7 @@ impl MetaItem {
 
     pub async fn add_prop_text(&mut self, ext_id: ExternalId) -> Option<wikibase::Statement> {
         let ei = crate::viaf::VIAF::new("312603351").await.ok()?; // Any prop/ID will do
-        if !ei.do_not_use_external_url(&ext_id.id) {
+        if !ei.do_not_use_external_url(ext_id.id()) {
             self.prop_text.push(ext_id);
         }
         None

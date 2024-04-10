@@ -12,8 +12,8 @@ lazy_static! {
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct ExternalId {
-    pub property: usize,
-    pub id: String,
+    property: usize,
+    id: String,
 }
 
 impl fmt::Display for ExternalId {
@@ -83,6 +83,14 @@ impl ExternalId {
     pub async fn get_item_for_string_external_id_value(&self, s: &str) -> Option<String> {
         let query = format!("{s} haswbstatement:\"P{}={}\"", self.property, &self.id);
         self.search_wikidata_single_item(&query).await
+    }
+
+    pub fn property(&self) -> usize {
+        self.property
+    }
+
+    pub fn id(&self) -> &str {
+        &self.id
     }
 }
 

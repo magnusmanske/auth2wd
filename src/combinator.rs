@@ -19,6 +19,7 @@ lazy_static! {
             SupportedProperty::new(269, "IdRef", "IdRef/SUDOC", "026812304"),
             SupportedProperty::new(906, "SELIBR", "National Library of Sweden", "231727"),
             SupportedProperty::new(950, "BNE", "Biblioteca Nacional de España", "XX990809"),
+            SupportedProperty::new(1015, "NORAF", "Norwegian Authority File", "90053126"),
             SupportedProperty::new(
                 1006,
                 "NB",
@@ -59,6 +60,7 @@ impl SupportedProperty {
             906 => Box::new(crate::selibr::SELIBR::new(id).await?),
             950 => Box::new(crate::bne::BNE::new(id).await?),
             1006 => Box::new(crate::nb::NB::new(id).await?),
+            1015 => Box::new(crate::noraf::NORAF::new(id).await?),
             _ => panic!("no generator for property: 'P{}'", self.property),
         };
         Ok(ret)
@@ -103,17 +105,17 @@ impl Combinator {
     ) -> Result<Box<dyn ExternalImporter + Send + Sync>> {
         match SUPPORTED_PROPERTIES
             .iter()
-            .find(|sp| sp.property == id.property)
+            .find(|sp| sp.property == id.property())
         {
-            Some(sp) => sp.generator(&id.id).await,
-            None => Err(anyhow!("unsupported property: '{}'", id.property)),
+            Some(sp) => sp.generator(id.id()).await,
+            None => Err(anyhow!("unsupported property: '{}'", id.property())),
         }
     }
 
     pub fn has_parser_for_ext_id(id: &ExternalId) -> bool {
         SUPPORTED_PROPERTIES
             .iter()
-            .any(|sp| sp.property == id.property)
+            .any(|sp| sp.property == id.property())
     }
 
     pub async fn import(&mut self, ids: Vec<ExternalId>) -> Result<()> {
@@ -125,12 +127,16 @@ impl Combinator {
                 None => break,
             };
             ids_used.push(id.to_owned());
-            let parser =
-                match Self::get_parser_for_property(&format!("P{}", id.property), &id.id).await {
-                    Ok(parser) => parser,
-                    _ => continue,
-                };
-            let key = ExternalId::new(id.property, &parser.my_id()).to_string();
+            let parser = match Self::get_parser_for_property(
+                &format!("P{}", id.property()),
+                id.id(),
+            )
+            .await
+            {
+                Ok(parser) => parser,
+                _ => continue,
+            };
+            let key = ExternalId::new(id.property(), &parser.my_id()).to_string();
             if self.items.contains_key(&key) {
                 continue;
             }
