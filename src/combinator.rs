@@ -3,7 +3,9 @@ use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::supported_property::SUPPORTED_PROPERTIES;
 use anyhow::{anyhow, Result};
+use futures::future::join_all;
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 #[derive(Debug, Clone, Default)]
 pub struct Combinator {
@@ -53,33 +55,48 @@ impl Combinator {
     }
 
     pub async fn import(&mut self, ids: Vec<ExternalId>) -> Result<()> {
-        let mut ids_used: Vec<ExternalId> = vec![];
+        let mut ids_used: HashSet<ExternalId> = HashSet::new();
         let mut ids = ids.to_owned();
         while !ids.is_empty() {
-            let id = match ids.pop() {
-                Some(id) => id,
-                None => break,
-            };
-            ids_used.push(id.to_owned());
-            let parser = match Self::get_parser_for_property(
-                &format!("P{}", id.property()),
-                id.id(),
-            )
-            .await
-            {
-                Ok(parser) => parser,
-                _ => continue,
-            };
-            let key = ExternalId::new(id.property(), &parser.my_id()).to_string();
-            if self.items.contains_key(&key) {
-                continue;
+            ids.sort();
+            ids.dedup();
+            let mut futures = vec![];
+            for ext_id in &ids {
+                ids_used.insert(ext_id.to_owned());
+                let parser = Self::get_parser_for_ext_id(ext_id);
+                futures.push(parser);
             }
-            let item = parser.run().await?;
-            let external_ids = item.get_external_ids();
-            self.items.insert(key, item);
-            for external_id in external_ids {
-                if !ids_used.contains(&external_id) && !ids.contains(&external_id) {
-                    ids.push(external_id.to_owned());
+            let parsers = join_all(futures).await;
+            let parsers: Vec<_> = parsers
+                .into_iter()
+                .filter_map(|parser| parser.ok())
+                .collect();
+
+            ids.clear();
+            let mut futures = vec![];
+            for parser in &parsers {
+                let key = ExternalId::new(parser.my_property(), &parser.my_id()).to_string();
+                if self.items.contains_key(&key) {
+                    continue;
+                }
+                futures.push(parser.run());
+            }
+            let items = join_all(futures).await;
+            for (parser, item) in std::iter::zip(parsers, items) {
+                let item = match item {
+                    Ok(item) => item,
+                    Err(_) => continue,
+                };
+                let key = ExternalId::new(parser.my_property(), &parser.my_id()).to_string();
+                if self.items.contains_key(&key) {
+                    continue;
+                }
+                let external_ids = item.get_external_ids();
+                self.items.insert(key, item);
+                for external_id in external_ids {
+                    if !ids_used.contains(&external_id) && !ids.contains(&external_id) {
+                        ids.push(external_id.to_owned());
+                    }
                 }
             }
         }

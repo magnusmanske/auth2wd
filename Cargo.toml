@@ -28,3 +28,4 @@ tracing = "*"
 tracing-subscriber = "*"
 tower-http = { version = "*", features = ["full"] }
 anyhow = "*"
+futures = "*"
