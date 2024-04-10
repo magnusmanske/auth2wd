@@ -46,7 +46,7 @@ lazy_static! {
             (Regex::new(r"^https?://thesaurus.cerl.org/record/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),"${1}".to_string(),1871),
             (Regex::new(r"^https?://authority\.bibsys\.no/authority/rest/authorities/html/([1-9]\d*).*$").unwrap(),"${1}".to_string(),1015),
             (Regex::new(r"^https?://(?:www\.)?viaf\.org/processed/BIBSYS%7C([1-9]\d*)$").unwrap(),"${1}".to_string(),1015),
-            (Regex::new(r"^https://authority.bibsys.no/authority/rest/authorities/html/(\d+).*$").unwrap(),"${1}".to_string(),1015),
+            (Regex::new(r"^https?://authority.bibsys.no/authority/rest/authorities/html/(\d+).*$").unwrap(),"${1}".to_string(),1015),
         ]
     };
 
