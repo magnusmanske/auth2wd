@@ -1,14 +1,14 @@
-use std::rc::Rc;
-
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::utility::Utility;
 use anyhow::{anyhow, Result};
 use axum::async_trait;
 use regex::Regex;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
+use std::rc::Rc;
 
 lazy_static! {
     static ref RE_NUMERIC_ID: Regex =
@@ -95,6 +95,16 @@ impl ExternalImporter for BNF {
             }
         }
 
+        let born_died_in = [
+            ("http://rdvocab.info/ElementsGr2/placeOfBirth", 19),
+            ("http://rdvocab.info/ElementsGr2/placeOfDeath", 20),
+        ];
+        for (key, prop) in born_died_in {
+            for s in self.triples_subject_literals(&self.get_id_url(), key)? {
+                ret.add_prop_text(ExternalId::new(prop, &s)).await;
+            }
+        }
+
         self.try_rescue_prop_text(&mut ret).await?;
         ret.cleanup();
         Ok(ret)
@@ -114,7 +124,7 @@ impl BNF {
         };
 
         let rdf_url = format!("https://data.bnf.fr/{numeric_id}/{name}/rdf.xml");
-        let resp = reqwest::get(&rdf_url).await?.text().await?;
+        let resp = Utility::get_url(&rdf_url).await?;
 
         let mut graph: FastGraph = FastGraph::new();
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
@@ -126,7 +136,7 @@ impl BNF {
 
     async fn get_name_for_id(numeric_id: &str) -> Option<String> {
         let rdf_url = format!("https://data.bnf.fr/en/{numeric_id}");
-        let resp = reqwest::get(&rdf_url).await.ok()?.text().await.ok()?;
+        let resp = Utility::get_url(&rdf_url).await.ok()?;
         Some(RE_URL.captures(&resp)?.get(1)?.as_str().to_string())
     }
 }
@@ -138,15 +148,37 @@ mod tests {
     use super::*;
 
     const TEST_ID: &str = "11898689q";
+    const TEST_ID2: &str = "15585136v";
 
     #[tokio::test]
     async fn test_run() {
-        let viaf = BNF::new(TEST_ID).await.unwrap();
-        let meta_item = viaf.run().await.unwrap();
+        let bnf = BNF::new(TEST_ID).await.unwrap();
+        let meta_item = bnf.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
             vec![LocaleString::new("fr", "Charles Darwin")]
         );
+    }
+
+    #[tokio::test]
+    async fn test_run_birth_death_place() {
+        let bnf = BNF::new(TEST_ID2).await.unwrap();
+        let meta_item = bnf.run().await.unwrap();
+        assert_eq!(
+            *meta_item.item.labels(),
+            vec![LocaleString::new("fr", "Louis Bassal")]
+        );
+        assert_eq!(meta_item.prop_text.len(), 2);
+        assert_eq!(
+            meta_item.prop_text[0],
+            ExternalId::new(19, "Rivesaltes (Pyrénées-Orientales)")
+        );
+        assert_eq!(
+            meta_item.prop_text[1],
+            ExternalId::new(20, "Grenoble (Isère)")
+        );
+
+        println!("{:?}", meta_item.prop_text);
     }
 
     #[tokio::test]

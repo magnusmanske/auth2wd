@@ -10,12 +10,12 @@ pub mod external_importer;
 pub mod gnd;
 pub mod id_ref;
 pub mod loc;
-// pub mod merge_diff;
 pub mod meta_item;
 pub mod nb;
 pub mod noraf;
 pub mod selibr;
 pub mod supported_property;
+pub mod utility;
 pub mod viaf;
 
 use axum::{extract::Path, response::Html, routing::get, Json, Router};
