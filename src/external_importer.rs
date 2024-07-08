@@ -307,7 +307,7 @@ pub trait ExternalImporter {
         )
     }
 
-    fn add_same_as(&self, ret: &mut MetaItem) -> Result<()> {
+    async fn add_same_as(&self, ret: &mut MetaItem) -> Result<()> {
         let iris = [
             "http://www.w3.org/2002/07/owl#sameAs",
             "http://www.w3.org/2002/07/owl#sameAs",
@@ -323,7 +323,11 @@ pub trait ExternalImporter {
                 }
                 let _ = match self.url2external_id(&url) {
                     Some(extid) => {
-                        ret.add_claim(self.new_statement_string(extid.property(), extid.id()))
+                        if extid.check_if_valid().await? {
+                            ret.add_claim(self.new_statement_string(extid.property(), extid.id()))
+                        } else {
+                            None
+                        }
                     }
                     None => ret.add_claim(self.new_statement_url(973, &url)),
                 };
@@ -507,7 +511,7 @@ pub trait ExternalImporter {
     async fn add_the_usual(&self, ret: &mut MetaItem) -> Result<()> {
         self.add_own_id(ret)?;
         self.add_instance_of(ret).await?;
-        self.add_same_as(ret)?;
+        self.add_same_as(ret).await?;
         self.add_gender(ret).await?;
         self.add_label_aliases(ret)?;
         self.add_description(ret)?;

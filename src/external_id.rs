@@ -1,12 +1,16 @@
+use anyhow::Result;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::fmt;
+use std::{collections::HashMap, fmt, sync::Arc};
+use tokio::sync::Mutex;
 use wikimisc::wikibase::*;
 
 lazy_static! {
     static ref RE_PROPERTY_NUMERIC: Regex =
         Regex::new(r#"^\s*[Pp](\d+)\s*$"#).expect("Regexp error");
     static ref RE_FROM_STRING: Regex = Regex::new(r#"^[Pp](\d+):(.+)$"#).expect("Regexp error");
+    static ref EXTERNAL_IDS_OK_CACHE: Arc<Mutex<HashMap<ExternalId, bool>>> =
+        Arc::new(Mutex::new(HashMap::new()));
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Hash)]
@@ -82,6 +86,28 @@ impl ExternalId {
     pub async fn get_item_for_string_external_id_value(&self, s: &str) -> Option<String> {
         let query = format!("{s} haswbstatement:\"P{}={}\"", self.property, &self.id);
         self.search_wikidata_single_item(&query).await
+    }
+
+    /// Checks some properties (eg GND) if the external ID is valid (eg not deprecated)
+    pub async fn check_if_valid(&self) -> Result<bool> {
+        if let Some(is_ok) = EXTERNAL_IDS_OK_CACHE.lock().await.get(self) {
+            return Ok(*is_ok);
+        }
+        let mut ret = true;
+        let mut was_checked = false;
+        if self.property == 227 {
+            // GND
+            was_checked = true;
+            let url = format!("https://d-nb.info/gnd/{}/about/lds.rdf", self.id);
+            let resp = reqwest::get(&url).await?.text().await?;
+            let check = format!("rdf:about=\"https://d-nb.info/gnd/{}\">", self.id);
+            ret = resp.contains(&check);
+        }
+        if was_checked {
+            // No need to store the result if no check was run
+            EXTERNAL_IDS_OK_CACHE.lock().await.insert(self.clone(), ret);
+        }
+        Ok(ret)
     }
 
     pub fn property(&self) -> usize {
