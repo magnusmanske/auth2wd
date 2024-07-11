@@ -109,10 +109,12 @@ async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
     if let Err(e) = combinator.import(ext_ids).await {
         return Json(json!({"status":e.to_string()}));
     }
-    let other = match combinator.combine() {
+    let mut other = match combinator.combine() {
         Some(other) => other,
         None => return Json(json!({"status":"No items to combine"})),
     };
+    other.fix_dates();
+    other.fix_images(&base_item);
     let diff = base_item.merge(&other);
     Json(json!(diff))
 }
@@ -182,6 +184,7 @@ async fn get_extend(item: &str) -> Result<MergeDiff, Box<dyn std::error::Error>>
         None => return Err("No items to combine".into()),
     };
     other.fix_dates();
+    other.fix_images(&base_item);
     Ok(base_item.merge(&other))
 }
 

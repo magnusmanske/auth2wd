@@ -254,7 +254,7 @@ pub trait ExternalImporter {
                 SnakType::Value,
                 Some(DataValue::new(
                     DataValueType::MonoLingualText,
-                    Value::MonoLingual(MonoLingualText::new(lang, s)),
+                    Value::MonoLingual(MonoLingualText::new(s, lang)),
                 )),
             ),
             vec![],

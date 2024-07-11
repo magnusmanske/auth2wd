@@ -176,6 +176,20 @@ impl MetaItem {
         self.prop_text.dedup();
     }
 
+    pub fn fix_images(&mut self, base_item: &MetaItem) {
+        // Check if base item has P18 image, remove P4765 (commons compatible image URL)
+        if base_item
+            .item
+            .claims()
+            .iter()
+            .any(|c| c.main_snak().property() == "P18")
+        {
+            self.item
+                .claims_mut()
+                .retain(|c| c.main_snak().property() != "P4765");
+        }
+    }
+
     /// Fixes birth and death dates by deprecating less precise ones.
     /// https://github.com/magnusmanske/auth2wd/issues/1
     pub fn fix_dates(&mut self) {
