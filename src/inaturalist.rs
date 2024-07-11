@@ -120,9 +120,7 @@ impl INaturalist {
 
     fn add_commons_compatible_image(&self, ret: &mut MetaItem) -> Option<()> {
         let default_photo = self.json.get("default_photo")?.as_object()?;
-        if Some(true) == self.add_commons_compatible_image_from_photo(ret, default_photo) {
-            return Some(());
-        }
+        let _ = self.add_commons_compatible_image_from_photo(ret, default_photo);
         let taxon_photos = self.json.get("taxon_photos")?.as_array()?;
         let _found = taxon_photos
             .iter()
@@ -130,7 +128,7 @@ impl INaturalist {
             .filter_map(|photo| photo.get("photo"))
             .filter_map(|photo| photo.as_object())
             .filter_map(|photo| self.add_commons_compatible_image_from_photo(ret, photo))
-            .any(|result| result);
+            .count();
         Some(())
     }
 
@@ -286,6 +284,6 @@ mod tests {
             meta_item.item.labels()[0],
             LocaleString::new("en", "Licea bryophila")
         );
-        assert_eq!(meta_item.item.claims().len(), 6);
+        assert_eq!(meta_item.item.claims().len(), 8);
     }
 }
