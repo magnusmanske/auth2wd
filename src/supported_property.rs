@@ -51,6 +51,13 @@ lazy_static! {
                 "890",
                 Some("Ruffed Grouse".to_string()),
             ),
+            SupportedProperty::new(
+                685,
+                "NCBI taxonomy",
+                "NCBI taxon ID",
+                "1747344",
+                Some("Priocnessus nuperus".to_string()),
+            ),
         ]
     };
 }
@@ -90,6 +97,7 @@ impl SupportedProperty {
             244 => Box::new(crate::loc::LOC::new(id).await?),
             268 => Box::new(crate::bnf::BNF::new(id).await?),
             269 => Box::new(crate::id_ref::IdRef::new(id).await?),
+            685 => Box::new(crate::ncbi_taxonomy::NCBItaxonomy::new(id).await?),
             906 => Box::new(crate::selibr::SELIBR::new(id).await?),
             950 => Box::new(crate::bne::BNE::new(id).await?),
             1006 => Box::new(crate::nb::NB::new(id).await?),

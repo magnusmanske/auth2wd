@@ -10,6 +10,7 @@ sophia = { version = "*", features = ["xml"] }
 reqwest = { version = "*", features = ["blocking", "json"] }
 tokio = { version = "1", features = ["full"] }
 lazy_static = "1"
+quickxml_to_serde = "0.6"
 regex = "1"
 wikimisc = { git = "https://github.com/magnusmanske/wikimisc" }
 serde = "1"

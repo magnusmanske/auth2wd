@@ -13,6 +13,7 @@ pub mod inaturalist;
 pub mod loc;
 pub mod meta_item;
 pub mod nb;
+pub mod ncbi_taxonomy;
 pub mod noraf;
 pub mod selibr;
 pub mod supported_property;
