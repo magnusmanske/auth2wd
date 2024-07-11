@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
@@ -11,7 +9,7 @@ use sophia::xml;
 
 pub struct BNE {
     id: String,
-    graph: Rc<FastGraph>,
+    graph: FastGraph,
 }
 
 unsafe impl Send for BNE {}
@@ -33,10 +31,6 @@ impl ExternalImporter for BNE {
 
     fn graph(&self) -> &FastGraph {
         &self.graph
-    }
-
-    fn graph_mut(&mut self) -> &mut Rc<FastGraph> {
-        &mut self.graph
     }
 
     fn primary_language(&self) -> String {
@@ -90,7 +84,7 @@ impl BNE {
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
-            graph: Rc::new(graph),
+            graph,
         })
     }
 }

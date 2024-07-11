@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::external_importer::*;
 use crate::meta_item::*;
 use anyhow::Result;
@@ -11,7 +9,7 @@ use sophia::xml;
 #[derive(Clone)]
 pub struct VIAF {
     id: String,
-    graph: Rc<FastGraph>,
+    graph: FastGraph,
 }
 
 unsafe impl Send for VIAF {}
@@ -38,9 +36,6 @@ impl ExternalImporter for VIAF {
     fn graph(&self) -> &FastGraph {
         &self.graph
     }
-    fn graph_mut(&mut self) -> &mut Rc<FastGraph> {
-        &mut self.graph
-    }
     fn transform_label(&self, s: &str) -> String {
         self.transform_label_last_first_name(s)
     }
@@ -63,7 +58,7 @@ impl VIAF {
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
-            graph: Rc::new(graph),
+            graph,
         })
     }
 }
@@ -127,12 +122,5 @@ mod tests {
             *meta_item.item.labels(),
             vec![LocaleString::new("en", "Magnus Manske")]
         );
-    }
-
-    #[tokio::test]
-    async fn test_graph() {
-        let mut viaf = VIAF::new(TEST_ID).await.unwrap();
-        let _graph = viaf.graph();
-        let _graph = viaf.graph_mut();
     }
 }

@@ -7,7 +7,6 @@ use regex::Regex;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
-use std::rc::Rc;
 use wikimisc::wikibase::{Snak, StatementRank};
 
 lazy_static! {
@@ -19,7 +18,7 @@ lazy_static! {
 #[derive(Clone)]
 pub struct GND {
     id: String,
-    graph: Rc<FastGraph>,
+    graph: FastGraph,
 }
 
 unsafe impl Send for GND {}
@@ -41,10 +40,6 @@ impl ExternalImporter for GND {
 
     fn graph(&self) -> &FastGraph {
         &self.graph
-    }
-
-    fn graph_mut(&mut self) -> &mut Rc<FastGraph> {
-        &mut self.graph
     }
 
     fn primary_language(&self) -> String {
@@ -183,7 +178,7 @@ impl GND {
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         let mut ret = Self {
             id: id.to_string(),
-            graph: Rc::new(graph),
+            graph,
         };
         ret.fix_own_id()?;
         Ok(ret)
@@ -259,12 +254,5 @@ mod tests {
             *meta_item.item.labels(),
             vec![LocaleString::new("de", "Magnus Manske")]
         );
-    }
-
-    #[tokio::test]
-    async fn test_graph() {
-        let mut gnd = GND::new(TEST_ID).await.unwrap();
-        let _graph = gnd.graph();
-        let _graph = gnd.graph_mut();
     }
 }

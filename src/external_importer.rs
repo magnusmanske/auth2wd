@@ -8,7 +8,6 @@ use sophia::api::ns;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::turtle::serializer::nt::NtSerializer;
-use std::rc::Rc;
 use std::vec::Vec;
 use wikimisc::wikibase::*;
 
@@ -68,7 +67,6 @@ pub trait ExternalImporter {
     // These methods need to be implemented by the importer
     fn get_key_url(&self, key: &str) -> String;
     fn graph(&self) -> &FastGraph;
-    fn graph_mut(&mut self) -> &mut Rc<FastGraph>;
     fn primary_language(&self) -> String;
     fn my_property(&self) -> usize;
     fn my_id(&self) -> String;
@@ -81,8 +79,8 @@ pub trait ExternalImporter {
 
     fn get_graph_text(&mut self) -> String {
         let mut nt_stringifier = NtSerializer::new_stringifier();
-        let graph = self.graph_mut();
-        match nt_stringifier.serialize_graph(graph.as_ref()) {
+        let graph = self.graph();
+        match nt_stringifier.serialize_graph(graph) {
             Ok(s) => s.to_string(),
             Err(_) => String::new(),
         }
@@ -239,6 +237,24 @@ pub trait ExternalImporter {
                 Some(DataValue::new(
                     DataValueType::StringType,
                     Value::StringValue(s.to_owned()),
+                )),
+            ),
+            vec![],
+            self.get_ref(),
+        )
+    }
+
+    fn new_statement_monolingual_text(&self, property: usize, lang: &str, s: &str) -> Statement {
+        Statement::new(
+            "statement",
+            StatementRank::Normal,
+            Snak::new(
+                SnakDataType::MonolingualText,
+                format!("P{}", property),
+                SnakType::Value,
+                Some(DataValue::new(
+                    DataValueType::MonoLingualText,
+                    Value::MonoLingual(MonoLingualText::new(lang, s)),
                 )),
             ),
             vec![],
@@ -451,10 +467,9 @@ pub trait ExternalImporter {
     ) -> Result<bool> {
         let mut found = false;
         for s in self.triples_literals(p_iri)? {
-            let ext_id = ExternalId::new(prop, &s);
             let query = format!("{s} haswbstatement:P31={p31}");
             // TODO check all returned items for label/alias instead of just returning item if a single one was found
-            match ext_id.search_wikidata_single_item(&query).await {
+            match ExternalId::search_wikidata_single_item(&query).await {
                 Some(item) => {
                     ret.add_claim(self.new_statement_item(prop, &item));
                     found = true;

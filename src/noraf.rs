@@ -5,14 +5,12 @@ use axum::async_trait;
 use regex::Regex;
 use serde_json::Value;
 use sophia::inmem::graph::FastGraph;
-use std::rc::Rc;
 use wikimisc::wikibase::{EntityTrait, LocaleString, SnakDataType};
 
 // Was: Bibsys
 
 pub struct NORAF {
     id: String,
-    graph: Rc<FastGraph>,
     j: Value,
 }
 
@@ -34,11 +32,10 @@ impl ExternalImporter for NORAF {
     }
 
     fn graph(&self) -> &FastGraph {
-        &self.graph
-    }
-
-    fn graph_mut(&mut self) -> &mut Rc<FastGraph> {
-        &mut self.graph
+        lazy_static! {
+            static ref DUMMY_GRAPH: FastGraph = FastGraph::new();
+        }
+        &DUMMY_GRAPH
     }
 
     fn primary_language(&self) -> String {
@@ -72,10 +69,8 @@ impl NORAF {
         let rdf_url = format!("https://authority.bibsys.no/authority/rest/authorities/v2/{id}");
         let resp = reqwest::get(&rdf_url).await?.text().await?;
         let j: Value = serde_json::from_str(&resp)?;
-        let dummy: FastGraph = FastGraph::new();
         Ok(Self {
             id: id.to_string(),
-            graph: Rc::new(dummy),
             j,
         })
     }

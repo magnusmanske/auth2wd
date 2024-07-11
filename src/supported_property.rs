@@ -44,6 +44,13 @@ lazy_static! {
                 "068364229",
                 None,
             ),
+            SupportedProperty::new(
+                3151,
+                "INaturalist",
+                "INaturalist taxon ID",
+                "890",
+                Some("Ruffed Grouse".to_string()),
+            ),
         ]
     };
 }
@@ -87,6 +94,7 @@ impl SupportedProperty {
             950 => Box::new(crate::bne::BNE::new(id).await?),
             1006 => Box::new(crate::nb::NB::new(id).await?),
             1015 => Box::new(crate::noraf::NORAF::new(id).await?),
+            3151 => Box::new(crate::inaturalist::INaturalist::new(id).await?),
             _ => return Err(anyhow!("no generator for property: 'P{}'", self.property)),
         };
         Ok(ret)

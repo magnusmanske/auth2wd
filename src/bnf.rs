@@ -8,7 +8,6 @@ use regex::Regex;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
-use std::rc::Rc;
 
 lazy_static! {
     static ref RE_NUMERIC_ID: Regex =
@@ -20,7 +19,7 @@ lazy_static! {
 
 pub struct BNF {
     id: String,
-    graph: Rc<FastGraph>,
+    graph: FastGraph,
 }
 
 unsafe impl Send for BNF {}
@@ -42,10 +41,6 @@ impl ExternalImporter for BNF {
 
     fn graph(&self) -> &FastGraph {
         &self.graph
-    }
-
-    fn graph_mut(&mut self) -> &mut Rc<FastGraph> {
-        &mut self.graph
     }
 
     fn primary_language(&self) -> String {
@@ -130,7 +125,7 @@ impl BNF {
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
-            graph: Rc::new(graph),
+            graph,
         })
     }
 

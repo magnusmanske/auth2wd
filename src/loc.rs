@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::external_importer::*;
 use crate::meta_item::*;
 use anyhow::Result;
@@ -10,7 +8,7 @@ use sophia::xml;
 
 pub struct LOC {
     id: String,
-    graph: Rc<FastGraph>,
+    graph: FastGraph,
 }
 
 const HTTP_USER_AGENT : &str = "Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405";
@@ -39,9 +37,6 @@ impl ExternalImporter for LOC {
     fn graph(&self) -> &FastGraph {
         &self.graph
     }
-    fn graph_mut(&mut self) -> &mut Rc<FastGraph> {
-        &mut self.graph
-    }
     fn transform_label(&self, s: &str) -> String {
         self.transform_label_last_first_name(s)
     }
@@ -67,7 +62,7 @@ impl LOC {
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
-            graph: Rc::new(graph),
+            graph,
         })
     }
 }

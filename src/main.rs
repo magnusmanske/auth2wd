@@ -9,6 +9,7 @@ pub mod external_id;
 pub mod external_importer;
 pub mod gnd;
 pub mod id_ref;
+pub mod inaturalist;
 pub mod loc;
 pub mod meta_item;
 pub mod nb;

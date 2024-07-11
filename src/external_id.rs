@@ -66,7 +66,7 @@ impl ExternalId {
         Some(Self::new(prop_numeric, id))
     }
 
-    pub async fn search_wikidata_single_item(&self, query: &str) -> Option<String> {
+    pub async fn search_wikidata_single_item(query: &str) -> Option<String> {
         // TODO urlencode query?
         let url = format!("https://www.wikidata.org/w/api.php?action=query&list=search&srnamespace=0&format=json&srsearch={}",&query);
         let text = reqwest::get(url).await.ok()?.text().await.ok()?;
@@ -80,12 +80,12 @@ impl ExternalId {
 
     pub async fn get_item_for_external_id_value(&self) -> Option<String> {
         let query = format!("haswbstatement:\"P{}={}\"", self.property, self.id);
-        self.search_wikidata_single_item(&query).await
+        Self::search_wikidata_single_item(&query).await
     }
 
     pub async fn get_item_for_string_external_id_value(&self, s: &str) -> Option<String> {
         let query = format!("{s} haswbstatement:\"P{}={}\"", self.property, &self.id);
-        self.search_wikidata_single_item(&query).await
+        Self::search_wikidata_single_item(&query).await
     }
 
     /// Checks some properties (eg GND) if the external ID is valid (eg not deprecated)
