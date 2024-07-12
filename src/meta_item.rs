@@ -41,6 +41,13 @@ impl MetaItem {
         Self::default()
     }
 
+    pub fn new_from_item(item: ItemEntity) -> Self {
+        Self {
+            item,
+            ..Default::default()
+        }
+    }
+
     pub async fn from_entity(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let api = mediawiki::api::Api::new("https://www.wikidata.org/w/api.php").await?;
         let entity_container = entity_container::EntityContainer::new();

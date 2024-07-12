@@ -21,40 +21,39 @@ pub mod supported_property;
 pub mod utility;
 pub mod viaf;
 
+use axum::Form;
 use axum::{extract::Path, response::Html, routing::get, Json, Router};
 use combinator::*;
 use external_id::*;
 use external_importer::*;
-use serde_json::json;
+use meta_item::MetaItem;
+use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
 use std::collections::HashMap;
-use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::net::SocketAddr;
+use std::{env, fs};
 use supported_property::SUPPORTED_PROPERTIES;
 use tower_http::cors::{Any, CorsLayer};
+use tower_http::services::ServeDir;
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
+use wikimisc::item_merger::ItemMerger;
 use wikimisc::mediawiki::api::Api;
 use wikimisc::merge_diff::MergeDiff;
+use wikimisc::wikibase::{EntityTrait, ItemEntity, Snak, Statement};
+
+fn wrap_html(html: &str) -> String {
+    let outer: String = fs::read_to_string("./html/wrapper.html").unwrap();
+    let ret = outer.replace("$1$", html);
+    ret
+}
 
 async fn root() -> Html<String> {
     let sources: Vec<String> = SUPPORTED_PROPERTIES.iter().map(|sp| sp.as_li()).collect();
-    let html = r##"<h1>Auhority Control data to Wikidata item</h1>
-    This API can load AC (Authority Control) data from other sources and convert them into a Wikidata item.
-
-    <h2>Available sources</h3>
-    <ul>"##.to_string() + &sources.join("\n") + r##"</ul>
-    <h2>Functions</h2>
-    <ul>
-    <li><a href="/item/P227/118523813">item</a>, the JSON of a new item containing the parsed data from the respective source</li>
-    <li><a href="/meta_item/P1006/068364229">meta_item</a>, item plus some properties that could not be resolved automatically</li>
-    <li><a href="/graph/P227/118523813">graph</a>, the internal graph representation before parsing</li>
-    <li><a href="/extend/Q1035">extend</a>, extract AC data from external IDs in an item, and get the payload for <tt>wbeditentity</tt></li>
-    </ul>
-    <hr/>
-    <a href='https://github.com/magnusmanske/auth2wd'>git</a>
-    "##;
-    Html(html)
+    let mut html: String = fs::read_to_string("./html/root.html").unwrap();
+    html = html.replace("$1$", &sources.join("\n"));
+    Html(wrap_html(&html))
 }
 
 async fn item(Path((property, id)): Path<(String, String)>) -> Json<serde_json::Value> {
@@ -97,7 +96,7 @@ async fn graph(Path((property, id)): Path<(String, String)>) -> String {
 }
 
 async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
-    let mut base_item = match meta_item::MetaItem::from_entity(&item).await {
+    let mut base_item = match MetaItem::from_entity(&item).await {
         Ok(base_item) => base_item,
         Err(e) => return Json(json!({"status":e.to_string()})),
     };
@@ -121,6 +120,73 @@ async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
     Json(json!(diff))
 }
 
+#[derive(Serialize, Deserialize)]
+struct MergeForm {
+    base_item: String,
+    new_item: String,
+}
+
+fn item_from_json_string(s: &str) -> Result<(ItemEntity, bool), String> {
+    let mut item = serde_json::from_str::<Value>(s).map_err(|e| e.to_string())?;
+    let mut has_fake_id = false;
+    if item.get("id").is_none() {
+        item["id"] = json!("Q0");
+        has_fake_id = true;
+    }
+    let item = ItemEntity::new_from_json(&item).map_err(|e| e.to_string())?;
+    Ok((item, has_fake_id))
+}
+
+async fn merge(Form(params): Form<MergeForm>) -> Json<serde_json::Value> {
+    let (base_item, base_item_has_fake_id) = match item_from_json_string(&params.base_item) {
+        Ok(item) => item,
+        Err(e) => return Json(json!({"error":e.to_string()})),
+    };
+    let (new_item, _) = match item_from_json_string(&params.new_item) {
+        Ok(item) => item,
+        Err(e) => return Json(json!({"error":e.to_string()})),
+    };
+
+    let mut im = ItemMerger::new(base_item);
+    let diff = im.merge(&new_item);
+
+    let mut j = im.item.to_json();
+    if base_item_has_fake_id {
+        if let Some(jo) = j.as_object_mut() {
+            jo.remove("id");
+        }
+    }
+    let j = json!({"item":j,"diff":diff});
+    Json(j)
+}
+
+async fn merge_info() -> Html<String> {
+    let mut base_item = ItemEntity::new_empty();
+    let mut new_item = ItemEntity::new_empty();
+    base_item.set_id("Q0".to_string());
+    new_item.set_id("Q0".to_string());
+    base_item.add_claim(Statement::new_normal(
+        Snak::new_item("P31", "Q5"),
+        vec![],
+        vec![],
+    ));
+    new_item.add_claim(Statement::new_normal(
+        Snak::new_string("P18", "Pretty_image.jpg"),
+        vec![],
+        vec![],
+    ));
+
+    let mut base_item = base_item.to_json();
+    let mut new_item = new_item.to_json();
+    base_item.as_object_mut().unwrap().remove("id");
+    new_item.as_object_mut().unwrap().remove("id");
+
+    let mut html: String = fs::read_to_string("./html/merge_info.html").unwrap();
+    html = html.replace("$1$", &serde_json::to_string_pretty(&base_item).unwrap());
+    html = html.replace("$2$", &serde_json::to_string_pretty(&new_item).unwrap());
+    Html(wrap_html(&html))
+}
+
 async fn supported_properties() -> Json<serde_json::Value> {
     let ret: Vec<String> = Combinator::get_supported_properties()
         .iter()
@@ -141,6 +207,8 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
         .route("/meta_item/:prop/:id", get(meta_item))
         .route("/graph/:prop/:id", get(graph))
         .route("/extend/:item", get(extend))
+        .route("/merge", get(merge_info).post(merge))
+        .nest_service("/images", ServeDir::new("images"))
         .layer(TraceLayer::new_for_http())
         .layer(CompressionLayer::new())
         .layer(cors);
@@ -172,7 +240,7 @@ fn get_extid_from_argv(argv: &[String]) -> Result<ExternalId, Box<dyn std::error
 }
 
 async fn get_extend(item: &str) -> Result<MergeDiff, Box<dyn std::error::Error>> {
-    let mut base_item = meta_item::MetaItem::from_entity(item).await?;
+    let mut base_item = MetaItem::from_entity(item).await?;
     let ext_ids: Vec<ExternalId> = base_item
         .get_external_ids()
         .iter()
@@ -243,7 +311,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match argv.get(1).map(|s| s.as_str()) {
         Some("combinator") => {
             // Combinator
-            let mut base_item = meta_item::MetaItem::from_entity("Q1035").await?;
+            let mut base_item = MetaItem::from_entity("Q1035").await?;
             //println!("{:?}",&base_item);
             let ext_id = get_extid_from_argv(&argv)?;
             let mut combinator = Combinator::new();
@@ -308,6 +376,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let item = argv.get(2).expect("Item argument required");
             let diff = get_extend(item).await.unwrap();
             println!("{}", &serde_json::to_string_pretty(&diff).unwrap());
+        }
+        Some("merge") => {
+            todo!();
         }
         _ => run_server().await?,
     }

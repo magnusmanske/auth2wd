@@ -1,0 +1,19 @@
+<h1>Merge two items</h1>
+<p>This action requires data being passed as the <tt>POST</tt> payload.</p>
+<p>The payload should have two keys, <tt>base_item</tt> and <tt>new_item</tt>, each containing a string with the JSON representation of an item.</p>
+<p>The results contains the merged <tt>item</tt>, and the <tt>diff</tt> that can be applied in the Wikidata API with the <tt>wbeditentity</tt> action.</p>
+<p>
+<form method="post" action="/merge">
+<div style="width: 100%;">
+<div style="display: inline-block; width: 49%;">
+<h3>Base item</h3>
+<textarea class="form-control" name="base_item" id="base_item" rows="30" style="font-size:8pt; width: 100%;">$1$</textarea>
+</div>
+<div style="display: inline-block; width: 49%;">
+<h3>New item</h3>
+<textarea class="form-control" name="new_item" id="new_item" rows="30" style="font-size:8pt; width: 100%;">$2$</textarea>
+</div>
+</div>
+<input class="btn btn-outline-primary" type="submit" value="Merge" />
+</form>
+</p>

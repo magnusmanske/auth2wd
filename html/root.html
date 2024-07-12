@@ -1,0 +1,20 @@
+<h1>Auhority Control data to Wikidata item</h1>
+This API can load AC (Authority Control) data from other sources and convert them into a Wikidata item.
+
+<h2>Available sources</h3>
+    <p>
+        These links will generate the JSON data for a new item, containing the parsed data from the respective source.
+    </p>
+<ul>$1$</ul>
+<h2>Functions</h2>
+<h3>Main functions</h3>
+<ul>
+<li><a href="/item/P227/118523813">item</a>, the JSON of a new item containing the parsed data from the respective source (example: P227:118523813)</li>
+<li><a href="/extend/Q1035">extend</a>, extract AC data from external IDs in an item, and get the payload for <tt>wbeditentity</tt></li>
+<li><a href="/merge">merge</a>, merges <tt>new_item</tt> into <tt>base_item</tt></li>
+</ul>
+<h3>Auxilary functions</h3>
+<ul>
+<li><a href="/meta_item/P1006/068364229">meta_item</a>, item plus some properties that could not be resolved automatically</li>
+<li><a href="/graph/P227/118523813">graph</a>, the internal graph representation before parsing</li>
+</ul>
