@@ -7,6 +7,7 @@ pub mod bnf;
 pub mod combinator;
 pub mod external_id;
 pub mod external_importer;
+pub mod gbif_taxon;
 pub mod gnd;
 pub mod id_ref;
 pub mod inaturalist;

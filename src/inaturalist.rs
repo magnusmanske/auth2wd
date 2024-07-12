@@ -1,15 +1,10 @@
-use std::collections::HashMap;
-
 use crate::external_importer::*;
 use crate::meta_item::*;
-use crate::ncbi_taxonomy::TAXON_LABEL_LANGUAGES;
-use crate::ncbi_taxonomy::TAXON_MAP;
 use crate::ExternalId;
 use anyhow::{anyhow, Result};
 use axum::async_trait;
 use regex::Regex;
 use serde_json::Value;
-use sophia::inmem::graph::FastGraph;
 use wikimisc::wikibase::EntityTrait;
 use wikimisc::wikibase::LocaleString;
 use wikimisc::wikibase::Snak;
@@ -19,23 +14,6 @@ lazy_static! {
         Regex::new(r#" *taxon: (\{.+)\.results\[0\]"#).expect("Regexp error");
     static ref RE_IUCN_REDLIST_URL: Regex =
         Regex::new(r#"https://www.iucnredlist.org/species/(\d+)/\d+"#).expect("Regexp error");
-    static ref VALID_IMAGE_LICENSES: HashMap<&'static str, &'static str> =
-        vec![("cc-by-sa", "Q6905942"), ("cc-by", "Q6905323"),]
-            .into_iter()
-            .collect();
-    static ref IUCN_REDLIST: HashMap<&'static str, &'static str> = vec![
-        ("ne", "Q3350324"),
-        ("dd", "Q3245245"),
-        ("lc", "Q211005"),
-        ("nt", "Q719675"),
-        ("vu", "Q278113"),
-        ("en", "Q11394"),
-        ("cr", "Q219127"),
-        ("ew", "Q239509"),
-        ("ex", "Q237350"),
-    ]
-    .into_iter()
-    .collect();
 }
 
 #[derive(Clone)]
@@ -63,15 +41,6 @@ impl ExternalImporter for INaturalist {
     }
     fn my_id(&self) -> String {
         self.id.to_owned()
-    }
-    fn graph(&self) -> &FastGraph {
-        lazy_static! {
-            static ref DUMMY_GRAPH: FastGraph = FastGraph::new();
-        }
-        &DUMMY_GRAPH
-    }
-    fn transform_label(&self, s: &str) -> String {
-        s.to_string()
     }
 
     async fn run(&self) -> Result<MetaItem> {

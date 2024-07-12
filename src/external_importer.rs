@@ -8,8 +8,11 @@ use sophia::api::ns;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::turtle::serializer::nt::NtSerializer;
+use std::collections::HashMap;
 use std::vec::Vec;
 use wikimisc::wikibase::*;
+
+pub const TAXON_LABEL_LANGUAGES: &[&str] = &["en", "de", "es", "it", "nl", "fr"];
 
 lazy_static! {
     static ref EXTERNAL_ID_REGEXPS : Vec<(Regex,String,usize)> = {
@@ -60,18 +63,119 @@ lazy_static! {
             Regex::new(r"^https?://data.bnf.fr/#foaf:Person$").unwrap(),
         ]
     };
+
+    /// Used in various taxonomy sources
+    pub static ref TAXON_MAP: HashMap<&'static str, &'static str> = vec![
+        ("cultivar", "Q4886"),
+        ("species", "Q7432"),
+        ("genus", "Q34740"),
+        ("family", "Q35409"),
+        ("order", "Q36602"),
+        ("kingdom", "Q36732"),
+        ("class", "Q37517"),
+        ("phylum", "Q38348"),
+        ("subspecies", "Q68947"),
+        ("domain", "Q146481"),
+        ("tribe", "Q227936"),
+        ("form", "Q279749"),
+        ("division", "Q334460"),
+        ("subvariety", "Q630771"),
+        ("cryptic species complex", "Q765940"),
+        ("variety", "Q767728"),
+        ("subphylum", "Q1153785"),
+        ("nothospecies", "Q1306176"),
+        ("superspecies", "Q1783100"),
+        ("infraclass", "Q2007442"),
+        ("superfamily", "Q2136103"),
+        ("infraphylum", "Q2361851"),
+        ("subfamily", "Q2455704"),
+        ("subkingdom", "Q2752679"),
+        ("infraorder", "Q2889003"),
+        ("cohorte", "Q2981883"),
+        ("series", "Q3025161"),
+        ("infrakingdom", "Q3150876"),
+        ("section", "Q3181348"),
+        ("subgenus", "Q3238261"),
+        ("branch", "Q3418438"),
+        ("subdomain", "Q3491996"),
+        ("subdivision", "Q3491997"),
+        ("superclass", "Q3504061"),
+        ("forma specialis", "Q3825509"),
+        ("subtribe", "Q3965313"),
+        ("superphylum", "Q3978005"),
+        ("group", "Q4150646"),
+        ("infracohort", "Q4226087"),
+        ("form", "Q5469884"),
+        ("infrafamily", "Q5481039"),
+        ("subclass", "Q5867051"),
+        ("suborder", "Q5867959"),
+        ("superorder", "Q5868144"),
+        ("subsection", "Q5998839"),
+        ("nothogenus", "Q6045742"),
+        ("magnorder", "Q6054237"),
+        ("supercohort", "Q6054425"),
+        ("infralegion", "Q6054535"),
+        ("sublegion", "Q6054637"),
+        ("superlegion", "Q6054795"),
+        ("parvorder", "Q6311258"),
+        ("grandorder", "Q6462265"),
+        ("legion", "Q7504331"),
+        ("mirorder", "Q7506274"),
+        ("subcohorte", "Q7509617"),
+        ("species group", "Q7574964"),
+        ("epifamily", "Q10296147"),
+        ("subsection", "Q10861375"),
+        ("section", "Q10861426"),
+        ("subseries", "Q13198444"),
+        ("subform", "Q13202655"),
+        ("supertribe", "Q14817220"),
+        ("superkingdom", "Q19858692"),
+        ("subterclass", "Q21061204"),
+        ("hyporder", "Q21074316"),
+    ]
+    .into_iter()
+    .collect();
+
+    pub static ref VALID_IMAGE_LICENSES: HashMap<&'static str, &'static str> =
+        vec![
+            ("cc-by-sa", "Q6905942"),
+            ("cc-by", "Q6905323"),
+            ("http://creativecommons.org/licenses/by/4.0/","Q20007257"),
+            ("http://creativecommons.org/licenses/by-sa/4.0/","Q18199165"),
+        ]
+            .into_iter()
+            .collect();
+    pub static ref IUCN_REDLIST: HashMap<&'static str, &'static str> = vec![
+        ("ne", "Q3350324"),
+        ("dd", "Q3245245"),
+        ("lc", "Q211005"),
+        ("nt", "Q719675"),
+        ("vu", "Q278113"),
+        ("en", "Q11394"),
+        ("cr", "Q219127"),
+        ("ew", "Q239509"),
+        ("ex", "Q237350"),
+    ]
+    .into_iter()
+    .collect();
 }
 
 #[async_trait]
 pub trait ExternalImporter {
     // These methods need to be implemented by the importer
     fn get_key_url(&self, key: &str) -> String;
-    fn graph(&self) -> &FastGraph;
     fn primary_language(&self) -> String;
     fn my_property(&self) -> usize;
     fn my_id(&self) -> String;
     fn my_stated_in(&self) -> &str;
     async fn run(&self) -> Result<MetaItem>;
+
+    fn graph(&self) -> &FastGraph {
+        lazy_static! {
+            static ref DUMMY_GRAPH: FastGraph = FastGraph::new();
+        }
+        &DUMMY_GRAPH
+    }
 
     fn get_id_url(&self) -> String {
         self.get_key_url("id")
