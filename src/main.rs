@@ -45,8 +45,7 @@ use wikimisc::wikibase::{EntityTrait, ItemEntity, Snak, Statement};
 
 fn wrap_html(html: &str) -> String {
     let outer: String = fs::read_to_string("./html/wrapper.html").unwrap();
-    let ret = outer.replace("$1$", html);
-    ret
+    outer.replace("$1$", html)
 }
 
 async fn root() -> Html<String> {
