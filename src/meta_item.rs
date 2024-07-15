@@ -229,7 +229,11 @@ impl MetaItem {
                     if let Some(dv) = c.main_snak().data_value() {
                         if let Value::Time(t) = dv.value() {
                             if *t.precision() < best_precision {
+                                // Deprecate statement
                                 c.set_rank(StatementRank::Deprecated);
+                                // reason for deprecated rank: item/value with less precision and/or accuracy
+                                let snak = Snak::new_item("P2241", "Q42727519");
+                                c.add_qualifier_snak(snak);
                             }
                         }
                     }
@@ -315,6 +319,7 @@ mod tests {
         mi.item.add_claim(s3);
         mi.item.add_claim(s2);
         mi.fix_dates();
+        println!("{mi:#?}");
         assert_eq!(mi.item.claims().len(), 3);
         assert_eq!(*mi.item.claims()[0].rank(), StatementRank::Deprecated);
         assert_eq!(*mi.item.claims()[1].rank(), StatementRank::Normal);

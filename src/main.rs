@@ -389,9 +389,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 cargo run -- combinator P950 XX990809
 
 TODO:
-P244    Library of Congress authority ID
-P213    ISNI
+P244	Library of Congress authority ID
+P213	ISNI
 P349    NDL Authority ID (Japan)
+P7545	askArt person ID (has JSON in HTML source)
 
 https://vokabular.bs.no/bibbi/nb/page/22778
 
