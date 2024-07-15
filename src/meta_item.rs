@@ -319,7 +319,6 @@ mod tests {
         mi.item.add_claim(s3);
         mi.item.add_claim(s2);
         mi.fix_dates();
-        println!("{mi:#?}");
         assert_eq!(mi.item.claims().len(), 3);
         assert_eq!(*mi.item.claims()[0].rank(), StatementRank::Deprecated);
         assert_eq!(*mi.item.claims()[1].rank(), StatementRank::Normal);
