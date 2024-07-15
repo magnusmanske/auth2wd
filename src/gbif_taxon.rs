@@ -139,7 +139,7 @@ impl GBIFtaxon {
             let mut statement = self.new_statement_string(4765, image_url);
             statement.add_qualifier_snak(Snak::new_item("P275", license_item));
             statement.add_qualifier_snak(Snak::new_string("P2093", attribution));
-            statement.add_qualifier_snak(Snak::new_string("P2699", image_url));
+            statement.add_qualifier_snak(Snak::new_url("P2699", image_url));
             let format = medium.get("format")?.as_str()?;
             if format == "image/jpeg" {
                 statement.add_qualifier_snak(Snak::new_item("P2701", "Q2195"));

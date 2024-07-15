@@ -3449,9 +3449,9 @@ dependencies = [
 
 [[package]]
 name = "wikibase"
-version = "0.7.1"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbcd53632062073292c9a31d9c9e953246d90798be4da412017b3b6e096d7c94"
+checksum = "10e7de44dca08d4c37678bee10a61b5594a8dbf69ee008d2b2442dfde91ee659"
 dependencies = [
  "curl",
  "futures",
@@ -3467,7 +3467,7 @@ dependencies = [
 [[package]]
 name = "wikimisc"
 version = "0.1.0"
-source = "git+https://github.com/magnusmanske/wikimisc#6e1cba2ca420ba241f1584cb1cfbd8dfff649fa4"
+source = "git+https://github.com/magnusmanske/wikimisc#96e24a7138618ed37ce8814eb63388e723061c3d"
 dependencies = [
  "anyhow",
  "chrono",
