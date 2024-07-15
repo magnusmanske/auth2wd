@@ -68,7 +68,7 @@ impl WorldCat {
                         let _ = ret.add_claim(self.new_statement_item(31, "Q5"));
                     }
                     other => {
-                        let ext_id = ExternalId::new(31, &other);
+                        let ext_id = ExternalId::new(31, other);
                         let _ = ret.add_prop_text(ext_id);
                     }
                 }
