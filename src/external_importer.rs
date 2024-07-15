@@ -49,10 +49,13 @@ lazy_static! {
             (Regex::new(r"^https?://authority\.bibsys\.no/authority/rest/authorities/html/([1-9]\d*).*$").unwrap(),"${1}".to_string(),1015),
             (Regex::new(r"^https?://(?:www\.)?viaf\.org/processed/BIBSYS%7C([1-9]\d*)$").unwrap(),"${1}".to_string(),1015),
             (Regex::new(r"^https?://authority.bibsys.no/authority/rest/authorities/html/(\d+).*$").unwrap(),"${1}".to_string(),1015),
+            (Regex::new(r"^https?://entities.oclc.org/worldcat/entity/([^.]+)$").unwrap(),"${1}".to_string(),10832),
+            (Regex::new(r"^https?://entities.oclc.org/worldcat/entity/([^.]+).html$").unwrap(),"${1}".to_string(),10832),
+            (Regex::new(r"^https?://entities.oclc.org/worldcat/entity/([^.]+).jsonld$").unwrap(),"${1}".to_string(),10832),
         ]
     };
 
-    static ref DO_NOT_USE_EXTERNAL_URL_REGEXPS : Vec<Regex> = {
+    pub static ref DO_NOT_USE_EXTERNAL_URL_REGEXPS : Vec<Regex> = {
         // NOTE: The pattern always needs to cover the whole string, so use ^$
         vec![
             Regex::new(r"^https?://www.wikidata.org/.*$").unwrap(),
@@ -194,11 +197,11 @@ pub trait ExternalImporter {
         println!("{}", self.get_graph_text());
     }
 
-    fn do_not_use_external_url(&self, url: &str) -> bool {
-        DO_NOT_USE_EXTERNAL_URL_REGEXPS
-            .iter()
-            .any(|re| re.is_match(url))
-    }
+    // fn do_not_use_external_url(&self, url: &str) -> bool {
+    //     DO_NOT_USE_EXTERNAL_URL_REGEXPS
+    //         .iter()
+    //         .any(|re| re.is_match(url))
+    // }
 
     fn url2external_id(&self, url: &str) -> Option<ExternalId> {
         EXTERNAL_ID_REGEXPS
@@ -438,7 +441,7 @@ pub trait ExternalImporter {
         ];
         for iri in iris {
             for url in self.triples_iris(iri)? {
-                if self.do_not_use_external_url(&url) {
+                if ExternalId::do_not_use_external_url(&url) {
                     continue;
                 }
                 let _ = match self.url2external_id(&url) {
@@ -461,7 +464,7 @@ pub trait ExternalImporter {
             let _ = match s.as_str() {
                 "male" => ret.add_claim(self.new_statement_item(21, "Q6581097")),
                 "female" => ret.add_claim(self.new_statement_item(21, "Q6581072")),
-                _ => ret.add_prop_text(ExternalId::new(21, &s)).await,
+                _ => ret.add_prop_text(ExternalId::new(21, &s)),
             };
         }
 
@@ -469,7 +472,7 @@ pub trait ExternalImporter {
             let _ = match s.as_str() {
                 "Masculino" => ret.add_claim(self.new_statement_item(21, "Q6581097")),
                 "Femenino" => ret.add_claim(self.new_statement_item(21, "Q6581072")),
-                _ => ret.add_prop_text(ExternalId::new(21, &s)).await,
+                _ => ret.add_prop_text(ExternalId::new(21, &s)),
             };
         }
 
@@ -481,7 +484,7 @@ pub trait ExternalImporter {
                 "https://d-nb.info/standards/vocab/gnd/gender#female" => {
                     ret.add_claim(self.new_statement_item(21, "Q6581072"))
                 }
-                _ => ret.add_prop_text(ExternalId::new(21, &url)).await,
+                _ => ret.add_prop_text(ExternalId::new(21, &url)),
             };
         }
 
@@ -579,7 +582,7 @@ pub trait ExternalImporter {
                     found = true;
                 }
                 None => {
-                    let _ = ret.add_prop_text(ExternalId::new(prop, &s)).await;
+                    let _ = ret.add_prop_text(ExternalId::new(prop, &s));
                 }
             }
         }
@@ -634,7 +637,7 @@ pub trait ExternalImporter {
         self.add_gender(ret).await?;
         self.add_label_aliases(ret)?;
         self.add_description(ret)?;
-        self.add_language(ret).await?;
+        self.add_language(ret)?;
         Ok(())
     }
 
@@ -649,15 +652,15 @@ pub trait ExternalImporter {
                 "https://d-nb.info/standards/elementset/gnd#DifferentiatedPerson" => {
                     ret.add_claim(self.new_statement_item(31, "Q5"))
                 }
-                s => ret.add_prop_text(ExternalId::new(31, s)).await,
+                s => ret.add_prop_text(ExternalId::new(31, s)),
             };
         }
         Ok(())
     }
 
-    async fn add_language(&self, ret: &mut MetaItem) -> Result<()> {
+    fn add_language(&self, ret: &mut MetaItem) -> Result<()> {
         for s in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
-            let _ = ret.add_prop_text(ExternalId::new(1412, &s)).await;
+            let _ = ret.add_prop_text(ExternalId::new(1412, &s));
         }
         Ok(())
     }
@@ -702,12 +705,21 @@ mod tests {
 
     #[tokio::test]
     async fn test_do_not_use_external_url() {
-        let t = crate::viaf::VIAF::new("312603351").await.unwrap(); // Any ID will do
-        assert!(t.do_not_use_external_url("https://www.wikidata.org/entity/Q2071541"));
-        assert!(t.do_not_use_external_url("https://www.wikidata.org/item/Q2071541"));
-        assert!(t.do_not_use_external_url("http://www.wikidata.org/entity/Q2071541"));
-        assert!(!t.do_not_use_external_url("https://www.wikidatarrr.org/entity/Q2071541"));
-        assert!(t.do_not_use_external_url("http://data.bnf.fr/#foaf:Person"));
+        assert!(ExternalId::do_not_use_external_url(
+            "https://www.wikidata.org/entity/Q2071541"
+        ));
+        assert!(ExternalId::do_not_use_external_url(
+            "https://www.wikidata.org/item/Q2071541"
+        ));
+        assert!(ExternalId::do_not_use_external_url(
+            "http://www.wikidata.org/entity/Q2071541"
+        ));
+        assert!(!ExternalId::do_not_use_external_url(
+            "https://www.wikidatarrr.org/entity/Q2071541"
+        ));
+        assert!(ExternalId::do_not_use_external_url(
+            "http://data.bnf.fr/#foaf:Person"
+        ));
     }
 
     #[tokio::test]

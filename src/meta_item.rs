@@ -1,5 +1,4 @@
 use crate::external_id::*;
-use crate::external_importer::ExternalImporter;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_json::json;
 use std::vec::Vec;
@@ -162,9 +161,8 @@ impl MetaItem {
         }
     }
 
-    pub async fn add_prop_text(&mut self, ext_id: ExternalId) -> Option<Statement> {
-        let ei = crate::viaf::VIAF::new("312603351").await.ok()?; // Any prop/ID will do
-        if !ei.do_not_use_external_url(ext_id.id()) {
+    pub fn add_prop_text(&mut self, ext_id: ExternalId) -> Option<Statement> {
+        if !ExternalId::do_not_use_external_url(ext_id.id()) {
             self.prop_text.push(ext_id);
         }
         None
@@ -279,7 +277,7 @@ mod tests {
     async fn test_add_prop_text() {
         let mut mi = MetaItem::new();
         let ext_id = ExternalId::new(214, "12345");
-        mi.add_prop_text(ext_id.clone()).await;
+        mi.add_prop_text(ext_id.clone());
         assert_eq!(mi.prop_text, vec![ext_id]);
     }
 
@@ -288,9 +286,9 @@ mod tests {
         let mut mi = MetaItem::new();
         let ext_id1 = ExternalId::new(214, "12345");
         let ext_id2 = ExternalId::new(123, "456");
-        mi.add_prop_text(ext_id1.clone()).await;
-        mi.add_prop_text(ext_id2.clone()).await;
-        mi.add_prop_text(ext_id1.clone()).await;
+        mi.add_prop_text(ext_id1.clone());
+        mi.add_prop_text(ext_id2.clone());
+        mi.add_prop_text(ext_id1.clone());
         mi.cleanup();
         assert_eq!(mi.prop_text, vec![ext_id2, ext_id1]);
     }

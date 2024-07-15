@@ -51,7 +51,7 @@ impl ExternalImporter for NB {
 
         // Nationality
         for text in self.triples_literals("http://schema.org/nationality")? {
-            let _ = ret.add_prop_text(ExternalId::new(27, &text)).await;
+            let _ = ret.add_prop_text(ExternalId::new(27, &text));
         }
 
         // Born/died
@@ -65,7 +65,7 @@ impl ExternalImporter for NB {
                     Some((time, precision)) => {
                         ret.add_claim(self.new_statement_time(bd.1, &time, precision))
                     }
-                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)).await,
+                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
                 };
             }
         }

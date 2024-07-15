@@ -81,7 +81,7 @@ impl ExternalImporter for GND {
                 let ext_id = ExternalId::new(297, &country_code);
                 let _ = match ext_id.get_item_for_external_id_value().await {
                     Some(item) => ret.add_claim(self.new_statement_item(27, &item)),
-                    None => ret.add_prop_text(ext_id).await,
+                    None => ret.add_prop_text(ext_id),
                 };
             }
         }
@@ -103,7 +103,7 @@ impl ExternalImporter for GND {
                     Some((time, precision)) => {
                         ret.add_claim(self.new_statement_time(bd.1, &time, precision))
                     }
-                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)).await,
+                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
                 };
             }
         }
@@ -145,10 +145,10 @@ impl ExternalImporter for GND {
                     {
                         ret.add_claim(self.new_statement_item(kp.1, &item));
                     } else {
-                        let _ = ret.add_prop_text(ExternalId::new(kp.1, &url)).await;
+                        let _ = ret.add_prop_text(ExternalId::new(kp.1, &url));
                     }
                 } else {
-                    let _ = ret.add_prop_text(ExternalId::new(kp.1, &url)).await;
+                    let _ = ret.add_prop_text(ExternalId::new(kp.1, &url));
                 }
             }
         }

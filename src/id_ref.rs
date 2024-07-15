@@ -50,11 +50,11 @@ impl ExternalImporter for IdRef {
                 Some(extid) => {
                     let _ = match extid.get_item_for_external_id_value().await {
                         Some(item) => ret.add_claim(self.new_statement_item(27, &item)),
-                        None => ret.add_prop_text(ExternalId::new(27, &url)).await,
+                        None => ret.add_prop_text(ExternalId::new(27, &url)),
                     };
                 }
                 None => {
-                    let _ = ret.add_prop_text(ExternalId::new(27, &url)).await;
+                    let _ = ret.add_prop_text(ExternalId::new(27, &url));
                 }
             }
         }
@@ -69,7 +69,7 @@ impl ExternalImporter for IdRef {
                     Some((time, precision)) => {
                         ret.add_claim(self.new_statement_time(bd.1, &time, precision))
                     }
-                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)).await,
+                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
                 };
             }
         }

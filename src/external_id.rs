@@ -88,6 +88,12 @@ impl ExternalId {
         Self::search_wikidata_single_item(&query).await
     }
 
+    pub fn do_not_use_external_url(url: &str) -> bool {
+        crate::DO_NOT_USE_EXTERNAL_URL_REGEXPS
+            .iter()
+            .any(|re| re.is_match(url))
+    }
+
     /// Checks some properties (eg GND) if the external ID is valid (eg not deprecated)
     pub async fn check_if_valid(&self) -> Result<bool> {
         if let Some(is_ok) = EXTERNAL_IDS_OK_CACHE.lock().await.get(self) {

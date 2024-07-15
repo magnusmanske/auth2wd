@@ -70,7 +70,7 @@ impl ExternalImporter for BNF {
                     Some((time, precision)) => {
                         ret.add_claim(self.new_statement_time(bd.1, &time, precision))
                     }
-                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)).await,
+                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
                 };
             }
         }
@@ -85,7 +85,7 @@ impl ExternalImporter for BNF {
                     Some((time, precision)) => {
                         ret.add_claim(self.new_statement_time(bd.1, &time, precision))
                     }
-                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)).await,
+                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
                 };
             }
         }
@@ -96,7 +96,7 @@ impl ExternalImporter for BNF {
         ];
         for (key, prop) in born_died_in {
             for s in self.triples_subject_literals(&self.get_id_url(), key)? {
-                ret.add_prop_text(ExternalId::new(prop, &s)).await;
+                ret.add_prop_text(ExternalId::new(prop, &s));
             }
         }
 

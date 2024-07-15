@@ -45,6 +45,13 @@ lazy_static! {
                 None,
             ),
             SupportedProperty::new(
+                10832,
+                "WorldCat",
+                "WorldCat Identities",
+                "E39PBJd87VvgDDTV6RxBYm6qcP",
+                None,
+            ),
+            SupportedProperty::new(
                 3151,
                 "INaturalist",
                 "INaturalist taxon ID",
@@ -111,6 +118,7 @@ impl SupportedProperty {
             1006 => Box::new(crate::nb::NB::new(id).await?),
             1015 => Box::new(crate::noraf::NORAF::new(id).await?),
             3151 => Box::new(crate::inaturalist::INaturalist::new(id).await?),
+            10832 => Box::new(crate::worldcat::WorldCat::new(id).await?),
             _ => return Err(anyhow!("no generator for property: 'P{}'", self.property)),
         };
         Ok(ret)

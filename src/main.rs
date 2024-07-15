@@ -20,6 +20,7 @@ pub mod selibr;
 pub mod supported_property;
 pub mod utility;
 pub mod viaf;
+pub mod worldcat;
 
 use axum::Form;
 use axum::{extract::Path, response::Html, routing::get, Json, Router};
@@ -388,10 +389,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 cargo run -- combinator P950 XX990809
 
 TODO:
-P244
-P7859
-P213
-P349
+P244    Library of Congress authority ID
+P213    ISNI
+P349    NDL Authority ID (Japan)
 
 https://vokabular.bs.no/bibbi/nb/page/22778
 
