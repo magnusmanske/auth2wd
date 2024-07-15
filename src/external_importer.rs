@@ -59,6 +59,7 @@ lazy_static! {
         // NOTE: The pattern always needs to cover the whole string, so use ^$
         vec![
             Regex::new(r"^https?://www.wikidata.org/.*$").unwrap(),
+            Regex::new(r"^https?://[a-z-]+.wikipedia.org/.*$").unwrap(),
             Regex::new(r"^https?://viaf.org/viaf/sourceID/.*#skos:Concept$").unwrap(),
             Regex::new(r"^https?://www.loc.gov/mads/rdf/v1#.*$").unwrap(),
             Regex::new(r"^https?://www.w3.org/2004/02/skos/core#.*$").unwrap(),
@@ -196,12 +197,6 @@ pub trait ExternalImporter {
     fn dump_graph(&mut self) {
         println!("{}", self.get_graph_text());
     }
-
-    // fn do_not_use_external_url(&self, url: &str) -> bool {
-    //     DO_NOT_USE_EXTERNAL_URL_REGEXPS
-    //         .iter()
-    //         .any(|re| re.is_match(url))
-    // }
 
     fn url2external_id(&self, url: &str) -> Option<ExternalId> {
         EXTERNAL_ID_REGEXPS
