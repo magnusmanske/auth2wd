@@ -61,6 +61,7 @@ impl MetaItem {
         })
     }
 
+    /// Parses a date string and returns a tuple with the time and precision.
     pub fn parse_date(&self, s: &str) -> Option<(String, u64)> {
         let date = wikimisc::date::Date::from_str(s)?;
         Some((date.time().to_string(), date.precision()))
@@ -132,6 +133,7 @@ impl MetaItem {
         Some(new_claim)
     }
 
+    /// Checks if a new claim has a more precise date than existing claims.
     fn check_new_claim_for_dates(&self, new_claim: &mut Statement) {
         let prop = new_claim.property();
         if prop != "P569" && prop != "P570" {
