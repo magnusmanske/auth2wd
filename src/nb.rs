@@ -2,11 +2,12 @@ use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use anyhow::Result;
-use axum::async_trait;
+use async_trait::async_trait;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
 
+#[derive(Debug)]
 pub struct NB {
     id: String,
     graph: FastGraph,

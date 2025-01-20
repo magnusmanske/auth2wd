@@ -2,12 +2,12 @@ use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::ExternalId;
 use anyhow::Result;
-use axum::async_trait;
+use async_trait::async_trait;
 use serde_json::Value;
 use wikimisc::wikibase::EntityTrait;
 use wikimisc::wikibase::LocaleString;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct WorldCat {
     id: String,
     json: Value,
@@ -83,7 +83,7 @@ impl WorldCat {
             if let Some(s) = s.as_str() {
                 ret.item
                     .labels_mut()
-                    .push(LocaleString::new(language.as_str(), s))
+                    .push(LocaleString::new(language.as_str(), s));
             }
         }
         Some(())
@@ -97,7 +97,7 @@ impl WorldCat {
                     if let Some(alias) = alias.as_str() {
                         ret.item
                             .aliases_mut()
-                            .push(LocaleString::new(language.as_str(), alias))
+                            .push(LocaleString::new(language.as_str(), alias));
                     }
                 }
             }
@@ -111,7 +111,7 @@ impl WorldCat {
             if let Some(s) = s.as_str() {
                 ret.item
                     .descriptions_mut()
-                    .push(LocaleString::new(language.as_str(), s))
+                    .push(LocaleString::new(language.as_str(), s));
             }
         }
         Some(())

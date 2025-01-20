@@ -20,7 +20,7 @@ impl Combinator {
     pub async fn get_parser_for_property(
         property: &str,
         id: &str,
-    ) -> Result<Box<dyn ExternalImporter + Send + Sync>> {
+    ) -> Result<Box<dyn ExternalImporter>> {
         let property = match ExternalId::prop_numeric(property) {
             Some(property) => property,
             None => return Err(anyhow!("malformed property: '{property}'")),
@@ -36,9 +36,7 @@ impl Combinator {
             .collect()
     }
 
-    pub async fn get_parser_for_ext_id(
-        id: &ExternalId,
-    ) -> Result<Box<dyn ExternalImporter + Send + Sync>> {
+    pub async fn get_parser_for_ext_id(id: &ExternalId) -> Result<Box<dyn ExternalImporter>> {
         match SUPPORTED_PROPERTIES
             .iter()
             .find(|sp| sp.property() == id.property())
@@ -54,24 +52,32 @@ impl Combinator {
             .any(|sp| sp.property() == id.property())
     }
 
+    async fn import_get_parsers(
+        &self,
+        ids: &Vec<ExternalId>,
+        ids_used: &mut HashSet<ExternalId>,
+    ) -> Vec<Box<dyn ExternalImporter>> {
+        let mut futures = vec![];
+        for ext_id in ids {
+            ids_used.insert(ext_id.to_owned());
+            let parser = Self::get_parser_for_ext_id(ext_id);
+            futures.push(parser);
+        }
+        let parsers = join_all(futures).await;
+        let parsers: Vec<Box<dyn ExternalImporter>> = parsers
+            .into_iter()
+            .filter_map(|parser| parser.ok())
+            .collect();
+        parsers
+    }
+
     pub async fn import(&mut self, ids: Vec<ExternalId>) -> Result<()> {
         let mut ids_used: HashSet<ExternalId> = HashSet::new();
         let mut ids = ids.to_owned();
         while !ids.is_empty() {
             ids.sort();
             ids.dedup();
-            let mut futures = vec![];
-            for ext_id in &ids {
-                ids_used.insert(ext_id.to_owned());
-                let parser = Self::get_parser_for_ext_id(ext_id);
-                futures.push(parser);
-            }
-            let parsers = join_all(futures).await;
-            let parsers: Vec<_> = parsers
-                .into_iter()
-                .filter_map(|parser| parser.ok())
-                .collect();
-
+            let parsers = self.import_get_parsers(&ids, &mut ids_used).await;
             ids.clear();
             let mut futures = vec![];
             for parser in &parsers {

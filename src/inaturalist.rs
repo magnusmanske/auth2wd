@@ -2,7 +2,7 @@ use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::ExternalId;
 use anyhow::{anyhow, Result};
-use axum::async_trait;
+use async_trait::async_trait;
 use regex::Regex;
 use serde_json::Value;
 use wikimisc::wikibase::EntityTrait;
@@ -16,7 +16,7 @@ lazy_static! {
         Regex::new(r#"https://www.iucnredlist.org/species/(\d+)/\d+"#).expect("Regexp error");
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct INaturalist {
     id: String,
     json: Value,

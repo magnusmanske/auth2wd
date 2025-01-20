@@ -1,12 +1,14 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
 use anyhow::Result;
-use axum::async_trait;
+use async_trait::async_trait;
+use reqwest::Client;
+use serde_json::json;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct VIAF {
     id: String,
     graph: FastGraph,
@@ -51,11 +53,12 @@ impl ExternalImporter for VIAF {
 
 impl VIAF {
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = format!("https://viaf.org/viaf/{}/rdf.xml", id);
-        // let resp = ureq::get(&rdf_url).call()?.into_string()?;
-        let resp = reqwest::get(&rdf_url).await?.text().await?;
+        let url = "https://viaf.org/api/cluster-record";
+        let client = Client::new();
+        let payload = json!({"reqValues":{"recordId":id,"isSourceId":false,"acceptFiletype":"rdf+xml"},"meta":{"pageIndex":0,"pageSize":1}});
+        let response = client.post(url).json(&payload).send().await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
-        let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
+        let _ = xml::parser::parse_str(&response).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
             graph,

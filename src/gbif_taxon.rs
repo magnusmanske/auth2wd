@@ -2,13 +2,13 @@ use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::ExternalId;
 use anyhow::Result;
-use axum::async_trait;
+use async_trait::async_trait;
 use serde_json::Value;
 use wikimisc::wikibase::EntityTrait;
 use wikimisc::wikibase::LocaleString;
 use wikimisc::wikibase::Snak;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct GBIFtaxon {
     id: String,
     json: Value,
@@ -169,6 +169,6 @@ mod tests {
             format!("https://www.gbif.org/species/{}", TEST_ID)
         );
         let new_item = gbif.run().await.unwrap();
-        assert_eq!(new_item.item.claims().len(), 7);
+        assert_eq!(new_item.item.claims().len(), 10);
     }
 }

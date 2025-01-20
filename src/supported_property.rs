@@ -76,6 +76,7 @@ lazy_static! {
     };
 }
 
+#[derive(Debug)]
 pub struct SupportedProperty {
     property: usize,
     name: String,
@@ -104,8 +105,8 @@ impl SupportedProperty {
         }
     }
 
-    pub async fn generator(&self, id: &str) -> Result<Box<dyn ExternalImporter + Send + Sync>> {
-        let ret: Box<dyn ExternalImporter + Send + Sync> = match self.property {
+    pub async fn generator(&self, id: &str) -> Result<Box<dyn ExternalImporter>> {
+        let ret: Box<dyn ExternalImporter> = match self.property {
             214 => Box::new(crate::viaf::VIAF::new(id).await?),
             227 => Box::new(crate::gnd::GND::new(id).await?),
             244 => Box::new(crate::loc::LOC::new(id).await?),
@@ -137,7 +138,7 @@ impl SupportedProperty {
         )
     }
 
-    pub fn property(&self) -> usize {
+    pub const fn property(&self) -> usize {
         self.property
     }
 }

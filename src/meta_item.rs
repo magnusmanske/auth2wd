@@ -1,6 +1,7 @@
 use crate::external_id::*;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_json::json;
+use std::str::FromStr;
 use std::vec::Vec;
 use wikimisc::item_merger::ItemMerger;
 use wikimisc::merge_diff::MergeDiff;
@@ -63,7 +64,7 @@ impl MetaItem {
 
     /// Parses a date string and returns a tuple with the time and precision.
     pub fn parse_date(&self, s: &str) -> Option<(String, u64)> {
-        let date = wikimisc::date::Date::from_str(s)?;
+        let date = wikimisc::date::Date::from_str(s).ok()?;
         Some((date.time().to_string(), date.precision()))
     }
 
@@ -139,8 +140,8 @@ impl MetaItem {
         if prop != "P569" && prop != "P570" {
             return;
         }
-        if let Some(dv) = new_claim.main_snak().data_value() {
-            let new_claim_precision = match dv.value() {
+        if let Some(data_value) = new_claim.main_snak().data_value() {
+            let new_claim_precision = match data_value.value() {
                 Value::Time(t) => *t.precision(),
                 _ => return,
             };
@@ -198,7 +199,7 @@ impl MetaItem {
     }
 
     /// Fixes birth and death dates by deprecating less precise ones.
-    /// https://github.com/magnusmanske/auth2wd/issues/1
+    /// <https://github.com/magnusmanske/auth2wd/issues/1>
     pub fn fix_dates(&mut self) {
         for prop in ["P569", "P570"] {
             let mut best_precision = 0;

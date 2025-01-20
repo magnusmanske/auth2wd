@@ -3,7 +3,7 @@ use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::utility::Utility;
 use anyhow::{anyhow, Result};
-use axum::async_trait;
+use async_trait::async_trait;
 use regex::Regex;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
@@ -17,6 +17,7 @@ lazy_static! {
             .expect("Regexp error");
 }
 
+#[derive(Debug)]
 pub struct BNF {
     id: String,
     graph: FastGraph,
@@ -60,11 +61,11 @@ impl ExternalImporter for BNF {
         self.add_the_usual(&mut ret).await?;
 
         // Born/died
-        let birth_death = [
+        let birth_death_rdvocab = [
             ("http://rdvocab.info/ElementsGr2/dateOfBirth", 569),
             ("http://rdvocab.info/ElementsGr2/dateOfDeath", 570),
         ];
-        for bd in birth_death {
+        for bd in birth_death_rdvocab {
             for s in self.triples_subject_iris(&self.get_id_url(), bd.0)? {
                 let _ = match ret.parse_date(&s) {
                     Some((time, precision)) => {
@@ -75,11 +76,11 @@ impl ExternalImporter for BNF {
             }
         }
 
-        let birth_death = [
+        let birth_death_vocab = [
             ("http://vocab.org/bio/0.1/birth", 569),
             ("http://vocab.org/bio/0.1/death", 570),
         ];
-        for bd in birth_death {
+        for bd in birth_death_vocab {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
                 let _ = match ret.parse_date(&s) {
                     Some((time, precision)) => {
@@ -111,28 +112,14 @@ impl BNF {
         if !RE_NUMERIC_ID.is_match(id) {
             return Err(anyhow!("ID format error for '{id}'"));
         }
-        let numeric_id = RE_NUMERIC_ID.replace_all(id, "${1}");
-
-        let name = match Self::get_name_for_id(&numeric_id).await {
-            Some(name) => name,
-            None => return Err(anyhow!("Name retrieval error for '{id}'")),
-        };
-
-        let rdf_url = format!("https://data.bnf.fr/{numeric_id}/{name}/rdf.xml");
+        let rdf_url = format!("https://data.bnf.fr/ark:/12148/cb{id}.rdfxml");
         let resp = Utility::get_url(&rdf_url).await?;
-
         let mut graph: FastGraph = FastGraph::new();
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
             graph,
         })
-    }
-
-    async fn get_name_for_id(numeric_id: &str) -> Option<String> {
-        let rdf_url = format!("https://data.bnf.fr/en/{numeric_id}");
-        let resp = Utility::get_url(&rdf_url).await.ok()?;
-        Some(RE_URL.captures(&resp)?.get(1)?.as_str().to_string())
     }
 }
 
@@ -173,7 +160,7 @@ mod tests {
             ExternalId::new(20, "Grenoble (Isère)")
         );
 
-        println!("{:?}", meta_item.prop_text);
+        // println!("{:?}", meta_item.prop_text);
     }
 
     #[tokio::test]

@@ -1,6 +1,7 @@
 use anyhow::Result;
 use std::time::Duration;
 
+#[derive(Copy, Clone, Debug)]
 pub struct Utility {}
 
 impl Utility {

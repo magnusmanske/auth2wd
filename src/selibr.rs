@@ -2,11 +2,12 @@ use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use anyhow::{anyhow, Result};
-use axum::async_trait;
+use async_trait::async_trait;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
 
+#[derive(Debug)]
 pub struct SELIBR {
     id: String,
     key: String,
@@ -81,7 +82,7 @@ impl SELIBR {
             &format!("http://libris.kb.se/auth/{id}"),
         )?;
         match ids.first() {
-            Some(id) => ret.key = id.to_owned(),
+            Some(first_id) => ret.key = first_id.to_owned(),
             None => return Err(anyhow!("could not find main key for '{id}'")),
         }
 

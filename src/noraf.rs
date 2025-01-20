@@ -1,7 +1,7 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
 use anyhow::Result;
-use axum::async_trait;
+use async_trait::async_trait;
 use regex::Regex;
 use serde_json::Value;
 use sophia::inmem::graph::FastGraph;
@@ -9,6 +9,7 @@ use wikimisc::wikibase::{EntityTrait, LocaleString, SnakDataType};
 
 // Was: Bibsys
 
+#[derive(Debug)]
 pub struct NORAF {
     id: String,
     j: Value,

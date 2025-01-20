@@ -1,6 +1,45 @@
+// #![forbid(unsafe_code)]
+#![warn(
+    clippy::cognitive_complexity,
+    clippy::dbg_macro,
+    clippy::debug_assert_with_mut_call,
+    clippy::doc_link_with_quotes,
+    clippy::doc_markdown,
+    clippy::empty_line_after_outer_attr,
+    // clippy::empty_structs_with_brackets,
+    clippy::float_cmp,
+    clippy::float_cmp_const,
+    clippy::float_equality_without_abs,
+    keyword_idents,
+    clippy::missing_const_for_fn,
+    missing_copy_implementations,
+    missing_debug_implementations,
+    // clippy::missing_errors_doc,
+    clippy::missing_panics_doc,
+    clippy::mod_module_files,
+    non_ascii_idents,
+    noop_method_call,
+    // clippy::option_if_let_else,
+    // clippy::print_stderr,
+    // clippy::print_stdout,
+    clippy::semicolon_if_nothing_returned,
+    clippy::unseparated_literal_suffix,
+    clippy::shadow_unrelated,
+    clippy::similar_names,
+    clippy::suspicious_operation_groupings,
+    unused_crate_dependencies,
+    unused_extern_crates,
+    unused_import_braces,
+    clippy::unused_self,
+    // clippy::use_debug,
+    clippy::used_underscore_binding,
+    clippy::useless_let_if_seq,
+    // clippy::wildcard_dependencies,
+    // clippy::wildcard_imports
+)]
+
 #[macro_use]
 extern crate lazy_static;
-extern crate nom_bibtex;
 
 pub mod bne;
 pub mod bnf;
@@ -56,8 +95,9 @@ async fn root() -> Html<String> {
     Html(wrap_html(&html))
 }
 
+#[axum::debug_handler]
 async fn item(Path((property, id)): Path<(String, String)>) -> Json<serde_json::Value> {
-    let parser: Box<dyn ExternalImporter + Send + Sync> =
+    let parser: Box<dyn ExternalImporter> =
         match Combinator::get_parser_for_property(&property, &id).await {
             Ok(parser) => parser,
             Err(e) => return Json(json!({"status":e.to_string()})),
@@ -72,7 +112,7 @@ async fn item(Path((property, id)): Path<(String, String)>) -> Json<serde_json::
 }
 
 async fn meta_item(Path((property, id)): Path<(String, String)>) -> Json<serde_json::Value> {
-    let parser: Box<dyn ExternalImporter + Send + Sync> =
+    let parser: Box<dyn ExternalImporter> =
         match Combinator::get_parser_for_property(&property, &id).await {
             Ok(parser) => parser,
             Err(e) => return Json(json!({"status":e.to_string()})),
@@ -128,11 +168,12 @@ struct MergeForm {
 
 fn item_from_json_string(s: &str) -> Result<(ItemEntity, bool), String> {
     let mut item = serde_json::from_str::<Value>(s).map_err(|e| e.to_string())?;
-    let mut has_fake_id = false;
-    if item.get("id").is_none() {
+    let has_fake_id = if item.get("id").is_none() {
         item["id"] = json!("Q0");
-        has_fake_id = true;
-    }
+        true
+    } else {
+        false
+    };
     let item = ItemEntity::new_from_json(&item).map_err(|e| e.to_string())?;
     Ok((item, has_fake_id))
 }

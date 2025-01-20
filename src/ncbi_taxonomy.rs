@@ -2,13 +2,13 @@ use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::ExternalId;
 use anyhow::{anyhow, Result};
-use axum::async_trait;
+use async_trait::async_trait;
 use quickxml_to_serde::xml_string_to_json;
 use serde_json::Value;
 use wikimisc::wikibase::EntityTrait;
 use wikimisc::wikibase::LocaleString;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct NCBItaxonomy {
     id: String,
     json: Value,

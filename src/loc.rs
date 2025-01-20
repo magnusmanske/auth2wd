@@ -1,11 +1,12 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
 use anyhow::Result;
-use axum::async_trait;
+use async_trait::async_trait;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
 
+#[derive(Debug)]
 pub struct LOC {
     id: String,
     graph: FastGraph,
@@ -13,8 +14,8 @@ pub struct LOC {
 
 const HTTP_USER_AGENT : &str = "Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405";
 
-unsafe impl Send for LOC {}
-unsafe impl Sync for LOC {}
+// unsafe impl Send for LOC {}
+// unsafe impl Sync for LOC {}
 
 #[async_trait]
 impl ExternalImporter for LOC {

@@ -116,7 +116,7 @@ impl ExternalId {
         Ok(ret)
     }
 
-    pub fn property(&self) -> usize {
+    pub const fn property(&self) -> usize {
         self.property
     }
 
@@ -157,7 +157,7 @@ mod tests {
     #[test]
     fn test_from_external_id_claim() {
         // Test OK
-        let statement = Statement::new(
+        let statement1 = Statement::new(
             "statement",
             StatementRank::Normal,
             Snak::new(
@@ -174,11 +174,11 @@ mod tests {
         );
         assert_eq!(
             ExternalId::from_string("P214:ABCDEF"),
-            ExternalId::from_external_id_claim(&statement)
+            ExternalId::from_external_id_claim(&statement1)
         );
 
         // Test wrong value type
-        let statement = Statement::new(
+        let statement2 = Statement::new(
             "statement",
             StatementRank::Normal,
             Snak::new(
@@ -193,10 +193,10 @@ mod tests {
             vec![],
             vec![],
         );
-        assert_eq!(None, ExternalId::from_external_id_claim(&statement));
+        assert_eq!(None, ExternalId::from_external_id_claim(&statement2));
 
         // Test wrong snak type
-        let statement = Statement::new(
+        let statement3 = Statement::new(
             "statement",
             StatementRank::Normal,
             Snak::new(
@@ -211,35 +211,37 @@ mod tests {
             vec![],
             vec![],
         );
-        assert_eq!(None, ExternalId::from_external_id_claim(&statement));
+        assert_eq!(None, ExternalId::from_external_id_claim(&statement3));
     }
 
     #[tokio::test]
     async fn test_get_item_for_external_id() {
         // Test OK
-        let ext_id = ExternalId::new(214, "30701597");
+        let ext_id1 = ExternalId::new(214, "30701597");
         assert_eq!(
-            ext_id.get_item_for_external_id_value().await,
+            ext_id1.get_item_for_external_id_value().await,
             Some("Q13520818".to_string())
         );
 
         // Test OK
         assert_eq!(
-            ext_id.get_item_for_string_external_id_value("Magnus").await,
+            ext_id1
+                .get_item_for_string_external_id_value("Magnus")
+                .await,
             Some("Q13520818".to_string())
         );
 
         // Test wrong string
         assert_eq!(
-            ext_id
+            ext_id1
                 .get_item_for_string_external_id_value("ocshs87gvdsu6gsdi7vchkuchs")
                 .await,
             None
         );
 
         // Test wrong ID
-        let ext_id = ExternalId::new(214, "3070159777777");
-        assert_eq!(ext_id.get_item_for_external_id_value().await, None);
+        let ext_id2 = ExternalId::new(214, "3070159777777");
+        assert_eq!(ext_id2.get_item_for_external_id_value().await, None);
 
         // TODOO multiple items
     }

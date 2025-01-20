@@ -1,7 +1,7 @@
 use crate::external_id::*;
 use crate::meta_item::*;
 use anyhow::Result;
-use axum::async_trait;
+use async_trait::async_trait;
 use chrono::prelude::*;
 use regex::Regex;
 use sophia::api::ns;
@@ -165,7 +165,7 @@ lazy_static! {
 }
 
 #[async_trait]
-pub trait ExternalImporter {
+pub trait ExternalImporter: Send + Sync {
     // These methods need to be implemented by the importer
     fn get_key_url(&self, key: &str) -> String;
     fn primary_language(&self) -> String;
@@ -528,7 +528,7 @@ pub trait ExternalImporter {
                         if label != s && label != self.transform_label(&s) {
                             ret.item
                                 .aliases_mut()
-                                .push(LocaleString::new(&language, &s))
+                                .push(LocaleString::new(&language, &s));
                         }
                     }
                 }
