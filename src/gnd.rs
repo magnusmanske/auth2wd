@@ -138,7 +138,7 @@ impl ExternalImporter for GND {
         ];
         for kp in key_prop {
             for url in self.triples_subject_iris(&self.get_id_url(), kp.0)? {
-                if let Some(gnd_id) = url.split('/').last() {
+                if let Some(gnd_id) = url.split('/').next_back() {
                     if let Some(item) = ExternalId::new(227, gnd_id)
                         .get_item_for_external_id_value()
                         .await
