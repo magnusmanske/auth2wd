@@ -22,6 +22,7 @@ lazy_static! {
                 None,
             ),
             SupportedProperty::new(269, "IdRef", "IdRef/SUDOC", "026812304", None),
+            SupportedProperty::new(662, "PubChem CID", "PubChem Compound ID", "22027196", Some("4-[1-(4-Hydroxyphenyl)heptyl]phenol".to_string()),),
             SupportedProperty::new(906, "SELIBR", "National Library of Sweden", "231727", None),
             SupportedProperty::new(
                 950,
@@ -113,6 +114,7 @@ impl SupportedProperty {
             268 => Box::new(crate::bnf::BNF::new(id).await?),
             269 => Box::new(crate::id_ref::IdRef::new(id).await?),
             685 => Box::new(crate::ncbi_taxonomy::NCBItaxonomy::new(id).await?),
+            662 => Box::new(crate::pubchem_cid::PubChemCid::new(id).await?),
             846 => Box::new(crate::gbif_taxon::GBIFtaxon::new(id).await?),
             906 => Box::new(crate::selibr::SELIBR::new(id).await?),
             950 => Box::new(crate::bne::BNE::new(id).await?),
