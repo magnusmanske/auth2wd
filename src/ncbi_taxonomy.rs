@@ -3,15 +3,14 @@ use crate::meta_item::*;
 use crate::ExternalId;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use quickxml_to_serde::xml_string_to_json;
-use serde_json::Value;
+use serde::{Deserialize, Serialize};
 use wikimisc::wikibase::EntityTrait;
 use wikimisc::wikibase::LocaleString;
 
 #[derive(Clone, Debug)]
 pub struct NCBItaxonomy {
     id: String,
-    json: Value,
+    taxon: Taxon,
 }
 
 unsafe impl Send for NCBItaxonomy {}
@@ -50,26 +49,97 @@ impl ExternalImporter for NCBItaxonomy {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+struct TaxaSet {
+    #[serde(rename = "Taxon")]
+    taxon: Vec<Taxon>,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+struct Taxon {
+    #[serde(rename = "TaxId")]
+    taxid: i64,
+    #[serde(rename = "ScientificName")]
+    scientific_name: Option<String>,
+    #[serde(rename = "ParentTaxId")]
+    parent_taxid: Option<i64>,
+    #[serde(rename = "Rank")]
+    rank: Option<String>,
+    #[serde(rename = "OtherNames")]
+    other_names: OtherNames,
+    #[serde(rename = "Division")]
+    division: Option<String>,
+    #[serde(rename = "LineageEx")]
+    lineage_ex: LineageEx,
+    // TODO(?): GeneticCode
+    #[serde(rename = "MitoGeneticCode")]
+    mito_genetic_code: Option<MitoGeneticCode>,
+    #[serde(rename = "Lineage")]
+    lineage: Option<String>,
+    #[serde(rename = "CreateDate")]
+    create_date: String,
+    #[serde(rename = "UpdateDate")]
+    update_date: String,
+    #[serde(rename = "PubDate")]
+    pub_date: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+struct MitoGeneticCode {
+    #[serde(rename = "MGCId")]
+    mgc_id: String,
+    #[serde(rename = "MGCName")]
+    mgc_name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+struct LineageEx {
+    #[serde(rename = "Taxon")]
+    taxons: Vec<LineageTaxon>,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+struct LineageTaxon {
+    #[serde(rename = "ScientificName")]
+    scientific_name: Option<String>,
+    #[serde(rename = "TaxId")]
+    taxid: Option<i64>,
+    #[serde(rename = "Rank")]
+    rank: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+struct OtherNames {
+    #[serde(rename = "Name")]
+    names: Vec<Name>,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+struct Name {
+    #[serde(rename = "ClassCDE")]
+    class_cde: String,
+    #[serde(rename = "DispName")]
+    display_name: String,
+}
+
 impl NCBItaxonomy {
     pub async fn new(id: &str) -> Result<Self> {
         let url = format!("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=taxonomy&id={id}&format=xml");
         let resp = reqwest::get(&url).await?.text().await?;
-        let conf = quickxml_to_serde::Config::new_with_defaults();
-        let json = xml_string_to_json(resp.to_owned(), &conf)?;
-        let json = json
-            .get("TaxaSet")
-            .ok_or_else(|| anyhow!("Invalid JSON"))?
-            .get("Taxon")
-            .ok_or_else(|| anyhow!("Invalid JSON"))?
-            .to_owned();
+        let taxa_set: TaxaSet = serde_xml_rs::from_str(&resp)?;
+        // Use first taxon, there should only be one!
+        let taxon = match taxa_set.taxon.first() {
+            Some(taxon) => taxon.clone(),
+            None => return Err(anyhow!("Invalid XML")),
+        };
         Ok(Self {
             id: id.to_string(),
-            json,
+            taxon,
         })
     }
 
     async fn add_parent_taxon(&self, ret: &mut MetaItem) -> Option<()> {
-        let parent_id = self.json.get("ParentTaxId")?.as_i64()?;
+        let parent_id = self.taxon.parent_taxid?;
         let query = format!("haswbstatement:P685={parent_id} haswbstatement:P31=Q16521");
         let item = ExternalId::search_wikidata_single_item(&query).await?;
         ret.add_claim(self.new_statement_item(171, &item));
@@ -83,8 +153,8 @@ impl NCBItaxonomy {
     }
 
     fn add_taxon_name_and_labels(&self, ret: &mut MetaItem) -> Option<()> {
-        let name = self.json.get("ScientificName")?.as_str()?;
-        ret.add_claim(self.new_statement_string(225, name));
+        let name = self.taxon.scientific_name.clone()?;
+        ret.add_claim(self.new_statement_string(225, &name));
         for lang in TAXON_LABEL_LANGUAGES {
             let label = LocaleString::new(lang.to_string(), name.to_string());
             ret.item.labels_mut().push(label);
@@ -93,7 +163,7 @@ impl NCBItaxonomy {
     }
 
     fn add_taxon_rank(&self, ret: &mut MetaItem) -> Option<()> {
-        let rank = self.json.get("Rank")?.as_str()?.to_lowercase();
+        let rank = self.taxon.rank.clone()?.to_lowercase();
         let item = TAXON_MAP.get(rank.as_str())?;
         ret.add_claim(self.new_statement_item(105, item));
         Some(())

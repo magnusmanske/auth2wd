@@ -11,7 +11,7 @@ sophia = { version = "*", features = ["xml"] }
 reqwest = { version = "*", features = ["blocking", "json"] }
 tokio = { version = "1", features = ["full"] }
 lazy_static = "1"
-quickxml_to_serde = "0.6"
+serde-xml-rs = "0.8"
 regex = "1"
 wikimisc = { git = "https://github.com/magnusmanske/wikimisc" }
 serde = "1"
@@ -30,3 +30,12 @@ tracing-subscriber = "*"
 tower-http = { version = "*", features = ["full"] }
 anyhow = "*"
 futures = "*"
+
+[profile.dev]
+debug = false
+
+[profile.release]
+opt-level = 3
+lto = 'fat'
+panic = 'abort'
+codegen-units = 1
