@@ -5,10 +5,15 @@ use std::time::Duration;
 pub struct Utility {}
 
 impl Utility {
-    pub async fn get_url(url: &str) -> Result<String> {
-        let resp = reqwest::ClientBuilder::new()
+    pub fn get_reqwest_client() -> Result<reqwest::Client> {
+        let ret = reqwest::ClientBuilder::new()
             .timeout(Duration::from_secs(60))
-            .build()?
+            .build();
+        Ok(ret?)
+    }
+
+    pub async fn get_url(url: &str) -> Result<String> {
+        let resp = Self::get_reqwest_client()?
             .get(url)
             .send()
             .await?

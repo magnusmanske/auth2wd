@@ -1,16 +1,55 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
-use sophia::api::prelude::*;
+use reqwest::header::{HeaderMap, HeaderValue, ACCEPT};
+use serde::{Deserialize, Serialize};
 use sophia::inmem::graph::FastGraph;
-use sophia::xml;
+use wikimisc::wikibase::EntityTrait;
+use wikimisc::wikibase::LocaleString;
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+enum TermType {
+    BlankNode,
+    NamedNode,
+    Literal,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct TripleEntry {
+    #[serde(rename = "termType")]
+    term_type: TermType,
+    value: String,
+    datatype: Option<String>,
+    language: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct Triple {
+    #[serde(rename = "0")]
+    s: TripleEntry,
+    #[serde(rename = "1")]
+    p: TripleEntry,
+    #[serde(rename = "2")]
+    o: TripleEntry,
+}
+
+impl Triple {
+    fn is_named_node(&self, key: &str) -> bool {
+        match self.p.term_type {
+            TermType::NamedNode => self.p.value == key,
+            _ => false,
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct NB {
     id: String,
     graph: FastGraph,
+    data: Vec<Triple>,
 }
 
 unsafe impl Send for NB {}
@@ -47,27 +86,61 @@ impl ExternalImporter for NB {
     }
 
     async fn run(&self) -> Result<MetaItem> {
+        let own_url = format!("http://data.bibliotheken.nl/id/thes/p{}", self.id);
         let mut ret = MetaItem::new();
         self.add_the_usual(&mut ret).await?;
 
-        // Nationality
-        for text in self.triples_literals("http://schema.org/nationality")? {
-            let _ = ret.add_prop_text(ExternalId::new(27, &text));
-        }
-
-        // Born/died
-        let birth_death = [
-            ("http://schema.org/birthDate", 569),
-            ("http://schema.org/deathDate", 570),
-        ];
-        for bd in birth_death {
-            for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
-                let _ = match ret.parse_date(&s) {
+        for triple in &self.data {
+            if triple.s.value != own_url {
+                // Only gather data about the subject itself
+                continue;
+            }
+            let language = triple.o.language.to_owned().unwrap_or("nl".to_string());
+            if triple.is_named_node("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
+                && triple.o.value == "http://schema.org/Person"
+            {
+                ret.add_claim(self.new_statement_item(31, "Q5"));
+            }
+            if triple.is_named_node("http://schema.org/alternateName") {
+                ret.item
+                    .aliases_mut()
+                    .push(LocaleString::new(&language, &triple.o.value));
+            }
+            if triple.is_named_node("http://schema.org/name") {
+                ret.item
+                    .labels_mut()
+                    .push(LocaleString::new(&language, &triple.o.value));
+            }
+            if triple.is_named_node("http://schema.org/description") {
+                ret.item
+                    .descriptions_mut()
+                    .push(LocaleString::new(&language, &triple.o.value));
+            }
+            if triple.is_named_node("http://schema.org/nationality") {
+                ret.add_prop_text(ExternalId::new(27, &triple.o.value));
+            }
+            if triple.is_named_node("http://schema.org/birthDate") {
+                match ret.parse_date(&triple.o.value) {
                     Some((time, precision)) => {
-                        ret.add_claim(self.new_statement_time(bd.1, &time, precision))
+                        ret.add_claim(self.new_statement_time(569, &time, precision))
                     }
-                    None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
+                    None => ret.add_prop_text(ExternalId::new(569, &triple.o.value)),
                 };
+            }
+            if triple.is_named_node("http://schema.org/deathDate") {
+                match ret.parse_date(&triple.o.value) {
+                    Some((time, precision)) => {
+                        ret.add_claim(self.new_statement_time(570, &time, precision))
+                    }
+                    None => ret.add_prop_text(ExternalId::new(570, &triple.o.value)),
+                };
+            }
+            if triple.is_named_node("http://schema.org/sameAs")
+                || triple.is_named_node("http://www.w3.org/2002/07/owl#sameAs")
+            {
+                if let Some(ext_id) = self.url2external_id(&triple.o.value) {
+                    ret.add_claim(self.new_statement_string(ext_id.property(), ext_id.id()));
+                }
             }
         }
 
@@ -79,13 +152,22 @@ impl ExternalImporter for NB {
 
 impl NB {
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = format!("http://data.bibliotheken.nl/doc/thes/p{}.rdf", id);
-        let resp = reqwest::get(&rdf_url).await?.text().await?;
-        let mut graph: FastGraph = FastGraph::new();
-        let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
+        let url = format!("http://data.bibliotheken.nl/id/thes/p{id}");
+        let client = Utility::get_reqwest_client()?;
+        let mut headers = HeaderMap::new();
+        headers.insert(ACCEPT, HeaderValue::from_static("application/json"));
+        let data: Vec<Triple> = client
+            .get(url)
+            .headers(headers)
+            .send()
+            .await?
+            .json()
+            .await?;
+
         Ok(Self {
             id: id.to_string(),
-            graph,
+            graph: FastGraph::new(),
+            data,
         })
     }
 }
@@ -132,8 +214,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_run() {
-        let viaf = NB::new(TEST_ID).await.unwrap();
-        let meta_item = viaf.run().await.unwrap();
+        let nb = NB::new(TEST_ID).await.unwrap();
+        let meta_item = nb.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
             vec![LocaleString::new("nl", "Charles Darwin")]
