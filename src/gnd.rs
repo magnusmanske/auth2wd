@@ -123,6 +123,10 @@ impl ExternalImporter for GND {
                 40,
             ),
             (
+                "https://d-nb.info/standards/elementset/agrelon#hasSibling",
+                3373,
+            ),
+            (
                 "https://d-nb.info/standards/elementset/gnd#fieldOfStudy",
                 101,
             ),
