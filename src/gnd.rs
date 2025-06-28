@@ -131,6 +131,10 @@ impl ExternalImporter for GND {
                 101,
             ),
             (
+                "https://d-nb.info/standards/elementset/gnd#professionOrOccupation",
+                106,
+            ),
+            (
                 "https://d-nb.info/standards/elementset/gnd#placeOfActivity",
                 937,
             ),
