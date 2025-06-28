@@ -131,29 +131,38 @@ impl ExternalImporter for GND {
                 101,
             ),
             (
-                "https://d-nb.info/standards/elementset/gnd#professionOrOccupation",
-                106,
-            ),
-            (
                 "https://d-nb.info/standards/elementset/gnd#placeOfActivity",
                 937,
             ),
             // TODO parent
         ];
-        for kp in key_prop {
-            for url in self.triples_subject_iris(&self.get_id_url(), kp.0)? {
-                if let Some(gnd_id) = url.split('/').next_back() {
-                    if let Some(item) = ExternalId::new(227, gnd_id)
-                        .get_item_for_external_id_value()
-                        .await
-                    {
-                        ret.add_claim(self.new_statement_item(kp.1, &item));
-                    } else {
-                        let _ = ret.add_prop_text(ExternalId::new(kp.1, &url));
+        for (elementset, property) in key_prop {
+            for url in self.triples_iris(elementset)? {
+                self.add_gnd_item(&url, property, &mut ret).await;
+            }
+        }
+
+        // Occupation
+        for bnode_id in self.triples_subject_iris_blank_nodes(
+            &self.get_id_url(),
+            "https://d-nb.info/standards/elementset/gnd#professionOrOccupation",
+        )? {
+            let mut gnd_urls = vec![];
+            let b = sophia::api::term::BnodeId::new(bnode_id.to_owned()).unwrap();
+            let _ = self
+                .graph()
+                .triples_matching([b], Any, Any)
+                .for_each_triple(|t| {
+                    if let Some(iri) = t.p().iri() {
+                        if iri.starts_with("http://www.w3.org/1999/02/22-rdf-syntax-ns#_") {
+                            if let Some(gnd_irl) = t.o().iri() {
+                                gnd_urls.push(gnd_irl.to_string());
+                            }
+                        }
                     }
-                } else {
-                    let _ = ret.add_prop_text(ExternalId::new(kp.1, &url));
-                }
+                });
+            for gnd_url in gnd_urls {
+                self.add_gnd_item(&gnd_url, 106, &mut ret).await;
             }
         }
 
@@ -164,6 +173,21 @@ impl ExternalImporter for GND {
 }
 
 impl GND {
+    async fn add_gnd_item(&self, url: &str, property: usize, ret: &mut MetaItem) {
+        if let Some(gnd_id) = url.split('/').next_back() {
+            if let Some(item) = ExternalId::new(227, gnd_id)
+                .get_item_for_external_id_value()
+                .await
+            {
+                ret.add_claim(self.new_statement_item(property, &item));
+            } else {
+                let _ = ret.add_prop_text(ExternalId::new(property, url));
+            }
+        } else {
+            let _ = ret.add_prop_text(ExternalId::new(property, url));
+        }
+    }
+
     /// Changes internal ID in case of redirect
     fn fix_own_id(&mut self) -> Result<()> {
         let ids = self.triples_property_literals(

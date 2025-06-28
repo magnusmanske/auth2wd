@@ -230,6 +230,22 @@ pub trait ExternalImporter: Send + Sync {
         Ok(ret)
     }
 
+    fn triples_subject_iris_blank_nodes(&self, id_url: &str, p: &str) -> Result<Vec<String>> {
+        let mut ret = vec![];
+        let iri_id = Iri::new(id_url)?;
+        let iri_p = Iri::new(p)?;
+        self.graph()
+            .triples_matching([&iri_id], [&iri_p], Any)
+            .for_each_triple(|t| {
+                if let Some(bnode_id) = t.o().bnode_id() {
+                    ret.push(bnode_id.to_string());
+                }
+            })?;
+        ret.sort();
+        ret.dedup();
+        Ok(ret)
+    }
+
     fn triples_iris(&self, p: &str) -> Result<Vec<String>> {
         self.triples_subject_iris(&self.get_id_url(), p)
     }
