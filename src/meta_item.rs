@@ -248,6 +248,7 @@ impl MetaItem {
         let mut im = ItemMerger::new(self.item.to_owned());
         im.set_properties_ignore_qualifier_match(vec!["P225".to_string()]);
         let diff = im.merge(&other.item);
+        diff.apply(&mut self.item);
         self.prop_text.append(&mut other.prop_text.clone());
         self.prop_text.sort();
         self.prop_text.dedup();

@@ -137,7 +137,7 @@ async fn graph(Path((property, id)): Path<(String, String)>) -> String {
 }
 
 async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
-    let mut base_item = match MetaItem::from_entity(&item).await {
+    let base_item = match MetaItem::from_entity(&item).await {
         Ok(base_item) => base_item,
         Err(e) => return Json(json!({"status":e.to_string()})),
     };
@@ -151,14 +151,14 @@ async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
     if let Err(e) = combinator.import(ext_ids).await {
         return Json(json!({"status":e.to_string()}));
     }
-    let mut other = match combinator.combine() {
-        Some(other) => other,
+    let (_other, merge_diff) = match combinator.combine() {
+        Some((other, merge_diff)) => (other, merge_diff),
         None => return Json(json!({"status":"No items to combine"})),
     };
-    other.fix_dates();
-    other.fix_images(&base_item);
-    let diff = base_item.merge(&other);
-    Json(json!(diff))
+    // other.fix_dates();
+    // other.fix_images(&base_item);
+    // let diff = base_item.merge(&other);
+    Json(json!(merge_diff))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -285,14 +285,13 @@ async fn get_extend(item: &str) -> Result<MergeDiff, Box<dyn std::error::Error>>
     let mut base_item = MetaItem::from_entity(item).await?;
     let ext_ids: Vec<ExternalId> = base_item
         .get_external_ids()
-        .iter()
-        .filter(|ext_id| Combinator::has_parser_for_ext_id(ext_id))
-        .cloned()
+        .into_iter()
+        .filter(Combinator::has_parser_for_ext_id)
         .collect();
     let mut combinator = Combinator::new();
     combinator.import(ext_ids).await?;
-    let mut other = match combinator.combine() {
-        Some(other) => other,
+    let (mut other, _merge_diff) = match combinator.combine() {
+        Some((other, merge_diff)) => (other, merge_diff),
         None => return Err("No items to combine".into()),
     };
     other.fix_dates();
@@ -306,7 +305,6 @@ async fn apply_diff(
     api: &mut Api,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let json_string = json!(diff).to_string();
-    // println!("{item}: {json_string}");
     if json_string == "{}" {
         return Ok(());
     }
@@ -353,8 +351,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match argv.get(1).map(|s| s.as_str()) {
         Some("combinator") => {
             // Combinator
-            let mut base_item = MetaItem::from_entity("Q1035").await?;
-            //println!("{:?}",&base_item);
             let ext_id = get_extid_from_argv(&argv)?;
             let mut combinator = Combinator::new();
             combinator.import(vec![ext_id]).await?;
@@ -363,14 +359,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 combinator.items.len(),
                 combinator.items.keys()
             );
-            let other = combinator.combine().expect("No items to combine");
+            let (_other, diff) = combinator.combine().expect("No items to combine");
             println!(
                 "{} items: {:?}",
                 combinator.items.len(),
                 combinator.items.keys()
             );
             //println!("{:?}",&other);
-            let diff = base_item.merge(&other);
             //println!("{:?}",&diff);
             println!(
                 "Altered: {}, added: {}",

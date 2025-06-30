@@ -6,6 +6,7 @@ use anyhow::{anyhow, Result};
 use futures::future::join_all;
 use std::collections::HashMap;
 use std::collections::HashSet;
+use wikimisc::merge_diff::MergeDiff;
 
 #[derive(Debug, Clone, Default)]
 pub struct Combinator {
@@ -80,15 +81,17 @@ impl Combinator {
             let parsers = self.import_get_parsers(&ids, &mut ids_used).await;
             ids.clear();
             let mut futures = vec![];
+            let mut running_parsers = vec![];
             for parser in &parsers {
                 let key = ExternalId::new(parser.my_property(), &parser.my_id()).to_string();
                 if self.items.contains_key(&key) {
                     continue;
                 }
+                running_parsers.push(parser);
                 futures.push(parser.run());
             }
             let items = join_all(futures).await;
-            for (parser, item) in std::iter::zip(parsers, items) {
+            for (parser, item) in std::iter::zip(running_parsers, items) {
                 let item = match item {
                     Ok(item) => item,
                     Err(_) => continue,
@@ -109,15 +112,18 @@ impl Combinator {
         Ok(())
     }
 
-    pub fn combine(&mut self) -> Option<MetaItem> {
+    pub fn combine(&mut self) -> Option<(MetaItem, MergeDiff)> {
+        let mut merge_diff = MergeDiff::default();
         while self.items.len() > 1 {
             let keys: Vec<String> = self.items.keys().cloned().collect();
             let k1 = &keys[0];
             let k2 = &keys[1];
-            let other = self.items.get(k2)?.to_owned();
-            let _ = self.items.get_mut(k1)?.merge(&other);
-            self.items.remove(k2);
+            let other = self.items.remove(k2)?;
+            let diff = self.items.get_mut(k1)?.merge(&other);
+
+            merge_diff.extend(&diff);
         }
-        self.items.iter().next().map(|(_, v)| v.to_owned())
+        let meta_item = self.items.iter().next().map(|(_, v)| v.to_owned())?;
+        Some((meta_item, merge_diff))
     }
 }
