@@ -137,7 +137,7 @@ async fn graph(Path((property, id)): Path<(String, String)>) -> String {
 }
 
 async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
-    let base_item = match MetaItem::from_entity(&item).await {
+    let mut base_item = match MetaItem::from_entity(&item).await {
         Ok(base_item) => base_item,
         Err(e) => return Json(json!({"status":e.to_string()})),
     };
@@ -151,14 +151,14 @@ async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
     if let Err(e) = combinator.import(ext_ids).await {
         return Json(json!({"status":e.to_string()}));
     }
-    let (_other, merge_diff) = match combinator.combine() {
+    let (mut other, _merge_diff) = match combinator.combine() {
         Some((other, merge_diff)) => (other, merge_diff),
         None => return Json(json!({"status":"No items to combine"})),
     };
-    // other.fix_dates();
-    // other.fix_images(&base_item);
-    // let diff = base_item.merge(&other);
-    Json(json!(merge_diff))
+    other.fix_dates();
+    other.fix_images(&base_item);
+    let diff = base_item.merge(&other);
+    Json(json!(diff))
 }
 
 #[derive(Serialize, Deserialize)]
