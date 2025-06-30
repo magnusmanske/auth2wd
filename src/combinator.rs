@@ -120,7 +120,6 @@ impl Combinator {
             let k2 = &keys[1];
             let other = self.items.remove(k2)?;
             let diff = self.items.get_mut(k1)?.merge(&other);
-
             merge_diff.extend(&diff);
         }
         let meta_item = self.items.iter().next().map(|(_, v)| v.to_owned())?;
