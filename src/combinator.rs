@@ -122,7 +122,59 @@ impl Combinator {
             let diff = self.items.get_mut(k1)?.merge(&other);
             merge_diff.extend(&diff);
         }
+        // self.items
+        //     .iter_mut()
+        //     .for_each(|(_id, mi)| mi.clear_fake_statement_ids());
         let meta_item = self.items.iter().next().map(|(_, v)| v.to_owned())?;
         Some((meta_item, merge_diff))
+    }
+
+    pub fn combine_on_base_item(&mut self, base_item: &mut MetaItem) -> Option<MergeDiff> {
+        let mut merge_diff = MergeDiff::default();
+        if self.items.is_empty() {
+            return None;
+        }
+        for (_id, item) in self.items.iter() {
+            let diff = base_item.merge(item);
+            diff.apply(&mut base_item.item);
+            merge_diff.extend(&diff);
+        }
+        Some(merge_diff)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::Value;
+    use wikimisc::wikibase::{EntityTrait, ItemEntity};
+
+    use super::*;
+
+    #[test]
+    fn test_combine() {
+        // this test does not work correctly ... yet!
+        let mut combinator = Combinator::new();
+
+        let s1 = include_str!("../test_data/item1.json");
+        let j1: Value = serde_json::from_str(s1).unwrap();
+        let i1 = ItemEntity::new_from_json(&j1).unwrap();
+        let mi1 = MetaItem::new_from_item(i1);
+
+        let s2 = include_str!("../test_data/item2.json");
+        let j2: Value = serde_json::from_str(s2).unwrap();
+        let i2 = ItemEntity::new_from_json(&j2).unwrap();
+        let mi2 = MetaItem::new_from_item(i2);
+
+        combinator.items.insert("Q1".to_string(), mi1.to_owned());
+        combinator.items.insert("Q2".to_string(), mi2.to_owned());
+        combinator.items.insert("Q3".to_string(), mi2.to_owned());
+        let (res_item1, _res_diff1) = combinator.combine().unwrap();
+
+        combinator.items.insert("Q2".to_string(), mi2.to_owned());
+        combinator.items.insert("Q1".to_string(), mi1.to_owned());
+        combinator.items.insert("Q3".to_string(), mi1.to_owned());
+        let (res_item2, _res_diff2) = combinator.combine().unwrap();
+
+        assert_eq!(res_item1.item.claims().len(), res_item2.item.claims().len());
     }
 }

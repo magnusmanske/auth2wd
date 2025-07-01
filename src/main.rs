@@ -151,13 +151,13 @@ async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
     if let Err(e) = combinator.import(ext_ids).await {
         return Json(json!({"status":e.to_string()}));
     }
-    let (mut other, _merge_diff) = match combinator.combine() {
-        Some((other, merge_diff)) => (other, merge_diff),
+    let diff = match combinator.combine_on_base_item(&mut base_item) {
+        Some(diff) => diff,
         None => return Json(json!({"status":"No items to combine"})),
     };
-    other.fix_dates();
-    other.fix_images(&base_item);
-    let diff = base_item.merge(&other);
+    base_item.fix_dates();
+    // other.fix_images(&base_item);
+    // let diff = base_item.merge(&other);
     Json(json!(diff))
 }
 

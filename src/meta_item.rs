@@ -244,10 +244,36 @@ impl MetaItem {
         }
     }
 
+    // fn add_fake_statement_ids(&mut self) {
+    //     self.item
+    //         .claims_mut()
+    //         .iter_mut()
+    //         .filter(|c| c.id().is_none())
+    //         .for_each(|c| {
+    //             let fake_id = format!("tmp:{}", Uuid::new_v4());
+    //             c.set_id(fake_id);
+    //         });
+    // }
+
+    // pub fn clear_fake_statement_ids(&mut self) {
+    //     self.item
+    //         .claims_mut()
+    //         .iter_mut()
+    //         .filter(|c| match c.id() {
+    //             Some(id) => id.starts_with("tmp:"),
+    //             None => false,
+    //         })
+    //         .for_each(|c| {
+    //             c.remove_id();
+    //         });
+    // }
+
     pub fn merge(&mut self, other: &MetaItem) -> MergeDiff {
+        // self.add_fake_statement_ids();
         let mut im = ItemMerger::new(self.item.to_owned());
         im.set_properties_ignore_qualifier_match(vec!["P225".to_string()]);
         let diff = im.merge(&other.item);
+        self.item = im.item;
         // diff.apply(&mut self.item); // TODO FIXME
         self.prop_text.append(&mut other.prop_text.clone());
         self.prop_text.sort();
