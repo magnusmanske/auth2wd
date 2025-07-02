@@ -146,10 +146,13 @@ impl ExternalImporter for GND {
             }
         }
 
-        // Occupation
+        // Blank nodes aka multiple values
         for (elementset, property) in key_prop {
-            self.occupation(elementset, property, &mut ret).await?;
+            self.bnodes(elementset, property, &mut ret).await?;
         }
+
+        // Work activity
+        self.activity(&mut ret).await?;
 
         self.try_rescue_prop_text(&mut ret).await?;
         ret.cleanup();
@@ -158,7 +161,42 @@ impl ExternalImporter for GND {
 }
 
 impl GND {
-    async fn occupation(&self, url: &str, property: usize, ret: &mut MetaItem) -> Result<()> {
+    async fn activity(&self, ret: &mut MetaItem) -> Result<()> {
+        lazy_static! {
+            static ref RE_SINGLE_YEAR: Regex = Regex::new(r"^(\d{3,4})$").expect("Regexp error");
+            static ref RE_YEAR_RANGE: Regex =
+                Regex::new(r"^(\d{3,4}) *- *(\d{3,4})$").expect("Regexp error");
+        }
+        let lits = self.triples_property_literals(
+            "https://d-nb.info/standards/elementset/gnd#periodOfActivity",
+        )?;
+        if lits.len() != 1 {
+            return Ok(());
+        }
+        if let Some(lit) = lits.first() {
+            if let Some(year) = RE_SINGLE_YEAR.captures(lit) {
+                if let Some(year) = year.get(1) {
+                    if let Some((time, precision)) = ret.parse_date(year.as_str()) {
+                        ret.add_claim(self.new_statement_time(1317, &time, precision));
+                    }
+                }
+            } else if let Some(result) = RE_YEAR_RANGE.captures(lit) {
+                if let Some(start_year) = result.get(1) {
+                    if let Some((time, precision)) = ret.parse_date(start_year.as_str()) {
+                        ret.add_claim(self.new_statement_time(2031, &time, precision));
+                    }
+                }
+                if let Some(end_year) = result.get(2) {
+                    if let Some((time, precision)) = ret.parse_date(end_year.as_str()) {
+                        ret.add_claim(self.new_statement_time(2032, &time, precision));
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+
+    async fn bnodes(&self, url: &str, property: usize, ret: &mut MetaItem) -> Result<()> {
         for bnode_id in self.triples_subject_iris_blank_nodes(
             &self.get_id_url(),
             url,
