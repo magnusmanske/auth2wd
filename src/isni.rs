@@ -9,7 +9,7 @@ use sophia::inmem::graph::FastGraph;
 lazy_static! {
     static ref RE_VIAF: Regex = Regex::new(r"\bhttps?://viaf.org/viaf/(\d+)").unwrap();
     static ref RE_GND: Regex = Regex::new(r"\bhttps?://d-nb.info/gnd/(1[012]?\d{7}[0-9X]|[47]\d{6}-\d|[1-9]\d{0,7}-[0-9X]|3\d{7}[0-9X])\b").unwrap();
-    static ref RE_LOC: Regex = Regex::new(r"\bhttps?://id.loc.gov/authorities/names/(gf|n|nb|nr|no|ns|sh|sj)([4-9][0-9]|00|20[0-2][0-9])([0-9]{6})\b").unwrap();
+    static ref RE_LOC: Regex = Regex::new(r#"\bhttps?://id.loc.gov/authorities/names/(.+?)""#).unwrap();
     static ref RE_BORN_DIED: Regex = Regex::new(r"<span>Dates:.*?</span>.*?<span>(.+?)</span>").unwrap();
     static ref RE_YEAR: Regex = Regex::new(r"(\d{3,4})").unwrap();
     static ref RE_NAME: Regex = Regex::new(r"<span>Name:.*?</span>.*?<span>(.+?)</span>").unwrap();
