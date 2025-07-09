@@ -50,6 +50,7 @@ pub mod gbif_taxon;
 pub mod gnd;
 pub mod id_ref;
 pub mod inaturalist;
+pub mod isni;
 pub mod loc;
 pub mod meta_item;
 pub mod nb;
@@ -427,7 +428,6 @@ cargo run -- combinator P950 XX990809
 
 TODO:
 P244	Library of Congress authority ID
-P213	ISNI
 P349    NDL Authority ID (Japan)
 P7545	askArt person ID (has JSON in HTML source)
 

@@ -6,6 +6,13 @@ lazy_static! {
     pub static ref SUPPORTED_PROPERTIES: Vec<SupportedProperty> = {
         vec![
             SupportedProperty::new(
+                213,
+                "ISNI",
+                "International Standard Name Identifier",
+                "0000000121251077",
+                None,
+            ),
+            SupportedProperty::new(
                 214,
                 "VIAF",
                 "Virtual International Authority File",
@@ -108,6 +115,7 @@ impl SupportedProperty {
 
     pub async fn generator(&self, id: &str) -> Result<Box<dyn ExternalImporter>> {
         let ret: Box<dyn ExternalImporter> = match self.property {
+            213 => Box::new(crate::isni::ISNI::new(id).await?),
             214 => Box::new(crate::viaf::VIAF::new(id).await?),
             227 => Box::new(crate::gnd::GND::new(id).await?),
             244 => Box::new(crate::loc::LOC::new(id).await?),
