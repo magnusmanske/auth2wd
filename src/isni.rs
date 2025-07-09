@@ -53,7 +53,7 @@ impl ExternalImporter for ISNI {
 
     async fn add_the_usual(&self, ret: &mut MetaItem) -> Result<()> {
         self.add_own_id(ret)?;
-        ret.add_claim(self.new_statement_item(31, "Q5")); // Human
+        // ret.add_claim(self.new_statement_item(31, "Q5")); // Human TODO only for some
         Ok(())
     }
 
@@ -181,7 +181,7 @@ mod tests {
             .map(|c| c.main_snak().property().to_string())
             .collect();
         assert!(props.contains(&"P213".to_string()));
-        assert!(props.contains(&"P31".to_string()));
+        // assert!(props.contains(&"P31".to_string()));
         assert!(props.contains(&"P214".to_string()));
         assert!(props.contains(&"P227".to_string()));
         assert!(props.contains(&"P244".to_string()));
