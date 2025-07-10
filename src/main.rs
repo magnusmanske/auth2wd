@@ -59,6 +59,7 @@ pub mod noraf;
 pub mod pubchem_cid;
 pub mod selibr;
 pub mod supported_property;
+pub mod ulan;
 pub mod utility;
 pub mod viaf;
 pub mod worldcat;
@@ -427,7 +428,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 cargo run -- combinator P950 XX990809
 
 TODO:
-P244	Library of Congress authority ID
 P349    NDL Authority ID (Japan)
 P7545	askArt person ID (has JSON in HTML source)
 

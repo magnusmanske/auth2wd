@@ -225,7 +225,7 @@ impl GND {
 
     async fn add_gnd_item(&self, url: &str, property: usize, ret: &mut MetaItem) {
         if let Some(gnd_id) = url.split('/').next_back() {
-            if let Some(item) = ExternalId::new(227, gnd_id)
+            if let Some(item) = ExternalId::new(self.my_property(), gnd_id)
                 .get_item_for_external_id_value()
                 .await
             {

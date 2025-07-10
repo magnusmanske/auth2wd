@@ -499,6 +499,19 @@ pub trait ExternalImporter: Send + Sync {
             };
         }
 
+        for url in self.triples_iris("http://schema.org/gender")? {
+            println!("Gender URL: {}", url);
+            let _ = match url.as_str() {
+                "http://vocab.getty.edu/aat/300189559" => {
+                    ret.add_claim(self.new_statement_item(21, "Q6581097"))
+                }
+                "http://vocab.getty.edu/aat/500446177" => {
+                    ret.add_claim(self.new_statement_item(21, "Q6581072"))
+                }
+                _ => ret.add_prop_text(ExternalId::new(21, &url)),
+            };
+        }
+
         Ok(())
     }
 
@@ -527,12 +540,19 @@ pub trait ExternalImporter: Send + Sync {
 
         let urls = [
             "http://schema.org/name",
+            "https://schema.org/name",
             "http://xmlns.com/foaf/0.1/name",
+            "https://xmlns.com/foaf/0.1/name",
+            "http://datos.bne.es/def/P5012",
             "https://datos.bne.es/def/P5012",
+            "http://d-nb.info/standards/elementset/gnd#preferredNameForThePerson",
             "https://d-nb.info/standards/elementset/gnd#preferredNameForThePerson",
+            "http://d-nb.info/standards/elementset/gnd#variantNameForThePerson",
             "https://d-nb.info/standards/elementset/gnd#variantNameForThePerson",
             "http://schema.org/alternateName",
+            "https://schema.org/alternateName",
             "http://www.w3.org/2000/01/rdf-schema#label",
+            "https://www.w3.org/2000/01/rdf-schema#label",
         ];
         for url in urls {
             for s in self.triples_literals(url)? {
@@ -612,12 +632,19 @@ pub trait ExternalImporter: Send + Sync {
         let language = self.primary_language();
         let iris = [
             "http://www.w3.org/2004/02/skos/core#prefLabel",
+            "https://www.w3.org/2004/02/skos/core#prefLabel",
+            "http://datos.bne.es/def/P3067",
             "https://datos.bne.es/def/P3067",
             "http://rdaregistry.info/Elements/a/#P50113",
+            "https://rdaregistry.info/Elements/a/#P50113",
             "http://rdvocab.info/ElementsGr2/biographicalInformation",
+            "https://rdvocab.info/ElementsGr2/biographicalInformation",
             "http://www.w3.org/2004/02/skos/core#altLabel",
+            "https://www.w3.org/2004/02/skos/core#altLabel",
+            "http://id.kb.se/vocab/description",
             "https://id.kb.se/vocab/description",
             "http://www.loc.gov/mads/rdf/v1#authoritativeLabel",
+            "https://www.loc.gov/mads/rdf/v1#authoritativeLabel",
         ];
         for iri in iris {
             for s in self.triples_literals(iri)? {

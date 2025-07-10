@@ -102,9 +102,8 @@ impl PubChemCid {
             .filter_map(|s| s["Section"].as_array())
             .next()?;
         for o in other_identifiers.iter() {
-            match o["TOCHeading"].as_str() {
-                Some("Nikkaji Number") => self.extract_information_as_string_values(ret, o, 2085),
-                _ => {} // Ignore
+            if let Some("Nikkaji Number") = o["TOCHeading"].as_str() {
+                self.extract_information_as_string_values(ret, o, 2085);
             }
         }
 

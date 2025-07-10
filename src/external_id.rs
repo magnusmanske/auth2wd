@@ -70,7 +70,6 @@ impl ExternalId {
         // TODO urlencode query?
         let url = format!("https://www.wikidata.org/w/api.php?action=query&list=search&srnamespace=0&format=json&srsearch={}",&query);
         let text = reqwest::get(url).await.ok()?.text().await.ok()?;
-        // let text = ureq::get(&url).call().ok()?.into_string().ok()?;
         let j: serde_json::Value = serde_json::from_str(&text).ok()?;
         if j["query"]["searchinfo"]["totalhits"].as_i64()? == 1 {
             return Some(j["query"]["search"][0]["title"].as_str()?.to_string());
