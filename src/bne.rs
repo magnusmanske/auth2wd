@@ -79,7 +79,7 @@ impl ExternalImporter for BNE {
 
 impl BNE {
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = format!("https://datos.bne.es/resource/{}.rdf", id);
+        let rdf_url = format!("https://datos.bne.es/resource/{id}.rdf");
         let resp = reqwest::get(&rdf_url).await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;

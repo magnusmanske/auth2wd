@@ -52,6 +52,7 @@ lazy_static! {
             (Regex::new(r"^https?://entities.oclc.org/worldcat/entity/([^.]+)$").unwrap(),"${1}".to_string(),10832),
             (Regex::new(r"^https?://entities.oclc.org/worldcat/entity/([^.]+).html$").unwrap(),"${1}".to_string(),10832),
             (Regex::new(r"^https?://entities.oclc.org/worldcat/entity/([^.]+).jsonld$").unwrap(),"${1}".to_string(),10832),
+            (Regex::new(r"^https?://www.filmportal.de/([A-Za-z0-9]+)$").unwrap(),"${1}".to_string(),2639),
         ]
     };
 
@@ -350,7 +351,7 @@ pub trait ExternalImporter: Send + Sync {
             StatementRank::Normal,
             Snak::new(
                 SnakDataType::ExternalId,
-                format!("P{}", property),
+                format!("P{property}"),
                 SnakType::Value,
                 Some(DataValue::new(
                     DataValueType::StringType,
@@ -368,7 +369,7 @@ pub trait ExternalImporter: Send + Sync {
             StatementRank::Normal,
             Snak::new(
                 SnakDataType::MonolingualText,
-                format!("P{}", property),
+                format!("P{property}"),
                 SnakType::Value,
                 Some(DataValue::new(
                     DataValueType::MonoLingualText,
@@ -386,7 +387,7 @@ pub trait ExternalImporter: Send + Sync {
             StatementRank::Normal,
             Snak::new(
                 SnakDataType::Url,
-                format!("P{}", property),
+                format!("P{property}"),
                 SnakType::Value,
                 Some(DataValue::new(
                     DataValueType::StringType,
@@ -404,7 +405,7 @@ pub trait ExternalImporter: Send + Sync {
             StatementRank::Normal,
             Snak::new(
                 SnakDataType::WikibaseItem,
-                format!("P{}", property),
+                format!("P{property}"),
                 SnakType::Value,
                 Some(DataValue::new(
                     DataValueType::EntityId,
@@ -422,7 +423,7 @@ pub trait ExternalImporter: Send + Sync {
             StatementRank::Normal,
             Snak::new(
                 SnakDataType::Time,
-                format!("P{}", property),
+                format!("P{property}"),
                 SnakType::Value,
                 Some(DataValue::new(
                     DataValueType::Time,
@@ -500,7 +501,7 @@ pub trait ExternalImporter: Send + Sync {
         }
 
         for url in self.triples_iris("http://schema.org/gender")? {
-            println!("Gender URL: {}", url);
+            println!("Gender URL: {url}");
             let _ = match url.as_str() {
                 "http://vocab.getty.edu/aat/300189559" => {
                     ret.add_claim(self.new_statement_item(21, "Q6581097"))

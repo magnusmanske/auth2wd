@@ -83,7 +83,7 @@ impl ExternalImporter for IdRef {
 
 impl IdRef {
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = format!("https://www.idref.fr/{}.rdf", id);
+        let rdf_url = format!("https://www.idref.fr/{id}.rdf");
         let resp = reqwest::get(&rdf_url).await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;

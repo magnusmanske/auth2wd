@@ -336,9 +336,9 @@ async fn apply_diff(
 }
 
 async fn get_wikidata_api(path: &str) -> Result<Api, Box<dyn std::error::Error>> {
-    let file = File::open(path).map_err(|e| format!("{:?}", e))?;
+    let file = File::open(path)?;
     let reader = BufReader::new(file);
-    let j: serde_json::Value = serde_json::from_reader(reader).map_err(|e| format!("{:?}", e))?;
+    let j: serde_json::Value = serde_json::from_reader(reader)?;
     let oauth2_token = j["oauth2_token"]
         .as_str()
         .expect("No oauth2_token in {path}");
@@ -382,7 +382,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let ext_id = get_extid_from_argv(&argv)?;
             let parser = Combinator::get_parser_for_ext_id(&ext_id).await?;
             let item = parser.run().await?;
-            println!("{:?}", item);
+            println!("{item:?}");
         }
         Some("graph") => {
             // Single graph

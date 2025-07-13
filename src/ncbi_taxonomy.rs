@@ -187,8 +187,7 @@ mod tests {
         assert_eq!(
             ncbi_taxonomy.get_key_url(TEST_ID),
             format!(
-                "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id={}",
-                TEST_ID
+                "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id={TEST_ID}"
             )
         );
         let new_item = ncbi_taxonomy.run().await.unwrap();

@@ -58,7 +58,7 @@ impl ExternalImporter for SELIBR {
 
 impl SELIBR {
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = format!("http://libris.kb.se/resource/auth/{}/data.rdf", id);
+        let rdf_url = format!("http://libris.kb.se/resource/auth/{id}/data.rdf");
         let client = reqwest::ClientBuilder::new()
             .redirect(reqwest::redirect::Policy::limited(10))
             .build()?;

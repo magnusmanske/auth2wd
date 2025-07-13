@@ -250,7 +250,7 @@ impl GND {
     }
 
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = format!("https://d-nb.info/gnd/{}/about/lds.rdf", id);
+        let rdf_url = format!("https://d-nb.info/gnd/{id}/about/lds.rdf");
         let resp = reqwest::get(&rdf_url).await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;

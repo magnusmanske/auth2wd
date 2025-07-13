@@ -166,7 +166,7 @@ mod tests {
         assert_eq!(gbif.my_id(), TEST_ID);
         assert_eq!(
             gbif.get_key_url(TEST_ID),
-            format!("https://www.gbif.org/species/{}", TEST_ID)
+            format!("https://www.gbif.org/species/{TEST_ID}")
         );
         let new_item = gbif.run().await.unwrap();
         assert_eq!(new_item.item.claims().len(), 4);
