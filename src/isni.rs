@@ -175,7 +175,7 @@ mod tests {
         let meta_item = isni.run().await.unwrap();
         let props: Vec<String> = meta_item
             .item
-            .claims()
+            .statements()
             .iter()
             .map(|c| c.main_snak().property().to_string())
             .collect();

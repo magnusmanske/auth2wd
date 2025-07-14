@@ -2,7 +2,6 @@ use crate::external_importer::*;
 use crate::meta_item::*;
 use anyhow::Result;
 use async_trait::async_trait;
-use axum::extract::State;
 use regex::Regex;
 use serde_json::Value;
 use sophia::inmem::graph::FastGraph;
@@ -116,11 +115,11 @@ impl NORAF {
             let died = ret.parse_date(caps.get(2).unwrap().as_str()); // unwrap is safe
             if let Some((time, precision)) = born {
                 let statement = self.new_statement_time(569, &time, precision);
-                ret.item.claims_mut().push(statement);
+                ret.item.statements_mut().insert(statement);
             }
             if let Some((time, precision)) = died {
                 let statement = self.new_statement_time(570, &time, precision);
-                ret.item.claims_mut().push(statement);
+                ret.item.statements_mut().insert(statement);
             }
         }
     }
@@ -128,9 +127,7 @@ impl NORAF {
     fn add_name(&self, name: &str, ret: &mut MetaItem) {
         let name = self.transform_label(name);
         let language = self.primary_language();
-        ret.item
-            .labels_mut()
-            .push(StatementValueContent::new_monolingual_text(language, name));
+        ret.item.labels_mut().list_mut().insert(language, name);
     }
 
     fn parse_identifiers(&self, ret: &mut MetaItem) {
@@ -159,6 +156,6 @@ mod tests {
         let noraf = NORAF::new("123").await.unwrap();
         let mut ret = MetaItem::new();
         noraf.add_dates("1900-2000", &mut ret);
-        assert_eq!(ret.item.claims().len(), 2);
+        assert_eq!(ret.item.statements().len(), 2);
     }
 }

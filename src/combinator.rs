@@ -1,5 +1,6 @@
 use crate::external_id::*;
 use crate::external_importer::*;
+use crate::merge_diff::MergeDiff;
 use crate::meta_item::*;
 use crate::supported_property::SUPPORTED_PROPERTIES;
 use anyhow::{anyhow, Result};
@@ -173,6 +174,9 @@ mod tests {
         combinator.items.insert("Q3".to_string(), mi1.to_owned());
         let (res_item2, _res_diff2) = combinator.combine().unwrap();
 
-        assert_eq!(res_item1.item.claims().len(), res_item2.item.claims().len());
+        assert_eq!(
+            res_item1.item.statements().len(),
+            res_item2.item.statements().len()
+        );
     }
 }

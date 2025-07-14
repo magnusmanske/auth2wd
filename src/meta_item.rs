@@ -1,13 +1,15 @@
-use crate::external_id::*;
+use crate::{
+    external_id::*,
+    merge_diff::{ItemMerger, MergeDiff},
+};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_json::json;
-use std::str::FromStr;
-use std::vec::Vec;
-use wikibase_rest_api::{Reference, Statement};
+use std::{str::FromStr, vec::Vec};
+use wikibase_rest_api::{entity::Entity, EntityId, Item, Reference, RestApi, Statement};
 
 #[derive(Debug, Clone)]
 pub struct MetaItem {
-    pub item: ItemEntity,
+    pub item: Item,
     pub prop_text: Vec<ExternalId>,
 }
 
@@ -17,7 +19,7 @@ impl Serialize for MetaItem {
         S: Serializer,
     {
         let mut state = serializer.serialize_struct("MetaItem", 2)?;
-        let mut item = self.item.to_json();
+        let mut item = json!(self.item);
         item["type"] = json!("item");
         state.serialize_field("item", &item)?;
         state.serialize_field("prop_text", &self.prop_text)?;
@@ -28,7 +30,7 @@ impl Serialize for MetaItem {
 impl Default for MetaItem {
     fn default() -> Self {
         Self {
-            item: ItemEntity::new_empty(),
+            item: Item::default(),
             prop_text: vec![],
         }
     }
@@ -39,7 +41,7 @@ impl MetaItem {
         Self::default()
     }
 
-    pub fn new_from_item(item: ItemEntity) -> Self {
+    pub fn new_from_item(item: Item) -> Self {
         Self {
             item,
             ..Default::default()
@@ -47,15 +49,8 @@ impl MetaItem {
     }
 
     pub async fn from_entity(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let api = mediawiki::api::Api::new("https://www.wikidata.org/w/api.php").await?;
-        let entity_container = entity_container::EntityContainer::new();
-        let entity = entity_container.load_entity(&api, id).await?;
-        let item = match entity {
-            Entity::Item(item) => item,
-            _ => return Err(format!("Not an item: '{id}'").into()),
-        };
         Ok(Self {
-            item,
+            item: Item::get(EntityId::item(id), &RestApi::wikidata()?).await?,
             prop_text: vec![],
         })
     }
@@ -93,7 +88,8 @@ impl MetaItem {
     pub fn add_claim(&mut self, new_claim: Statement) -> Option<Statement> {
         let mut existing_claims_iter = self
             .item
-            .claims_mut()
+            .statements_mut()
+            .statements_mut()
             .iter_mut()
             .filter(|existing_claim| {
                 ItemMerger::is_snak_identical(new_claim.main_snak(), existing_claim.main_snak())
@@ -146,7 +142,7 @@ impl MetaItem {
 
             let best_existing_precision = self
                 .item
-                .claims()
+                .statements()
                 .iter()
                 .filter(|c| c.property() == prop)
                 .filter_map(|c| c.main_snak().data_value().to_owned())
@@ -171,7 +167,7 @@ impl MetaItem {
 
     pub fn get_external_ids(&self) -> Vec<ExternalId> {
         self.item
-            .claims()
+            .statements()
             .iter()
             .filter_map(ExternalId::from_external_id_claim)
             .collect()
@@ -186,12 +182,13 @@ impl MetaItem {
         // Check if base item has P18 image, remove P4765 (commons compatible image URL)
         if base_item
             .item
-            .claims()
+            .statements()
             .iter()
             .any(|c| c.main_snak().property() == "P18")
         {
             self.item
-                .claims_mut()
+                .statements_mut()
+                .statements_mut()
                 .retain(|c| c.main_snak().property() != "P4765");
         }
     }
@@ -203,7 +200,7 @@ impl MetaItem {
             let mut best_precision = 0;
             let mut worst_precision = 255;
             self.item
-                .claims()
+                .statements()
                 .iter()
                 .filter(|c| c.main_snak().property() == prop)
                 .for_each(|c| {
@@ -222,7 +219,8 @@ impl MetaItem {
                 continue;
             }
             self.item
-                .claims_mut()
+                .statements_mut()
+                .statements_mut()
                 .iter_mut()
                 .filter(|c| c.main_snak().property() == prop)
                 .filter(|c| *c.rank() == StatementRank::Normal)
@@ -244,7 +242,7 @@ impl MetaItem {
 
     // fn add_fake_statement_ids(&mut self) {
     //     self.item
-    //         .claims_mut()
+    //         .statements_mut().statements_mut()
     //         .iter_mut()
     //         .filter(|c| c.id().is_none())
     //         .for_each(|c| {
@@ -255,7 +253,7 @@ impl MetaItem {
 
     // pub fn clear_fake_statement_ids(&mut self) {
     //     self.item
-    //         .claims_mut()
+    //         .statements_mut().statements_mut()
     //         .iter_mut()
     //         .filter(|c| match c.id() {
     //             Some(id) => id.starts_with("tmp:"),
@@ -347,9 +345,9 @@ mod tests {
         mi.item.add_claim(s3);
         mi.item.add_claim(s2);
         mi.fix_dates();
-        assert_eq!(mi.item.claims().len(), 3);
-        assert_eq!(*mi.item.claims()[0].rank(), StatementRank::Deprecated);
-        assert_eq!(*mi.item.claims()[1].rank(), StatementRank::Normal);
-        assert_eq!(*mi.item.claims()[2].rank(), StatementRank::Deprecated);
+        assert_eq!(mi.item.statements().len(), 3);
+        assert_eq!(*mi.item.statements()[0].rank(), StatementRank::Deprecated);
+        assert_eq!(*mi.item.statements()[1].rank(), StatementRank::Normal);
+        assert_eq!(*mi.item.statements()[2].rank(), StatementRank::Deprecated);
     }
 }

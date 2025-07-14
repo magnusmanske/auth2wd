@@ -4,7 +4,6 @@ use crate::ExternalId;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::Value;
-use wikibase_rest_api::prelude::StatementValueContent;
 use wikibase_rest_api::Statement;
 
 #[derive(Clone, Debug)]
@@ -80,9 +79,10 @@ impl GBIFtaxon {
         let name = self.json.get("Battus philenor")?.as_str()?;
         ret.add_claim(self.new_statement_string(225, name));
         for lang in TAXON_LABEL_LANGUAGES {
-            let label =
-                StatementValueContent::new_monolingual_text(lang.to_string(), name.to_string());
-            ret.item.labels_mut().push(label);
+            ret.item
+                .labels_mut()
+                .list_mut()
+                .insert(lang.to_string(), name.to_string());
         }
         Some(())
     }
@@ -172,6 +172,6 @@ mod tests {
             format!("https://www.gbif.org/species/{TEST_ID}")
         );
         let new_item = gbif.run().await.unwrap();
-        assert_eq!(new_item.item.claims().len(), 4);
+        assert_eq!(new_item.item.statements().len(), 4);
     }
 }

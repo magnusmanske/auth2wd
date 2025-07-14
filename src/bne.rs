@@ -92,8 +92,6 @@ impl BNE {
 
 #[cfg(test)]
 mod tests {
-    use wikibase_rest_api::prelude::StatementValueContent;
-
     use super::*;
 
     const TEST_ID: &str = "XX1234567";
@@ -120,11 +118,8 @@ mod tests {
         let bne = BNE::new(TEST_ID).await.unwrap();
         let meta_item = bne.run().await.unwrap();
         assert_eq!(
-            *meta_item.item.labels(),
-            vec![StatementValueContent::new_monolingual_text(
-                "es",
-                "Marcel Coulon"
-            )]
+            meta_item.item.labels().get_lang("es"),
+            Some("Marcel Coulon")
         );
     }
 }

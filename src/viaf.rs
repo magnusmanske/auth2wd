@@ -68,8 +68,6 @@ impl VIAF {
 
 #[cfg(test)]
 mod tests {
-    use wikibase_rest_api::prelude::StatementValueContent;
-
     use super::*;
 
     const TEST_ID: &str = "30701597";
@@ -122,11 +120,8 @@ mod tests {
         let viaf = VIAF::new(TEST_ID).await.unwrap();
         let meta_item = viaf.run().await.unwrap();
         assert_eq!(
-            *meta_item.item.labels(),
-            vec![StatementValueContent::new_monolingual_text(
-                "en",
-                "Magnus Manske"
-            )]
+            meta_item.item.labels().get_lang("en"),
+            Some("Magnus Manske")
         );
     }
 }

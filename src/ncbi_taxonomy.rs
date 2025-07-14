@@ -191,6 +191,6 @@ mod tests {
             )
         );
         let new_item = ncbi_taxonomy.run().await.unwrap();
-        assert_eq!(new_item.item.claims().len(), 5);
+        assert_eq!(new_item.item.statements().len(), 5);
     }
 }

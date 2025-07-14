@@ -142,6 +142,6 @@ mod tests {
             format!("https://pubchem.ncbi.nlm.nih.gov/compound/{TEST_ID}")
         );
         let new_item = gbif.run().await.unwrap();
-        assert_eq!(new_item.item.claims().len(), 7);
+        assert_eq!(new_item.item.statements().len(), 7);
     }
 }

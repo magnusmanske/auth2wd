@@ -256,6 +256,6 @@ mod tests {
             meta_item.item.labels()[0],
             StatementValueContent::new_monolingual_text("en", "Licea bryophila")
         );
-        assert_eq!(meta_item.item.claims().len(), 8);
+        assert_eq!(meta_item.item.statements().len(), 8);
     }
 }

@@ -73,9 +73,6 @@ use external_importer::*;
 use meta_item::MetaItem;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::collections::HashMap;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
 use std::net::SocketAddr;
 use std::{env, fs};
 use supported_property::SUPPORTED_PROPERTIES;
@@ -84,10 +81,7 @@ use tower_http::services::ServeDir;
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
 use wikibase_rest_api::prelude::*;
 
-// use wikimisc::item_merger::ItemMerger;
-// use wikimisc::mediawiki::api::Api;
-// use wikimisc::merge_diff::MergeDiff;
-// use wikimisc::wikibase::{EntityTrait, Item, Snak, Statement};
+use crate::merge_diff::{ItemMerger, MergeDiff};
 
 fn wrap_html(html: &str) -> String {
     let outer: String = fs::read_to_string("./html/wrapper.html").unwrap();
@@ -197,7 +191,7 @@ async fn merge(Form(params): Form<MergeForm>) -> Json<serde_json::Value> {
     let mut im = ItemMerger::new(base_item);
     let diff = im.merge(&new_item);
 
-    let mut j = im.item.to_json();
+    let mut j = json!(im.item());
     if base_item_has_fake_id {
         if let Some(jo) = j.as_object_mut() {
             jo.remove("id");
@@ -368,11 +362,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             );
             //println!("{:?}",&other);
             //println!("{:?}",&diff);
-            println!(
-                "Altered: {}, added: {}",
-                diff.altered_statements.len(),
-                diff.added_statements.len()
-            );
+            // println!(
+            //     "Altered: {}, added: {}",
+            //     diff.altered_statements.len(),
+            //     diff.added_statements.len()
+            // );
             let payload = json!(diff);
             println!("{}", &serde_json::to_string_pretty(&payload).unwrap());
         }

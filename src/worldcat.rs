@@ -4,7 +4,8 @@ use crate::ExternalId;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::Value;
-use wikibase_rest_api::prelude::StatementValueContent;
+use wikibase_rest_api::prelude::LanguageStrings;
+use wikibase_rest_api::LanguageString;
 
 #[derive(Debug, Clone)]
 pub struct WorldCat {
@@ -82,10 +83,7 @@ impl WorldCat {
             if let Some(s) = s.as_str() {
                 ret.item
                     .labels_mut()
-                    .push(StatementValueContent::new_monolingual_text(
-                        language.as_str(),
-                        s,
-                    ));
+                    .insert(LanguageString::new(language, s));
             }
         }
         Some(())
@@ -99,10 +97,7 @@ impl WorldCat {
                     if let Some(alias) = alias.as_str() {
                         ret.item
                             .aliases_mut()
-                            .push(StatementValueContent::new_monolingual_text(
-                                language.as_str(),
-                                alias,
-                            ));
+                            .insert(LanguageString::new(language, alias));
                     }
                 }
             }
@@ -116,10 +111,7 @@ impl WorldCat {
             if let Some(s) = s.as_str() {
                 ret.item
                     .descriptions_mut()
-                    .push(StatementValueContent::new_monolingual_text(
-                        language.as_str(),
-                        s,
-                    ));
+                    .insert(LanguageString::new(language, s));
             }
         }
         Some(())
@@ -203,20 +195,12 @@ mod tests {
     async fn test_run() {
         let worldcat = WorldCat::new(TEST_ID).await.unwrap();
         let meta_item = worldcat.run().await.unwrap();
-        assert!(meta_item
-            .item
-            .labels()
-            .contains(&StatementValueContent::new_monolingual_text(
-                "en",
-                "Helen Clark"
-            )));
+        assert_eq!(meta_item.item.labels().get_lang("en"), Some("Helen Clark"));
         assert!(meta_item
             .item
             .aliases()
-            .contains(&StatementValueContent::new_monolingual_text(
-                "en",
-                "Helen Elizabeth Clark"
-            )));
-        assert_eq!(meta_item.item.claims().len(), 3);
+            .get_lang("en")
+            .contains(&"Helen Elizabeth Clark"));
+        assert_eq!(meta_item.item.statements().len(), 3);
     }
 }
