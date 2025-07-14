@@ -4,8 +4,7 @@ use crate::ExternalId;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use wikimisc::wikibase::EntityTrait;
-use wikimisc::wikibase::LocaleString;
+use wikibase_rest_api::prelude::StatementValueContent;
 
 #[derive(Clone, Debug)]
 pub struct NCBItaxonomy {

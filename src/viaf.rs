@@ -68,7 +68,7 @@ impl VIAF {
 
 #[cfg(test)]
 mod tests {
-    use wikimisc::wikibase::{EntityTrait, LocaleString};
+    use wikibase_rest_api::prelude::StatementValueContent;
 
     use super::*;
 

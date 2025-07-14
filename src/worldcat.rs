@@ -4,8 +4,7 @@ use crate::ExternalId;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::Value;
-use wikimisc::wikibase::EntityTrait;
-use wikimisc::wikibase::LocaleString;
+use wikibase_rest_api::prelude::StatementValueContent;
 
 #[derive(Debug, Clone)]
 pub struct WorldCat {

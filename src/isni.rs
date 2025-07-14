@@ -143,7 +143,6 @@ impl ISNI {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use wikimisc::wikibase::EntityTrait;
 
     const TEST_ID: &str = "0000000121251077";
 

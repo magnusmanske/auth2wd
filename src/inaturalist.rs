@@ -5,9 +5,8 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use regex::Regex;
 use serde_json::Value;
-use wikimisc::wikibase::EntityTrait;
-use wikimisc::wikibase::LocaleString;
-use wikimisc::wikibase::Snak;
+use wikibase_rest_api::prelude::StatementValueContent;
+use wikibase_rest_api::Statement;
 
 lazy_static! {
     static ref RE_SERVER_PAYLOAD: Regex =
@@ -114,13 +113,16 @@ impl INaturalist {
             .or_else(|| photo.get("large_url")?.as_str())
             .or_else(|| photo.get("medium_url")?.as_str())?;
         let attribution = photo.get("attribution")?.as_str()?;
-        let mut statement = self.new_statement_string(4765, image_url);
-        statement.add_qualifier_snak(Snak::new_item("P275", license_item));
-        statement.add_qualifier_snak(Snak::new_string("P2093", attribution));
-        statement.add_qualifier_snak(Snak::new_url("P2699", image_url));
+        let mut qualifiers = vec![];
+        qualifiers.push(Statement::new_item("P275", *license_item).as_property_value());
+        qualifiers.push(Statement::new_string("P2093", attribution).as_property_value());
+        qualifiers.push(Statement::new_url("P2699", image_url).as_property_value());
         if image_url.ends_with("jpg") || image_url.ends_with("jpeg") {
-            statement.add_qualifier_snak(Snak::new_item("P2701", "Q2195"));
+            qualifiers.push(Statement::new_item("P2701", "Q2195").as_property_value());
         }
+        let statement = self
+            .new_statement_string(4765, image_url)
+            .with_qualifiers(qualifiers);
         ret.add_claim(statement);
         Some(true)
     }

@@ -96,9 +96,8 @@ impl IdRef {
 
 #[cfg(test)]
 mod tests {
-    use wikimisc::wikibase::{EntityTrait, LocaleString};
-
     use super::*;
+    use wikibase_rest_api::prelude::StatementValueContent;
 
     const TEST_ID: &str = "026812304";
 

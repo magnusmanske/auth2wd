@@ -7,7 +7,8 @@ use regex::Regex;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
-use wikimisc::wikibase::{Snak, StatementRank};
+use wikibase_rest_api::Statement;
+use wikibase_rest_api::StatementRank;
 
 lazy_static! {
     static ref RE_COUNTRY: Regex =
@@ -59,8 +60,8 @@ impl ExternalImporter for GND {
 
         if self.is_undifferentiated_person()? {
             statement.set_rank(StatementRank::Deprecated);
-            let snak = Snak::new_item("P2241", "Q68648103");
-            statement.add_qualifier_snak(snak);
+            let pv = Statement::new_item("P2241", "Q68648103").as_property_value();
+            statement.qualifiers_mut().push(pv);
         }
 
         ret.add_claim(statement);
@@ -275,7 +276,7 @@ impl GND {
 
 #[cfg(test)]
 mod tests {
-    use wikimisc::wikibase::{EntityTrait, LocaleString};
+    use wikibase_rest_api::prelude::StatementValueContent;
 
     use super::*;
 

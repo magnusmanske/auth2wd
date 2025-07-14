@@ -7,8 +7,7 @@ use async_trait::async_trait;
 use reqwest::header::{HeaderMap, HeaderValue, ACCEPT};
 use serde::{Deserialize, Serialize};
 use sophia::inmem::graph::FastGraph;
-use wikimisc::wikibase::EntityTrait;
-use wikimisc::wikibase::LocaleString;
+use wikibase_rest_api::prelude::StatementValueContent;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 enum TermType {
@@ -183,8 +182,6 @@ impl NB {
 
 #[cfg(test)]
 mod tests {
-    use wikimisc::wikibase::{EntityTrait, LocaleString};
-
     use super::*;
 
     const TEST_ID: &str = "068364229";

@@ -2,10 +2,12 @@ use crate::external_importer::*;
 use crate::meta_item::*;
 use anyhow::Result;
 use async_trait::async_trait;
+use axum::extract::State;
 use regex::Regex;
 use serde_json::Value;
 use sophia::inmem::graph::FastGraph;
-use wikimisc::wikibase::{EntityTrait, LocaleString, SnakDataType};
+use wikibase_rest_api::prelude::StatementValueContent;
+use wikibase_rest_api::Statement;
 
 // Was: Bibsys
 
@@ -140,8 +142,8 @@ impl NORAF {
                 .filter_map(|field| field.as_str())
                 .filter_map(|s| self.url2external_id(s))
                 .for_each(|ext_id| {
-                    let mut statement = self.new_statement_string(ext_id.property(), ext_id.id());
-                    statement.set_datatype(SnakDataType::ExternalId);
+                    let statement =
+                        Statement::new_external_id(format!("P{}", ext_id.property()), ext_id.id());
                     ret.item.add_claim(statement);
                 });
         };
