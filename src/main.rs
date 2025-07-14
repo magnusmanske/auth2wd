@@ -52,6 +52,7 @@ pub mod id_ref;
 pub mod inaturalist;
 pub mod isni;
 pub mod loc;
+pub mod merge_diff;
 pub mod meta_item;
 pub mod nb;
 pub mod ncbi_taxonomy;
@@ -86,7 +87,7 @@ use wikibase_rest_api::prelude::*;
 // use wikimisc::item_merger::ItemMerger;
 // use wikimisc::mediawiki::api::Api;
 // use wikimisc::merge_diff::MergeDiff;
-// use wikimisc::wikibase::{EntityTrait, ItemEntity, Snak, Statement};
+// use wikimisc::wikibase::{EntityTrait, Item, Snak, Statement};
 
 fn wrap_html(html: &str) -> String {
     let outer: String = fs::read_to_string("./html/wrapper.html").unwrap();
@@ -171,7 +172,7 @@ struct MergeForm {
     new_item: String,
 }
 
-fn item_from_json_string(s: &str) -> Result<(ItemEntity, bool), String> {
+fn item_from_json_string(s: &str) -> Result<(Item, bool), String> {
     let mut item = serde_json::from_str::<Value>(s).map_err(|e| e.to_string())?;
     let has_fake_id = if item.get("id").is_none() {
         item["id"] = json!("Q0");
@@ -179,7 +180,7 @@ fn item_from_json_string(s: &str) -> Result<(ItemEntity, bool), String> {
     } else {
         false
     };
-    let item = ItemEntity::new_from_json(&item).map_err(|e| e.to_string())?;
+    let item = Item::from_json(item).map_err(|e| e.to_string())?;
     Ok((item, has_fake_id))
 }
 
@@ -207,23 +208,19 @@ async fn merge(Form(params): Form<MergeForm>) -> Json<serde_json::Value> {
 }
 
 async fn merge_info() -> Html<String> {
-    let mut base_item = ItemEntity::new_empty();
-    let mut new_item = ItemEntity::new_empty();
-    base_item.set_id("Q0".to_string());
-    new_item.set_id("Q0".to_string());
-    base_item.add_claim(Statement::new_normal(
-        Snak::new_item("P31", "Q5"),
-        vec![],
-        vec![],
-    ));
-    new_item.add_claim(Statement::new_normal(
-        Snak::new_string("P18", "Pretty_image.jpg"),
-        vec![],
-        vec![],
-    ));
+    let mut base_item = Item::default();
+    let mut new_item = Item::default();
+    base_item.set_id(EntityId::item("Q0"));
+    new_item.set_id(EntityId::item("Q0"));
+    base_item
+        .statements_mut()
+        .insert(Statement::new_item("P31", "Q5"));
+    new_item
+        .statements_mut()
+        .insert(Statement::new_file("P18", "Pretty_image.jpg"));
 
-    let mut base_item = base_item.to_json();
-    let mut new_item = new_item.to_json();
+    let mut base_item = json!(base_item);
+    let mut new_item = json!(new_item);
     base_item.as_object_mut().unwrap().remove("id");
     new_item.as_object_mut().unwrap().remove("id");
 
@@ -303,51 +300,51 @@ async fn get_extend(item: &str) -> Result<MergeDiff, Box<dyn std::error::Error>>
     Ok(base_item.merge(&other))
 }
 
-async fn apply_diff(
-    item: &str,
-    diff: &MergeDiff,
-    api: &mut Api,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let json_string = json!(diff).to_string();
-    if json_string == "{}" {
-        return Ok(());
-    }
-    let token = api.get_edit_token().await?;
-    let params: HashMap<String, String> = vec![
-        ("action", "wbeditentity"),
-        ("id", item),
-        ("data", &json_string),
-        ("summary", "AC2WD"),
-        ("token", &token),
-        ("bot", "1"),
-    ]
-    .into_iter()
-    .map(|(k, v)| (k.to_string(), v.to_string()))
-    .collect();
-    let j = api
-        .post_query_api_json(&params)
-        .await
-        .map_err(|e| e.to_string())?;
-    match j["error"].as_object() {
-        Some(o) => {
-            let s = format!("{o:?}");
-            Err(s.into())
-        }
-        None => Ok(()),
-    }
-}
+// async fn apply_diff(
+//     item: &str,
+//     diff: &MergeDiff,
+//     api: &mut Api,
+// ) -> Result<(), Box<dyn std::error::Error>> {
+//     let json_string = json!(diff).to_string();
+//     if json_string == "{}" {
+//         return Ok(());
+//     }
+//     let token = api.get_edit_token().await?;
+//     let params: HashMap<String, String> = vec![
+//         ("action", "wbeditentity"),
+//         ("id", item),
+//         ("data", &json_string),
+//         ("summary", "AC2WD"),
+//         ("token", &token),
+//         ("bot", "1"),
+//     ]
+//     .into_iter()
+//     .map(|(k, v)| (k.to_string(), v.to_string()))
+//     .collect();
+//     let j = api
+//         .post_query_api_json(&params)
+//         .await
+//         .map_err(|e| e.to_string())?;
+//     match j["error"].as_object() {
+//         Some(o) => {
+//             let s = format!("{o:?}");
+//             Err(s.into())
+//         }
+//         None => Ok(()),
+//     }
+// }
 
-async fn get_wikidata_api(path: &str) -> Result<Api, Box<dyn std::error::Error>> {
-    let file = File::open(path)?;
-    let reader = BufReader::new(file);
-    let j: serde_json::Value = serde_json::from_reader(reader)?;
-    let oauth2_token = j["oauth2_token"]
-        .as_str()
-        .expect("No oauth2_token in {path}");
-    let mut api = Api::new("https://www.wikidata.org/w/api.php").await?;
-    api.set_oauth2(oauth2_token);
-    Ok(api)
-}
+// async fn get_wikidata_api(path: &str) -> Result<Api, Box<dyn std::error::Error>> {
+//     let file = File::open(path)?;
+//     let reader = BufReader::new(file);
+//     let j: serde_json::Value = serde_json::from_reader(reader)?;
+//     let oauth2_token = j["oauth2_token"]
+//         .as_str()
+//         .expect("No oauth2_token in {path}");
+//     let mut api = Api::new("https://www.wikidata.org/w/api.php").await?;
+//     api.set_oauth2(oauth2_token);
+//     Ok(api)
+// }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -392,27 +389,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let mut parser = Combinator::get_parser_for_ext_id(&ext_id).await?;
             parser.dump_graph();
         }
-        Some("list") => {
-            // List
-            let filename = argv.get(2).expect("USAGE: list LIST_FILE [START_ROW]");
-            let start = match argv.get(3) {
-                Some(s) => s.parse::<usize>().unwrap(),
-                None => 0,
-            };
-            let file = File::open(filename).unwrap();
-            let reader = BufReader::new(file);
-            let mut api = get_wikidata_api("config.json").await?;
-            for (index, line) in reader.lines().enumerate() {
-                if index >= start {
-                    if let Ok(item) = line {
-                        println!("{index}: {item}");
-                        if let Ok(diff) = get_extend(&item).await {
-                            let _ = apply_diff(&item, &diff, &mut api).await; // Ignore result
-                        }
-                    }
-                }
-            }
-        }
+        // Some("list") => {
+        //     // List
+        //     let filename = argv.get(2).expect("USAGE: list LIST_FILE [START_ROW]");
+        //     let start = match argv.get(3) {
+        //         Some(s) => s.parse::<usize>().unwrap(),
+        //         None => 0,
+        //     };
+        //     let file = File::open(filename).unwrap();
+        //     let reader = BufReader::new(file);
+        //     let mut api = get_wikidata_api("config.json").await?;
+        //     for (index, line) in reader.lines().enumerate() {
+        //         if index >= start {
+        //             if let Ok(item) = line {
+        //                 println!("{index}: {item}");
+        //                 if let Ok(diff) = get_extend(&item).await {
+        //                     let _ = apply_diff(&item, &diff, &mut api).await; // Ignore result
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
         Some("extend") => {
             let item = argv.get(2).expect("Item argument required");
             let diff = get_extend(item).await.unwrap();

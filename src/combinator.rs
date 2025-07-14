@@ -6,7 +6,6 @@ use anyhow::{anyhow, Result};
 use futures::future::join_all;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use wikimisc::merge_diff::MergeDiff;
 
 #[derive(Debug, Clone, Default)]
 pub struct Combinator {
@@ -145,10 +144,9 @@ impl Combinator {
 
 #[cfg(test)]
 mod tests {
-    use serde_json::Value;
-    use wikimisc::wikibase::{EntityTrait, ItemEntity};
-
     use super::*;
+    use serde_json::Value;
+    use wikibase_rest_api::{entity::Entity, Item};
 
     #[test]
     fn test_combine() {
@@ -157,12 +155,12 @@ mod tests {
 
         let s1 = include_str!("../test_data/item1.json");
         let j1: Value = serde_json::from_str(s1).unwrap();
-        let i1 = ItemEntity::new_from_json(&j1).unwrap();
+        let i1 = Item::from_json(j1).unwrap();
         let mi1 = MetaItem::new_from_item(i1);
 
         let s2 = include_str!("../test_data/item2.json");
         let j2: Value = serde_json::from_str(s2).unwrap();
-        let i2 = ItemEntity::new_from_json(&j2).unwrap();
+        let i2 = Item::from_json(j2).unwrap();
         let mi2 = MetaItem::new_from_item(i2);
 
         combinator.items.insert("Q1".to_string(), mi1.to_owned());

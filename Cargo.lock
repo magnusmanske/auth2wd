@@ -2314,7 +2314,7 @@ dependencies = [
 [[package]]
 name = "wikibase_rest_api"
 version = "0.1.10"
-source = "git+https://github.com/magnusmanske/wikibase_rest_api.git#8b94552493fd4231a84342e146a4532330da7d6b"
+source = "git+https://github.com/magnusmanske/wikibase_rest_api.git#d3537cc505adf4924fd5b8fd1dc98e8afac828e8"
 dependencies = [
  "async-trait",
  "chrono",

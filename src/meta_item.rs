@@ -3,9 +3,7 @@ use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_json::json;
 use std::str::FromStr;
 use std::vec::Vec;
-use wikimisc::item_merger::ItemMerger;
-use wikimisc::merge_diff::MergeDiff;
-use wikimisc::wikibase::*;
+use wikibase_rest_api::{Reference, Statement};
 
 #[derive(Debug, Clone)]
 pub struct MetaItem {
