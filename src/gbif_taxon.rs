@@ -4,9 +4,8 @@ use crate::ExternalId;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::Value;
-use wikimisc::wikibase::EntityTrait;
-use wikimisc::wikibase::LocaleString;
-use wikimisc::wikibase::Snak;
+use wikibase_rest_api::prelude::StatementValueContent;
+use wikibase_rest_api::Statement;
 
 #[derive(Clone, Debug)]
 pub struct GBIFtaxon {
@@ -81,7 +80,8 @@ impl GBIFtaxon {
         let name = self.json.get("Battus philenor")?.as_str()?;
         ret.add_claim(self.new_statement_string(225, name));
         for lang in TAXON_LABEL_LANGUAGES {
-            let label = LocaleString::new(lang.to_string(), name.to_string());
+            let label =
+                StatementValueContent::new_monolingual_text(lang.to_string(), name.to_string());
             ret.item.labels_mut().push(label);
         }
         Some(())
@@ -136,13 +136,16 @@ impl GBIFtaxon {
             let attribution = None
                 .or_else(|| medium.get("rightsHolder")?.as_str())
                 .or_else(|| medium.get("creator")?.as_str())?;
-            let mut statement = self.new_statement_string(4765, image_url);
-            statement.add_qualifier_snak(Snak::new_item("P275", license_item));
-            statement.add_qualifier_snak(Snak::new_string("P2093", attribution));
-            statement.add_qualifier_snak(Snak::new_url("P2699", image_url));
+            let mut statement = self
+                .new_statement_string(4765, image_url)
+                .with_qualifier(Statement::new_item("P275", *license_item).as_property_value())
+                .with_qualifier(Statement::new_string("P2093", attribution).as_property_value())
+                .with_qualifier(Statement::new_url("P2699", image_url).as_property_value());
             let format = medium.get("format")?.as_str()?;
             if format == "image/jpeg" {
-                statement.add_qualifier_snak(Snak::new_item("P2701", "Q2195"));
+                statement
+                    .qualifiers_mut()
+                    .push(Statement::new_item("P2701", "Q2195").as_property_value());
             }
 
             ret.add_claim(statement);

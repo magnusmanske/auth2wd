@@ -125,7 +125,7 @@ impl BNF {
 
 #[cfg(test)]
 mod tests {
-    use wikimisc::wikibase::{EntityTrait, LocaleString};
+    use wikibase_rest_api::prelude::StatementValueContent;
 
     use super::*;
 
@@ -138,7 +138,10 @@ mod tests {
         let meta_item = bnf.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
-            vec![LocaleString::new("fr", "Charles Darwin")]
+            vec![StatementValueContent::new_monolingual_text(
+                "fr",
+                "Charles Darwin"
+            )]
         );
     }
 
@@ -148,7 +151,10 @@ mod tests {
         let meta_item = bnf.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
-            vec![LocaleString::new("fr", "Louis Bassal")]
+            vec![StatementValueContent::new_monolingual_text(
+                "fr",
+                "Louis Bassal"
+            )]
         );
         assert_eq!(meta_item.prop_text.len(), 2);
         assert_eq!(

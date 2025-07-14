@@ -92,7 +92,7 @@ impl BNE {
 
 #[cfg(test)]
 mod tests {
-    use wikimisc::wikibase::{EntityTrait, LocaleString};
+    use wikibase_rest_api::prelude::StatementValueContent;
 
     use super::*;
 
@@ -121,7 +121,10 @@ mod tests {
         let meta_item = bne.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
-            vec![LocaleString::new("es", "Marcel Coulon")]
+            vec![StatementValueContent::new_monolingual_text(
+                "es",
+                "Marcel Coulon"
+            )]
         );
     }
 }

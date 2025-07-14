@@ -131,7 +131,10 @@ mod tests {
         let meta_item = viaf.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
-            vec![LocaleString::new("fr", "Charles Darwin")]
+            vec![StatementValueContent::new_monolingual_text(
+                "fr",
+                "Charles Darwin"
+            )]
         );
     }
 }

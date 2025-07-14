@@ -156,7 +156,8 @@ impl NCBItaxonomy {
         let name = self.taxon.scientific_name.clone()?;
         ret.add_claim(self.new_statement_string(225, &name));
         for lang in TAXON_LABEL_LANGUAGES {
-            let label = LocaleString::new(lang.to_string(), name.to_string());
+            let label =
+                StatementValueContent::new_monolingual_text(lang.to_string(), name.to_string());
             ret.item.labels_mut().push(label);
         }
         Some(())

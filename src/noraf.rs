@@ -128,7 +128,7 @@ impl NORAF {
         let language = self.primary_language();
         ret.item
             .labels_mut()
-            .push(LocaleString::new(language, name));
+            .push(StatementValueContent::new_monolingual_text(language, name));
     }
 
     fn parse_identifiers(&self, ret: &mut MetaItem) {

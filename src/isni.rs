@@ -108,7 +108,7 @@ impl ISNI {
     // fn parse_name(&self, ret: &mut MetaItem) -> Option<()> {
     //     let name = RE_NAME.captures(&self.html)?.get(1)?.as_str().trim();
     //     let name = self.transform_label(name);
-    //     ret.item.labels_mut().push(LocaleString::new("en", &name));
+    //     ret.item.labels_mut().push(StatementValueContent::new_monolingual_text("en", &name));
     //     None
     // }
 

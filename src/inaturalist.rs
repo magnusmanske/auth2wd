@@ -141,7 +141,8 @@ impl INaturalist {
         let name = self.json.get("name")?.as_str()?;
         ret.add_claim(self.new_statement_string(225, name));
         for lang in TAXON_LABEL_LANGUAGES {
-            let label = LocaleString::new(lang.to_string(), name.to_string());
+            let label =
+                StatementValueContent::new_monolingual_text(lang.to_string(), name.to_string());
             ret.item.labels_mut().push(label);
         }
         Some(())
@@ -251,7 +252,7 @@ mod tests {
         let meta_item = inaturalist.run().await.unwrap();
         assert_eq!(
             meta_item.item.labels()[0],
-            LocaleString::new("en", "Licea bryophila")
+            StatementValueContent::new_monolingual_text("en", "Licea bryophila")
         );
         assert_eq!(meta_item.item.claims().len(), 8);
     }

@@ -69,7 +69,7 @@ impl PubChemCid {
 
     fn add_label(&self, ret: &mut MetaItem) -> Option<()> {
         let name = self.json["Record"]["RecordTitle"].as_str()?;
-        let label = LocaleString::new("en".to_string(), name.to_string());
+        let label = StatementValueContent::new_monolingual_text("en".to_string(), name.to_string());
         ret.item.labels_mut().push(label);
         Some(())
     }

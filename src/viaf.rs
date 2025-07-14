@@ -123,7 +123,10 @@ mod tests {
         let meta_item = viaf.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
-            vec![LocaleString::new("en", "Magnus Manske")]
+            vec![StatementValueContent::new_monolingual_text(
+                "en",
+                "Magnus Manske"
+            )]
         );
     }
 }

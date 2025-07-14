@@ -330,7 +330,10 @@ mod tests {
         let meta_item = gnd.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
-            vec![LocaleString::new("de", "Magnus Manske")]
+            vec![StatementValueContent::new_monolingual_text(
+                "de",
+                "Magnus Manske"
+            )]
         );
     }
 }

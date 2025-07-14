@@ -462,12 +462,15 @@ pub trait ExternalImporter: Send + Sync {
                 let s = self.transform_label(&s);
                 let s = self.limit_string_length(&s);
                 match ret.item.label_in_locale(&language) {
-                    None => ret.item.labels_mut().push(LocaleString::new(&language, &s)),
+                    None => ret
+                        .item
+                        .labels_mut()
+                        .push(StatementValueContent::new_monolingual_text(&language, &s)),
                     Some(label) => {
                         if label != s && label != self.transform_label(&s) {
                             ret.item
                                 .aliases_mut()
-                                .push(LocaleString::new(&language, &s));
+                                .push(StatementValueContent::new_monolingual_text(&language, &s));
                         }
                     }
                 }
@@ -559,7 +562,7 @@ pub trait ExternalImporter: Send + Sync {
                     }
                     ret.item
                         .descriptions_mut()
-                        .push(LocaleString::new(&language, &s));
+                        .push(StatementValueContent::new_monolingual_text(&language, &s));
                 }
             }
         }

@@ -83,7 +83,10 @@ impl WorldCat {
             if let Some(s) = s.as_str() {
                 ret.item
                     .labels_mut()
-                    .push(LocaleString::new(language.as_str(), s));
+                    .push(StatementValueContent::new_monolingual_text(
+                        language.as_str(),
+                        s,
+                    ));
             }
         }
         Some(())
@@ -97,7 +100,10 @@ impl WorldCat {
                     if let Some(alias) = alias.as_str() {
                         ret.item
                             .aliases_mut()
-                            .push(LocaleString::new(language.as_str(), alias));
+                            .push(StatementValueContent::new_monolingual_text(
+                                language.as_str(),
+                                alias,
+                            ));
                     }
                 }
             }
@@ -111,7 +117,10 @@ impl WorldCat {
             if let Some(s) = s.as_str() {
                 ret.item
                     .descriptions_mut()
-                    .push(LocaleString::new(language.as_str(), s));
+                    .push(StatementValueContent::new_monolingual_text(
+                        language.as_str(),
+                        s,
+                    ));
             }
         }
         Some(())
@@ -198,11 +207,17 @@ mod tests {
         assert!(meta_item
             .item
             .labels()
-            .contains(&LocaleString::new("en", "Helen Clark")));
+            .contains(&StatementValueContent::new_monolingual_text(
+                "en",
+                "Helen Clark"
+            )));
         assert!(meta_item
             .item
             .aliases()
-            .contains(&LocaleString::new("en", "Helen Elizabeth Clark")));
+            .contains(&StatementValueContent::new_monolingual_text(
+                "en",
+                "Helen Elizabeth Clark"
+            )));
         assert_eq!(meta_item.item.claims().len(), 3);
     }
 }

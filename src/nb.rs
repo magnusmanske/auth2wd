@@ -104,17 +104,26 @@ impl ExternalImporter for NB {
             if triple.is_named_node("http://schema.org/alternateName") {
                 ret.item
                     .aliases_mut()
-                    .push(LocaleString::new(&language, &triple.o.value));
+                    .push(StatementValueContent::new_monolingual_text(
+                        &language,
+                        &triple.o.value,
+                    ));
             }
             if triple.is_named_node("http://schema.org/name") {
                 ret.item
                     .labels_mut()
-                    .push(LocaleString::new(&language, &triple.o.value));
+                    .push(StatementValueContent::new_monolingual_text(
+                        &language,
+                        &triple.o.value,
+                    ));
             }
             if triple.is_named_node("http://schema.org/description") {
                 ret.item
                     .descriptions_mut()
-                    .push(LocaleString::new(&language, &triple.o.value));
+                    .push(StatementValueContent::new_monolingual_text(
+                        &language,
+                        &triple.o.value,
+                    ));
             }
             if triple.is_named_node("http://schema.org/nationality") {
                 ret.add_prop_text(ExternalId::new(27, &triple.o.value));
@@ -218,7 +227,10 @@ mod tests {
         let meta_item = nb.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
-            vec![LocaleString::new("nl", "Charles Darwin")]
+            vec![StatementValueContent::new_monolingual_text(
+                "nl",
+                "Charles Darwin"
+            )]
         );
     }
 }
