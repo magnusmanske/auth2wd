@@ -81,10 +81,12 @@ use supported_property::SUPPORTED_PROPERTIES;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::services::ServeDir;
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
-use wikimisc::item_merger::ItemMerger;
-use wikimisc::mediawiki::api::Api;
-use wikimisc::merge_diff::MergeDiff;
-use wikimisc::wikibase::{EntityTrait, ItemEntity, Snak, Statement};
+use wikibase_rest_api::prelude::*;
+
+// use wikimisc::item_merger::ItemMerger;
+// use wikimisc::mediawiki::api::Api;
+// use wikimisc::merge_diff::MergeDiff;
+// use wikimisc::wikibase::{EntityTrait, ItemEntity, Snak, Statement};
 
 fn wrap_html(html: &str) -> String {
     let outer: String = fs::read_to_string("./html/wrapper.html").unwrap();

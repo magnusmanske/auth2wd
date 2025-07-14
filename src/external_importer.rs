@@ -10,7 +10,7 @@ use sophia::inmem::graph::FastGraph;
 use sophia::turtle::serializer::nt::NtSerializer;
 use std::collections::HashMap;
 use std::vec::Vec;
-use wikimisc::wikibase::*;
+use wikibase_rest_api::prelude::*;
 
 pub const TAXON_LABEL_LANGUAGES: &[&str] = &["en", "de", "es", "it", "nl", "fr"];
 
@@ -307,139 +307,41 @@ pub trait ExternalImporter: Send + Sync {
     fn get_ref(&self) -> Vec<Reference> {
         let time = Utc::now();
         let time = time.format("+%Y-%m-%dT00:00:00Z").to_string();
-        vec![Reference::new(vec![
-            Snak::new(
-                SnakDataType::WikibaseItem,
-                "P248",
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::EntityId,
-                    Value::Entity(EntityValue::new(EntityType::Item, self.my_stated_in())),
-                )),
-            ),
-            Snak::new(
-                SnakDataType::ExternalId,
-                format!("P{}", self.my_property()),
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::StringType,
-                    Value::StringValue(self.my_id()),
-                )),
-            ),
-            Snak::new(
-                SnakDataType::Time,
-                "P813",
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::Time,
-                    Value::Time(TimeValue::new(
-                        0,
-                        0,
-                        "http://www.wikidata.org/entity/Q1985727",
-                        11,
-                        &time,
-                        0,
-                    )),
-                )),
-            ),
-        ])]
+        let mut references = Reference::default();
+        // let reference = Statement::new_external_id("P248", self.my_stated_in()).as_property_value();
+        let parts = [
+            Statement::new_item("P248", self.my_stated_in()).as_property_value(),
+            Statement::new_external_id(&format!("P{}", self.my_property()), &self.my_id())
+                .as_property_value(),
+            Statement::new_time("P813", &time, TimePrecision::Day, GREGORIAN_CALENDAR)
+                .as_property_value(),
+        ];
+        references.parts_mut().extend(parts);
+        vec![references]
     }
 
     fn new_statement_string(&self, property: usize, s: &str) -> Statement {
-        Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::ExternalId,
-                format!("P{property}"),
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::StringType,
-                    Value::StringValue(s.to_owned()),
-                )),
-            ),
-            vec![],
-            self.get_ref(),
-        )
+        Statement::new_string(&format!("P{property}"), s).with_references(self.get_ref())
     }
 
     fn new_statement_monolingual_text(&self, property: usize, lang: &str, s: &str) -> Statement {
-        Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::MonolingualText,
-                format!("P{property}"),
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::MonoLingualText,
-                    Value::MonoLingual(MonoLingualText::new(s, lang)),
-                )),
-            ),
-            vec![],
-            self.get_ref(),
-        )
+        Statement::new_monolingual_text(&format!("P{property}"), lang, s)
+            .with_references(self.get_ref())
     }
 
     fn new_statement_url(&self, property: usize, s: &str) -> Statement {
-        Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::Url,
-                format!("P{property}"),
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::StringType,
-                    Value::StringValue(s.to_owned()),
-                )),
-            ),
-            vec![],
-            self.get_ref(),
-        )
+        Statement::new_url(&format!("P{property}"), s).with_references(self.get_ref())
     }
 
     fn new_statement_item(&self, property: usize, q: &str) -> Statement {
-        Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::WikibaseItem,
-                format!("P{property}"),
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::EntityId,
-                    Value::Entity(EntityValue::new(EntityType::Item, q)),
-                )),
-            ),
-            vec![],
-            self.get_ref(),
-        )
+        Statement::new_item(&format!("P{property}"), q).with_references(self.get_ref())
     }
 
     fn new_statement_time(&self, property: usize, time: &str, precision: u64) -> Statement {
-        Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::Time,
-                format!("P{property}"),
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::Time,
-                    Value::Time(TimeValue::new(
-                        0,
-                        0,
-                        "http://www.wikidata.org/entity/Q1985727",
-                        precision,
-                        time,
-                        0,
-                    )),
-                )),
-            ),
-            vec![],
-            self.get_ref(),
-        )
+        // TODO FIXME use TimePrecision
+        let precision = precision.try_into().unwrap_or(TimePrecision::Day);
+        Statement::new_time(&format!("P{property}"), time, precision, GREGORIAN_CALENDAR)
+            .with_references(self.get_ref())
     }
 
     async fn add_same_as(&self, ret: &mut MetaItem) -> Result<()> {

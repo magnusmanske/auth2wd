@@ -13,7 +13,8 @@ tokio = { version = "1", features = ["full"] }
 lazy_static = "1"
 serde-xml-rs = "0.8"
 regex = "1"
-wikimisc = { git = "https://github.com/magnusmanske/wikimisc" }
+wikibase_rest_api = { git = "https://github.com/magnusmanske/wikibase_rest_api.git" }
+# wikimisc = { git = "https://github.com/magnusmanske/wikimisc" }
 serde = "1"
 serde_json = "1"
 chrono = "*"
@@ -24,7 +25,6 @@ axum = { version = "*", features = [
 	"json",
 	"macros",
 ] }
-# tower = "*"
 tracing = "*"
 tracing-subscriber = "*"
 tower-http = { version = "*", features = ["full"] }

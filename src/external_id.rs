@@ -3,7 +3,7 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt, sync::Arc};
 use tokio::sync::Mutex;
-use wikimisc::wikibase::*;
+use wikibase_rest_api::prelude::*;
 
 lazy_static! {
     static ref RE_PROPERTY_NUMERIC: Regex =
@@ -52,18 +52,17 @@ impl ExternalId {
             .ok()
     }
 
-    pub fn from_external_id_claim(claim: &Statement) -> Option<Self> {
-        if *claim.main_snak().datatype() != SnakDataType::ExternalId {
+    pub fn from_external_id_claim(statement: &Statement) -> Option<Self> {
+        if *statement.property().datatype() == Some(DataType::ExternalId) {
             return None;
         }
-        let prop_numeric = Self::prop_numeric(claim.property())?;
-        let datavalue = (*claim.main_snak().data_value()).to_owned()?;
-        let id = match datavalue.value() {
-            Value::StringValue(id) => id,
-            _ => return None,
-        };
+        let prop_numeric = Self::prop_numeric(statement.property().id())?;
         // TODO change value eg P213(ISNI) from Wikidata format to external format
-        Some(Self::new(prop_numeric, id))
+        if let StatementValue::Value(StatementValueContent::String(id)) = statement.value() {
+            Some(Self::new(prop_numeric, id))
+        } else {
+            None
+        }
     }
 
     pub async fn search_wikidata_single_item(query: &str) -> Option<String> {
@@ -156,60 +155,18 @@ mod tests {
     #[test]
     fn test_from_external_id_claim() {
         // Test OK
-        let statement1 = Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::ExternalId,
-                "P214",
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::StringType,
-                    Value::StringValue("ABCDEF".to_string()),
-                )),
-            ),
-            vec![],
-            vec![],
-        );
+        let statement1 = Statement::new_external_id("P214", "ABCDEF");
         assert_eq!(
             ExternalId::from_string("P214:ABCDEF"),
             ExternalId::from_external_id_claim(&statement1)
         );
 
         // Test wrong value type
-        let statement2 = Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::ExternalId,
-                "P214",
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::StringType,
-                    Value::Entity(EntityValue::new(EntityType::Item, "Q123")),
-                )),
-            ),
-            vec![],
-            vec![],
-        );
+        let statement2 = Statement::new_item("P214", "Q123");
         assert_eq!(None, ExternalId::from_external_id_claim(&statement2));
 
         // Test wrong snak type
-        let statement3 = Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::CommonsMedia,
-                "P214",
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::StringType,
-                    Value::StringValue("ABCDEF".to_string()),
-                )),
-            ),
-            vec![],
-            vec![],
-        );
+        let statement3 = Statement::new_string("P214", "ABCDEF");
         assert_eq!(None, ExternalId::from_external_id_claim(&statement3));
     }
 
