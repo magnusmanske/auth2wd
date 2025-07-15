@@ -5,7 +5,6 @@ use async_trait::async_trait;
 use regex::Regex;
 use serde_json::Value;
 use sophia::inmem::graph::FastGraph;
-use wikibase_rest_api::prelude::StatementValueContent;
 use wikibase_rest_api::Statement;
 
 // Was: Bibsys
@@ -141,7 +140,7 @@ impl NORAF {
                 .for_each(|ext_id| {
                     let statement =
                         Statement::new_external_id(format!("P{}", ext_id.property()), ext_id.id());
-                    ret.item.add_claim(statement);
+                    ret.item.statements_mut().insert(statement);
                 });
         };
     }

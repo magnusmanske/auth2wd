@@ -4,7 +4,6 @@ use crate::ExternalId;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use wikibase_rest_api::prelude::StatementValueContent;
 
 #[derive(Clone, Debug)]
 pub struct NCBItaxonomy {
@@ -155,9 +154,10 @@ impl NCBItaxonomy {
         let name = self.taxon.scientific_name.clone()?;
         ret.add_claim(self.new_statement_string(225, &name));
         for lang in TAXON_LABEL_LANGUAGES {
-            let label =
-                StatementValueContent::new_monolingual_text(lang.to_string(), name.to_string());
-            ret.item.labels_mut().push(label);
+            ret.item
+                .labels_mut()
+                .list_mut()
+                .insert(lang.to_string(), name.to_string());
         }
         Some(())
     }

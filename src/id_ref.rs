@@ -97,7 +97,6 @@ impl IdRef {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use wikibase_rest_api::prelude::StatementValueContent;
 
     const TEST_ID: &str = "026812304";
 
@@ -129,11 +128,8 @@ mod tests {
         let viaf = IdRef::new(TEST_ID).await.unwrap();
         let meta_item = viaf.run().await.unwrap();
         assert_eq!(
-            *meta_item.item.labels(),
-            vec![StatementValueContent::new_monolingual_text(
-                "fr",
-                "Charles Darwin"
-            )]
+            meta_item.item.labels().get_lang("fr"),
+            Some("Charles Darwin")
         );
     }
 }

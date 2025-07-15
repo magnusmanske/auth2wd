@@ -125,8 +125,6 @@ impl BNF {
 
 #[cfg(test)]
 mod tests {
-    use wikibase_rest_api::prelude::StatementValueContent;
-
     use super::*;
 
     const TEST_ID: &str = "11898689q";
@@ -137,11 +135,8 @@ mod tests {
         let bnf = BNF::new(TEST_ID).await.unwrap();
         let meta_item = bnf.run().await.unwrap();
         assert_eq!(
-            *meta_item.item.labels(),
-            vec![StatementValueContent::new_monolingual_text(
-                "fr",
-                "Charles Darwin"
-            )]
+            meta_item.item.labels().get_lang("fr"),
+            Some("Charles Darwin")
         );
     }
 
@@ -149,13 +144,7 @@ mod tests {
     async fn test_run_birth_death_place() {
         let bnf = BNF::new(TEST_ID2).await.unwrap();
         let meta_item = bnf.run().await.unwrap();
-        assert_eq!(
-            *meta_item.item.labels(),
-            vec![StatementValueContent::new_monolingual_text(
-                "fr",
-                "Louis Bassal"
-            )]
-        );
+        assert_eq!(meta_item.item.labels().get_lang("fr"), Some("Louis Bassal"));
         assert_eq!(meta_item.prop_text.len(), 2);
         assert_eq!(
             meta_item.prop_text[0],

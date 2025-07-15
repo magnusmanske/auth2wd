@@ -7,7 +7,8 @@ use async_trait::async_trait;
 use reqwest::header::{HeaderMap, HeaderValue, ACCEPT};
 use serde::{Deserialize, Serialize};
 use sophia::inmem::graph::FastGraph;
-use wikibase_rest_api::prelude::StatementValueContent;
+use wikibase_rest_api::prelude::LanguageStrings;
+use wikibase_rest_api::LanguageString;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 enum TermType {
@@ -103,26 +104,17 @@ impl ExternalImporter for NB {
             if triple.is_named_node("http://schema.org/alternateName") {
                 ret.item
                     .aliases_mut()
-                    .push(StatementValueContent::new_monolingual_text(
-                        &language,
-                        &triple.o.value,
-                    ));
+                    .insert(LanguageString::new(&language, &triple.o.value));
             }
             if triple.is_named_node("http://schema.org/name") {
                 ret.item
                     .labels_mut()
-                    .push(StatementValueContent::new_monolingual_text(
-                        &language,
-                        &triple.o.value,
-                    ));
+                    .insert(LanguageString::new(&language, &triple.o.value));
             }
             if triple.is_named_node("http://schema.org/description") {
                 ret.item
                     .descriptions_mut()
-                    .push(StatementValueContent::new_monolingual_text(
-                        &language,
-                        &triple.o.value,
-                    ));
+                    .insert(LanguageString::new(&language, &triple.o.value));
             }
             if triple.is_named_node("http://schema.org/nationality") {
                 ret.add_prop_text(ExternalId::new(27, &triple.o.value));
@@ -223,11 +215,8 @@ mod tests {
         let nb = NB::new(TEST_ID).await.unwrap();
         let meta_item = nb.run().await.unwrap();
         assert_eq!(
-            *meta_item.item.labels(),
-            vec![StatementValueContent::new_monolingual_text(
-                "nl",
-                "Charles Darwin"
-            )]
+            meta_item.item.labels().get_lang("nl"),
+            Some("Charles Darwin")
         );
     }
 }

@@ -5,7 +5,8 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use regex::Regex;
 use serde_json::Value;
-use wikibase_rest_api::prelude::StatementValueContent;
+use wikibase_rest_api::prelude::LanguageStrings;
+use wikibase_rest_api::LanguageString;
 use wikibase_rest_api::Statement;
 
 lazy_static! {
@@ -143,9 +144,9 @@ impl INaturalist {
         let name = self.json.get("name")?.as_str()?;
         ret.add_claim(self.new_statement_string(225, name));
         for lang in TAXON_LABEL_LANGUAGES {
-            let label =
-                StatementValueContent::new_monolingual_text(lang.to_string(), name.to_string());
-            ret.item.labels_mut().push(label);
+            ret.item
+                .labels_mut()
+                .insert(LanguageString::new(*lang, name));
         }
         Some(())
     }
@@ -253,8 +254,8 @@ mod tests {
         let inaturalist = INaturalist::new(TEST_ID).await.unwrap();
         let meta_item = inaturalist.run().await.unwrap();
         assert_eq!(
-            meta_item.item.labels()[0],
-            StatementValueContent::new_monolingual_text("en", "Licea bryophila")
+            meta_item.item.labels().get_lang("en"),
+            Some("Licea bryophila")
         );
         assert_eq!(meta_item.item.statements().len(), 8);
     }

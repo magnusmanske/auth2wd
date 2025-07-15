@@ -3,7 +3,6 @@ use crate::meta_item::*;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::Value;
-use wikibase_rest_api::prelude::StatementValueContent;
 
 #[derive(Clone, Debug)]
 pub struct PubChemCid {
@@ -68,8 +67,10 @@ impl PubChemCid {
 
     fn add_label(&self, ret: &mut MetaItem) -> Option<()> {
         let name = self.json["Record"]["RecordTitle"].as_str()?;
-        let label = StatementValueContent::new_monolingual_text("en".to_string(), name.to_string());
-        ret.item.labels_mut().push(label);
+        ret.item
+            .labels_mut()
+            .list_mut()
+            .insert("en".to_string(), name.to_string());
         Some(())
     }
 
