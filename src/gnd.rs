@@ -276,10 +276,7 @@ impl GND {
 
 #[cfg(test)]
 mod tests {
-    use wikibase_rest_api::prelude::StatementValueContent;
-
     use super::*;
-
     const TEST_ID: &str = "132539691";
 
     #[tokio::test]

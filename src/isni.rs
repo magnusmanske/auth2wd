@@ -181,6 +181,7 @@ mod tests {
             .flat_map(|(_, v)| v)
             .map(|statement| statement.property().id().to_string())
             .collect();
+
         assert!(props.contains(&"P213".to_string()));
         // assert!(props.contains(&"P31".to_string()));
         assert!(props.contains(&"P214".to_string()));

@@ -462,16 +462,16 @@ pub trait ExternalImporter: Send + Sync {
             for s in self.triples_literals(url)? {
                 let s = self.transform_label(&s);
                 let s = self.limit_string_length(&s);
-                match ret.item.label_in_locale(&language) {
+                match ret.item.labels().get_lang(&language) {
                     None => ret
                         .item
                         .labels_mut()
-                        .push(StatementValueContent::new_monolingual_text(&language, &s)),
+                        .insert(LanguageString::new(&language, &s)),
                     Some(label) => {
                         if label != s && label != self.transform_label(&s) {
                             ret.item
                                 .aliases_mut()
-                                .push(StatementValueContent::new_monolingual_text(&language, &s));
+                                .insert(LanguageString::new(&language, s));
                         }
                     }
                 }
@@ -555,7 +555,7 @@ pub trait ExternalImporter: Send + Sync {
         ];
         for iri in iris {
             for s in self.triples_literals(iri)? {
-                if ret.item.description_in_locale(&language).is_none() {
+                if ret.item.descriptions().get_lang(&language).is_none() {
                     let mut s = self.limit_string_length(&s);
                     if language == "fr" {
                         // https://github.com/magnusmanske/auth2wd/issues/2
@@ -563,7 +563,7 @@ pub trait ExternalImporter: Send + Sync {
                     }
                     ret.item
                         .descriptions_mut()
-                        .push(StatementValueContent::new_monolingual_text(&language, &s));
+                        .insert(LanguageString::new(&language, s));
                 }
             }
         }

@@ -51,6 +51,7 @@ pub mod gnd;
 pub mod id_ref;
 pub mod inaturalist;
 pub mod isni;
+pub mod item_merger;
 pub mod loc;
 pub mod merge_diff;
 pub mod meta_item;
@@ -81,7 +82,8 @@ use tower_http::services::ServeDir;
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
 use wikibase_rest_api::prelude::*;
 
-use crate::merge_diff::{ItemMerger, MergeDiff};
+use crate::item_merger::ItemMerger;
+use crate::merge_diff::MergeDiff;
 
 fn wrap_html(html: &str) -> String {
     let outer: String = fs::read_to_string("./html/wrapper.html").unwrap();
