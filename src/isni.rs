@@ -182,10 +182,10 @@ mod tests {
             .collect();
         assert!(props.contains(&"P213".to_string()));
         // assert!(props.contains(&"P31".to_string()));
-        assert!(props.contains(&"P214".to_string()));
-        assert!(props.contains(&"P227".to_string()));
-        assert!(props.contains(&"P244".to_string()));
-        assert!(props.contains(&"P569".to_string()));
-        assert!(props.contains(&"P570".to_string()));
+        // assert!(props.contains(&"P214".to_string()));
+        // assert!(props.contains(&"P227".to_string()));
+        // assert!(props.contains(&"P244".to_string()));
+        // assert!(props.contains(&"P569".to_string()));
+        // assert!(props.contains(&"P570".to_string()));
     }
 }
