@@ -1,7 +1,6 @@
-use std::{cmp::Ordering, collections::HashSet};
-
 use crate::{external_id::ExternalId, merge_diff::MergeDiff};
 use serde::Serialize;
+use std::{cmp::Ordering, collections::HashSet};
 use wikibase_rest_api::{
     prelude::{PropertyValue, StatementValue, StatementValueContent},
     DataType, Item, Reference, Statement,
