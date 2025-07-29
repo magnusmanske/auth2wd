@@ -1,9 +1,12 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
+use serde_json::json;
+use serde_json::Value;
 use sophia::inmem::graph::FastGraph;
 
 lazy_static! {
@@ -63,6 +66,7 @@ impl ExternalImporter for ISNI {
 
     async fn run(&self) -> Result<MetaItem> {
         let mut ret = MetaItem::new();
+        self.try_viaf(&mut ret).await?;
         self.add_the_usual(&mut ret).await?;
         self.parse_external_ids(&mut ret);
         self.parse_dates(&mut ret);
@@ -94,6 +98,20 @@ impl ISNI {
                 ret.add_claim(self.new_statement_time(prop, &time, 9));
             }
         }
+    }
+
+    async fn try_viaf(&self, ret: &mut MetaItem) -> Result<()> {
+        let id = self.my_id();
+        let record_id = format!("ISNI|{id}");
+        let url = "https://viaf.org/api/cluster-record";
+        let payload = json!({"reqValues":{"recordId":record_id,"isSourceId":true},"meta":{"pageIndex":0,"pageSize":1}});
+        let client = Utility::get_reqwest_client()?;
+        let response: Value = client.post(url).json(&payload).send().await?.json().await?;
+        if let Some(viaf_id) = response["queryResult"]["viafID"].as_i64() {
+            let viaf_id = viaf_id.to_string();
+            ret.add_claim(self.new_statement_string(214, &viaf_id));
+        }
+        Ok(())
     }
 
     fn parse_dates(&self, ret: &mut MetaItem) -> Option<()> {
@@ -182,10 +200,20 @@ mod tests {
             .collect();
         assert!(props.contains(&"P213".to_string()));
         // assert!(props.contains(&"P31".to_string()));
-        // assert!(props.contains(&"P214".to_string()));
+        assert!(props.contains(&"P214".to_string()));
         // assert!(props.contains(&"P227".to_string()));
         // assert!(props.contains(&"P244".to_string()));
         // assert!(props.contains(&"P569".to_string()));
         // assert!(props.contains(&"P570".to_string()));
+    }
+
+    #[tokio::test]
+    async fn test_try_viaf() {
+        let isni = ISNI::new(TEST_ID).await.unwrap();
+        let mut mi = MetaItem::new();
+        isni.try_viaf(&mut mi).await.unwrap();
+        let ext_ids = mi.get_external_ids();
+        assert_eq!(ext_ids.len(), 1); // VIAF
+        assert_eq!(ext_ids[0], ExternalId::new(214, "27063124"));
     }
 }

@@ -1,5 +1,6 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
 use sophia::api::prelude::*;
@@ -11,8 +12,6 @@ pub struct LOC {
     id: String,
     graph: FastGraph,
 }
-
-const HTTP_USER_AGENT : &str = "Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405";
 
 // unsafe impl Send for LOC {}
 // unsafe impl Sync for LOC {}
@@ -54,10 +53,7 @@ impl ExternalImporter for LOC {
 impl LOC {
     pub async fn new(id: &str) -> Result<Self> {
         let rdf_url = format!("https://id.loc.gov/authorities/names/{id}.rdf");
-        let client = reqwest::ClientBuilder::new()
-            .redirect(reqwest::redirect::Policy::limited(10))
-            .user_agent(HTTP_USER_AGENT)
-            .build()?;
+        let client = Utility::get_reqwest_client()?;
         let resp = client.get(&rdf_url).send().await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;

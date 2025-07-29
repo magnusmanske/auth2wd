@@ -1,6 +1,7 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::utility::Utility;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use sophia::api::prelude::*;
@@ -59,9 +60,7 @@ impl ExternalImporter for SELIBR {
 impl SELIBR {
     pub async fn new(id: &str) -> Result<Self> {
         let rdf_url = format!("http://libris.kb.se/resource/auth/{id}/data.rdf");
-        let client = reqwest::ClientBuilder::new()
-            .redirect(reqwest::redirect::Policy::limited(10))
-            .build()?;
+        let client = Utility::get_reqwest_client()?;
         let resp = client
             .get(&rdf_url)
             .header(reqwest::header::ACCEPT, "application/rdf+xml")

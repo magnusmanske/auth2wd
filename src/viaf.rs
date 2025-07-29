@@ -1,8 +1,8 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
-use reqwest::Client;
 use serde_json::json;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
@@ -54,7 +54,7 @@ impl ExternalImporter for VIAF {
 impl VIAF {
     pub async fn new(id: &str) -> Result<Self> {
         let url = "https://viaf.org/api/cluster-record";
-        let client = Client::new();
+        let client = Utility::get_reqwest_client()?;
         let payload = json!({"reqValues":{"recordId":id,"isSourceId":false,"acceptFiletype":"rdf+xml"},"meta":{"pageIndex":0,"pageSize":1}});
         let response = client.post(url).json(&payload).send().await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
