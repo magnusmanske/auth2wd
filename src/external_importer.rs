@@ -64,6 +64,7 @@ lazy_static! {
             Regex::new(r"^https?://www.wikidata.org/.*$").unwrap(),
             Regex::new(r"^https?://[a-z-]+.wikipedia.org/.*$").unwrap(),
             Regex::new(r"^https?://viaf.org/viaf/sourceID/.*#skos:Concept$").unwrap(),
+            Regex::new(r"^https?://d-nb.info/gnd/.*$").unwrap(),
             Regex::new(r"^https?://www.loc.gov/mads/rdf/v1#.*$").unwrap(),
             Regex::new(r"^https?://www.w3.org/2004/02/skos/core#.*$").unwrap(),
             Regex::new(r"^https?://(www.)?orcid.org/.*-\d{0,3}-.*$").unwrap(),
