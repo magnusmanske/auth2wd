@@ -35,7 +35,8 @@ impl ExternalId {
         match property {
             213 => id.replace(' ', ""),  // P213 (ISNI) has no spaces
             1207 => id.replace('+', ""), // P1207 (NUKAT)
-            244 => id.replace('+', ""),  // P244 (LOC)
+            244 => id.replace('+', ""),
+            1368 => id.replace("LNC10-", ""),
             _ => id.to_string(),
         }
     }
