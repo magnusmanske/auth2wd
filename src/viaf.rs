@@ -47,7 +47,7 @@ lazy_static! {
         ret.insert("NLI".to_string(), 949);
         ret.insert("KRNLK".to_string(), 5034);
         ret.insert("LNB".to_string(), 1368);
-        ret.insert("LIH".to_string(), 7699);
+        // ret.insert("LIH".to_string(), 7699); // Something is wrong there
         ret.insert("BNL".to_string(), 7028);
         ret.insert("MRBNR".to_string(), 7058);
         ret.insert("W2Z".to_string(), 1015);
