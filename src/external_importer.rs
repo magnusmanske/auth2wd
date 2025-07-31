@@ -1,9 +1,11 @@
 use crate::external_id::*;
 use crate::meta_item::*;
+use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
 use chrono::prelude::*;
 use regex::Regex;
+use serde_json::json;
 use sophia::api::ns;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
@@ -501,7 +503,6 @@ pub trait ExternalImporter: Send + Sync {
         }
 
         for url in self.triples_iris("http://schema.org/gender")? {
-            println!("Gender URL: {url}");
             let _ = match url.as_str() {
                 "http://vocab.getty.edu/aat/300189559" => {
                     ret.add_claim(self.new_statement_item(21, "Q6581097"))
@@ -671,6 +672,7 @@ pub trait ExternalImporter: Send + Sync {
 
     async fn add_the_usual(&self, ret: &mut MetaItem) -> Result<()> {
         self.add_own_id(ret)?;
+        self.try_viaf(ret).await?;
         self.add_instance_of(ret).await?;
         self.add_same_as(ret).await?;
         self.add_gender(ret).await?;
@@ -734,6 +736,26 @@ pub trait ExternalImporter: Send + Sync {
             }
         }
         mi.prop_text = new_prop_text;
+        Ok(())
+    }
+
+    async fn try_viaf(&self, ret: &mut MetaItem) -> Result<()> {
+        let id = self.my_id();
+        let prop_numeric = self.my_property();
+        let key = match crate::viaf::VIAF::prop2key(prop_numeric) {
+            Some(key) => key,
+            None => return Ok(()), // No VIAF key for property found
+        };
+        let record_id = format!("{key}|{id}");
+        let url = "https://viaf.org/api/cluster-record";
+        let payload = json!({"reqValues":{"recordId":record_id,"isSourceId":true},"meta":{"pageIndex":0,"pageSize":1}});
+        let client = Utility::get_reqwest_client()?;
+        let response: serde_json::Value =
+            client.post(url).json(&payload).send().await?.json().await?;
+        if let Some(viaf_id) = response["queryResult"]["viafID"].as_i64() {
+            let viaf_id = viaf_id.to_string();
+            ret.add_claim(self.new_statement_string(214, &viaf_id));
+        }
         Ok(())
     }
 }
