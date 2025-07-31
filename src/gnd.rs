@@ -7,6 +7,7 @@ use regex::Regex;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
+use wikimisc::wikibase::EntityTrait;
 use wikimisc::wikibase::{Snak, StatementRank};
 
 lazy_static! {
@@ -70,6 +71,7 @@ impl ExternalImporter for GND {
     async fn run(&self) -> Result<MetaItem> {
         let mut ret = MetaItem::new();
         self.add_the_usual(&mut ret).await?;
+        ret.item.descriptions_mut().clear(); // Descriptions are usually nonsense
 
         // Nationality
         for url in self.triples_subject_iris(
