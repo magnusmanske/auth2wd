@@ -33,7 +33,8 @@ impl ExternalId {
 
     fn fix_property_value(property: usize, id: &str) -> String {
         match property {
-            213 => id.replace(' ', ""), // P213 (ISNI) has no spaces
+            213 => id.replace(' ', ""),  // P213 (ISNI) has no spaces
+            1207 => id.replace('+', ""), // P1207 (NUKAT)
             _ => id.to_string(),
         }
     }
