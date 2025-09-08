@@ -38,13 +38,13 @@ impl ExternalId {
             244 => id.replace('+', ""),
             1368 => id.replace("LNC10-", ""),
             8034 => id.replace("_", "/"),
-            268 => {
-                if id.chars().all(|c| c.is_numeric()) {
-                    format!("{id}p")
-                } else {
-                    id.to_string()
-                }
-            }
+            // 268 => {
+            //     if id.chars().all(|c| c.is_numeric()) {
+            //         format!("{id}p")
+            //     } else {
+            //         id.to_string()
+            //     }
+            // }
             _ => id.to_string(),
         }
     }

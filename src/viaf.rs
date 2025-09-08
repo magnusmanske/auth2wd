@@ -158,8 +158,6 @@ impl VIAF {
                 }
             }
         }
-        // let mut ids = Vec::new();
-        // meta_item.add_external_ids(ids);
         Ok(())
     }
 }
