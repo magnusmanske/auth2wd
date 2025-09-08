@@ -41,7 +41,7 @@ lazy_static! {
         ret.insert("BNC".to_string(), 9984);
         ret.insert("BNCHL".to_string(), 7369);
         ret.insert("ERRR".to_string(), 6394);
-        ret.insert("BNF".to_string(), 268);
+        // ret.insert("BNF".to_string(), 268); // Deactivated for now; eg Q136170149 / 6471159248261404870006 gives truncated ID
         ret.insert("GRATEVE".to_string(), 3348);
         ret.insert("N6I".to_string(), 10227);
         ret.insert("NLI".to_string(), 949);
