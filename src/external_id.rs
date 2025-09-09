@@ -38,7 +38,7 @@ impl ExternalId {
             244 => id.replace('+', ""),
             1368 => id.replace("LNC10-", ""),
             8034 => id.replace("_", "/"),
-            268 => id.chars().filter(|c| c.is_numeric()).collect(),
+            // 268 => id.chars().filter(|c| c.is_numeric()).collect(),
             // 268 => {
             //     if id.chars().all(|c| c.is_numeric()) {
             //         format!("{id}p")
