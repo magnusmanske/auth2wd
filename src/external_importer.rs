@@ -57,6 +57,7 @@ lazy_static! {
             (Regex::new(r"^https?://www.filmportal.de/([A-Za-z0-9]+)$").unwrap(),"${1}".to_string(),2639),
             (Regex::new(r"^https?://nektar.oszk.hu/resource/auth/([1-9]\d*)$").unwrap(),"${1}".to_string(),3133),
             (Regex::new(r"^https?://viaf.org/en/viaf/LC%7C(.+)$").unwrap(),"${1}".to_string(),244),
+            (Regex::new(r"^https?://www.persee.fr/authority/(\d+)$").unwrap(),"${1}".to_string(),2732),
         ]
     };
 
