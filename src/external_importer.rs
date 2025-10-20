@@ -470,7 +470,7 @@ pub trait ExternalImporter: Send + Sync {
                             None
                         }
                     }
-                    None => ret.add_claim(self.new_statement_url(973, &url)),
+                    None => None, //ret.add_claim(self.new_statement_url(973, &url)),
                 };
             }
         }
