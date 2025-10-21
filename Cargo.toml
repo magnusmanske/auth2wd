@@ -31,6 +31,9 @@ tower-http = { version = "*", features = ["full"] }
 anyhow = "*"
 futures = "*"
 
+[dev-dependencies]
+async-once-cell = "*"
+
 [profile.dev]
 debug = false
 

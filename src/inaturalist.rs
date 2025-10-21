@@ -1,5 +1,6 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::utility::Utility;
 use crate::ExternalId;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -61,8 +62,8 @@ impl ExternalImporter for INaturalist {
 impl INaturalist {
     pub async fn new(id: &str) -> Result<Self> {
         let url = format!("https://www.inaturalist.org/taxa/{id}");
-        let resp = reqwest::get(&url).await?.text().await?;
-        let j = Self::parse_html(&resp).ok_or(anyhow!("No JSON found"))?;
+        let text = Utility::get_url(&url).await?;
+        let j = Self::parse_html(&text).ok_or(anyhow!("No JSON found"))?;
         Ok(Self {
             id: id.to_string(),
             json: j,

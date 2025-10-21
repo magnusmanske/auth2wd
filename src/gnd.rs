@@ -1,6 +1,7 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
@@ -253,9 +254,9 @@ impl GND {
 
     pub async fn new(id: &str) -> Result<Self> {
         let rdf_url = format!("https://d-nb.info/gnd/{id}/about/lds.rdf");
-        let resp = reqwest::get(&rdf_url).await?.text().await?;
+        let text = Utility::get_url(&rdf_url).await?;
         let mut graph: FastGraph = FastGraph::new();
-        let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
+        let _ = xml::parser::parse_str(&text).add_to_graph(&mut graph)?;
         let mut ret = Self {
             id: id.to_string(),
             graph,
@@ -277,50 +278,74 @@ impl GND {
 
 #[cfg(test)]
 mod tests {
-    use wikimisc::wikibase::{EntityTrait, LocaleString};
-
     use super::*;
+    use async_once_cell::OnceCell;
+    use std::sync::Arc;
+    use wikimisc::wikibase::{EntityTrait, LocaleString};
 
     const TEST_ID: &str = "132539691";
 
+    lazy_static! {
+        static ref TEST_GND: Arc<OnceCell<GND>> = Arc::new(OnceCell::new());
+    }
+
+    async fn get_test_gnd() -> Result<GND> {
+        // GND sometimes has issues, so we retry until it works
+        // Also, we unse OnceCell to only load the test GND once
+        let ret = TEST_GND
+            .get_or_init(async {
+                loop {
+                    let gnd = GND::new(TEST_ID).await;
+                    match gnd {
+                        Ok(gnd) => break gnd,
+                        Err(_) => {
+                            tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+                        }
+                    }
+                }
+            })
+            .await;
+        Ok(ret.to_owned())
+    }
+
     #[tokio::test]
     async fn test_new() {
-        assert!(GND::new(TEST_ID).await.is_ok());
+        assert!(get_test_gnd().await.is_ok());
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let gnd = GND::new(TEST_ID).await.unwrap();
+        let gnd = get_test_gnd().await.unwrap();
         assert_eq!(gnd.my_property(), 227);
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let gnd = GND::new(TEST_ID).await.unwrap();
+        let gnd = get_test_gnd().await.unwrap();
         assert_eq!(gnd.my_stated_in(), "Q36578");
     }
 
     #[tokio::test]
     async fn test_primary_language() {
-        let gnd = GND::new(TEST_ID).await.unwrap();
+        let gnd = get_test_gnd().await.unwrap();
         assert_eq!(gnd.primary_language(), "de");
     }
 
     #[tokio::test]
     async fn test_get_key_url() {
-        let gnd = GND::new(TEST_ID).await.unwrap();
+        let gnd = get_test_gnd().await.unwrap();
         assert_eq!(gnd.get_key_url(TEST_ID), "https://d-nb.info/gnd/132539691");
     }
 
     #[tokio::test]
     async fn test_my_id() {
-        let gnd = GND::new(TEST_ID).await.unwrap();
+        let gnd = get_test_gnd().await.unwrap();
         assert_eq!(gnd.my_id(), TEST_ID);
     }
 
     #[tokio::test]
     async fn test_transform_label() {
-        let gnd = GND::new(TEST_ID).await.unwrap();
+        let gnd = get_test_gnd().await.unwrap();
         assert_eq!(gnd.transform_label("Manske, Magnus"), "Magnus Manske");
         assert_eq!(gnd.transform_label("Manske,Magnus"), "Manske,Magnus");
         assert_eq!(gnd.transform_label("Magnus Manske"), "Magnus Manske");
@@ -328,7 +353,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_run() {
-        let gnd = GND::new(TEST_ID).await.unwrap();
+        let gnd = get_test_gnd().await.unwrap();
         let meta_item = gnd.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),

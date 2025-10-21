@@ -7,7 +7,7 @@ use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct BNE {
     id: String,
     graph: FastGraph,
@@ -92,32 +92,56 @@ impl BNE {
 
 #[cfg(test)]
 mod tests {
-    use wikimisc::wikibase::{EntityTrait, LocaleString};
-
     use super::*;
+    use async_once_cell::OnceCell;
+    use std::sync::Arc;
+    use wikimisc::wikibase::{EntityTrait, LocaleString};
 
     const TEST_ID: &str = "XX1234567";
 
+    lazy_static! {
+        static ref TEST_BNE: Arc<OnceCell<BNE>> = Arc::new(OnceCell::new());
+    }
+
+    async fn get_test_bne() -> Result<BNE> {
+        // BNE sometimes has issues, so we retry until it works
+        // Also, we unse OnceCell to only load the test BNE once
+        let ret = TEST_BNE
+            .get_or_init(async {
+                loop {
+                    let bne = BNE::new(TEST_ID).await;
+                    match bne {
+                        Ok(gnd) => break gnd,
+                        Err(_) => {
+                            tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
+                        }
+                    }
+                }
+            })
+            .await;
+        Ok(ret.to_owned())
+    }
+
     #[tokio::test]
     async fn test_new() {
-        assert!(BNE::new(TEST_ID).await.is_ok());
+        assert!(get_test_bne().await.is_ok());
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let bne = BNE::new(TEST_ID).await.unwrap();
+        let bne = get_test_bne().await.unwrap();
         assert_eq!(bne.my_property(), 950);
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let bne = BNE::new(TEST_ID).await.unwrap();
+        let bne = get_test_bne().await.unwrap();
         assert_eq!(bne.my_stated_in(), "Q50358336");
     }
 
     #[tokio::test]
     async fn test_run() {
-        let bne = BNE::new(TEST_ID).await.unwrap();
+        let bne = get_test_bne().await.unwrap();
         let meta_item = bne.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),

@@ -5,6 +5,8 @@ use std::{collections::HashMap, fmt, sync::Arc};
 use tokio::sync::Mutex;
 use wikimisc::wikibase::*;
 
+use crate::utility::Utility;
+
 lazy_static! {
     static ref RE_PROPERTY_NUMERIC: Regex =
         Regex::new(r#"^\s*[Pp](\d+)\s*$"#).expect("Regexp error");
@@ -81,7 +83,7 @@ impl ExternalId {
     pub async fn search_wikidata_single_item(query: &str) -> Option<String> {
         // TODO urlencode query?
         let url = format!("https://www.wikidata.org/w/api.php?action=query&list=search&srnamespace=0&format=json&srsearch={}",&query);
-        let text = reqwest::get(url).await.ok()?.text().await.ok()?;
+        let text = Utility::get_url(&url).await.ok()?;
         let j: serde_json::Value = serde_json::from_str(&text).ok()?;
         if j["query"]["searchinfo"]["totalhits"].as_i64()? == 1 {
             return Some(j["query"]["search"][0]["title"].as_str()?.to_string());
@@ -116,9 +118,9 @@ impl ExternalId {
             // GND
             was_checked = true;
             let url = format!("https://d-nb.info/gnd/{}/about/lds.rdf", self.id);
-            let resp = reqwest::get(&url).await?.text().await?;
+            let text = Utility::get_url(&url).await?;
             let check = format!("rdf:about=\"https://d-nb.info/gnd/{}\">", self.id);
-            ret = resp.contains(&check);
+            ret = text.contains(&check);
         }
         if was_checked {
             // No need to store the result if no check was run
