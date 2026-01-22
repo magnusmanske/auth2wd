@@ -19,7 +19,7 @@ lazy_static! {
         ret.insert("PLWABN".to_string(), 7293);
         ret.insert("BIBSYS".to_string(), 1015);
         ret.insert("ICCU".to_string(), 396);
-        ret.insert("DBC".to_string(), 2753);
+        ret.insert("DBC".to_string(), 3846);
         ret.insert("FAST".to_string(), 2163);
         ret.insert("VLACC".to_string(), 7024);
         ret.insert("ISNI".to_string(), 213);

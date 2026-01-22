@@ -169,6 +169,6 @@ mod tests {
             format!("https://www.gbif.org/species/{TEST_ID}")
         );
         let new_item = gbif.run().await.unwrap();
-        assert_eq!(new_item.item.claims().len(), 4);
+        assert_eq!(new_item.item.claims().len(), 6);
     }
 }

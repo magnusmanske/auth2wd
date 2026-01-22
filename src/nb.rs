@@ -218,7 +218,7 @@ mod tests {
         let meta_item = nb.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
-            vec![LocaleString::new("nl", "Charles Darwin")]
+            vec![LocaleString::new("nl", "Charles Robert Darwin")]
         );
     }
 }
