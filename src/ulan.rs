@@ -1,6 +1,7 @@
 use crate::external_id::ExternalId;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -17,20 +18,20 @@ pub struct ULAN {
 #[async_trait]
 impl ExternalImporter for ULAN {
     fn my_property(&self) -> usize {
-        245
+        P_ULAN
     }
     fn my_stated_in(&self) -> &str {
         "Q2494649"
     }
     fn primary_language(&self) -> String {
-        "en".to_string()
+        String::from("en")
     }
     fn get_key_url(&self, _key: &str) -> String {
         format!("http://vocab.getty.edu/ulan/{}", self.id)
     }
 
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
     fn graph(&self) -> &FastGraph {
         &self.graph
@@ -69,14 +70,14 @@ impl ULAN {
     }
 
     fn add_p31(&self, ret: &mut MetaItem) -> Result<()> {
-        ret.add_claim(self.new_statement_item(31, "Q5"));
+        ret.add_claim(self.new_statement_item(P_INSTANCE_OF, "Q5"));
         Ok(())
     }
 
     async fn add_children(&self, ret: &mut MetaItem) -> Result<()> {
         let children = self.triples_iris("http://vocab.getty.edu/ontology#ulan1512_parent_of")?;
         for child in children {
-            self.add_ulan_item(&child, 40, ret).await;
+            self.add_ulan_item(&child, P_CHILD, ret).await;
         }
         Ok(())
     }
@@ -84,7 +85,7 @@ impl ULAN {
     async fn add_mentors(&self, ret: &mut MetaItem) -> Result<()> {
         let children = self.triples_iris("http://vocab.getty.edu/ontology#ulan1102_student_of")?;
         for child in children {
-            self.add_ulan_item(&child, 1066, ret).await;
+            self.add_ulan_item(&child, P_STUDENT_OF, ret).await;
         }
         Ok(())
     }

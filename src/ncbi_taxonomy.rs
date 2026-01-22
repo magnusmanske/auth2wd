@@ -1,5 +1,6 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use crate::ExternalId;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -13,19 +14,16 @@ pub struct NCBItaxonomy {
     taxon: Taxon,
 }
 
-unsafe impl Send for NCBItaxonomy {}
-unsafe impl Sync for NCBItaxonomy {}
-
 #[async_trait]
 impl ExternalImporter for NCBItaxonomy {
     fn my_property(&self) -> usize {
-        685
+        P_NCBI_TAXONOMY
     }
     fn my_stated_in(&self) -> &str {
         "Q13711410"
     }
     fn primary_language(&self) -> String {
-        "en".to_string()
+        String::from("en")
     }
     fn get_key_url(&self, _key: &str) -> String {
         format!(
@@ -34,7 +32,7 @@ impl ExternalImporter for NCBItaxonomy {
         )
     }
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
 
     async fn run(&self) -> Result<MetaItem> {
@@ -140,23 +138,26 @@ impl NCBItaxonomy {
 
     async fn add_parent_taxon(&self, ret: &mut MetaItem) -> Option<()> {
         let parent_id = self.taxon.parent_taxid?;
-        let query = format!("haswbstatement:P685={parent_id} haswbstatement:P31=Q16521");
+        let query = format!(
+            "haswbstatement:P{}={parent_id} haswbstatement:P{}=Q16521",
+            P_NCBI_TAXONOMY, P_INSTANCE_OF
+        );
         let item = ExternalId::search_wikidata_single_item(&query).await?;
-        ret.add_claim(self.new_statement_item(171, &item));
+        ret.add_claim(self.new_statement_item(P_PARENT_TAXON, &item));
         Some(())
     }
 
     fn add_p31(&self, ret: &mut MetaItem) -> Option<()> {
         // Taxon
-        ret.add_claim(self.new_statement_item(31, "Q16521"));
+        ret.add_claim(self.new_statement_item(P_INSTANCE_OF, "Q16521"));
         Some(())
     }
 
     fn add_taxon_name_and_labels(&self, ret: &mut MetaItem) -> Option<()> {
         let name = self.taxon.scientific_name.clone()?;
-        ret.add_claim(self.new_statement_string(225, &name));
+        ret.add_claim(self.new_statement_string(P_TAXON_NAME, &name));
         for lang in TAXON_LABEL_LANGUAGES {
-            let label = LocaleString::new(lang.to_string(), name.to_string());
+            let label = LocaleString::new(*lang, &name);
             ret.item.labels_mut().push(label);
         }
         Some(())
@@ -165,7 +166,7 @@ impl NCBItaxonomy {
     fn add_taxon_rank(&self, ret: &mut MetaItem) -> Option<()> {
         let rank = self.taxon.rank.clone()?.to_lowercase();
         let item = TAXON_MAP.get(rank.as_str())?;
-        ret.add_claim(self.new_statement_item(105, item));
+        ret.add_claim(self.new_statement_item(P_TAXON_RANK, item));
         Some(())
     }
 }
@@ -180,7 +181,7 @@ mod tests {
     #[tokio::test]
     async fn test_all() {
         let ncbi_taxonomy = NCBItaxonomy::new(TEST_ID).await.unwrap();
-        assert_eq!(ncbi_taxonomy.my_property(), 685);
+        assert_eq!(ncbi_taxonomy.my_property(), P_NCBI_TAXONOMY);
         assert_eq!(ncbi_taxonomy.my_stated_in(), "Q13711410");
         assert_eq!(ncbi_taxonomy.primary_language(), "en");
         assert_eq!(ncbi_taxonomy.my_id(), TEST_ID);

@@ -56,6 +56,7 @@ pub mod meta_item;
 pub mod nb;
 pub mod ncbi_taxonomy;
 pub mod noraf;
+pub mod properties;
 pub mod pubchem_cid;
 pub mod selibr;
 pub mod supported_property;

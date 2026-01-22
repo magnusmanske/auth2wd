@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::external_id::ExternalId;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -15,62 +16,62 @@ use sophia::xml;
 lazy_static! {
     static ref KEY2PROP: HashMap<String, usize> = {
         let mut ret = HashMap::new();
-        ret.insert("DNB".to_string(), 227);
-        ret.insert("PLWABN".to_string(), 7293);
-        ret.insert("BIBSYS".to_string(), 1015);
-        ret.insert("ICCU".to_string(), 396);
-        ret.insert("DBC".to_string(), 3846);
-        ret.insert("FAST".to_string(), 2163);
-        ret.insert("VLACC".to_string(), 7024);
-        ret.insert("ISNI".to_string(), 213);
-        ret.insert("DE633".to_string(), 5504);
-        ret.insert("LNL".to_string(), 7026);
-        ret.insert("CAOONL".to_string(), 8179);
-        ret.insert("EGAXA".to_string(), 1309);
-        ret.insert("LC".to_string(), 244);
-        // ret.insert("NII".to_string(), XXXX);
-        ret.insert("SIMACOB".to_string(), 1280);
-        ret.insert("NUKAT".to_string(), 1207);
-        ret.insert("CYT".to_string(), 1048);
-        ret.insert("NDL".to_string(), 349);
-        // ret.insert("NLB".to_string(), XXXX);
-        // ret.insert("B2Q".to_string(), XXXX);
-        ret.insert("ARBABN".to_string(), 3788);
-        // ret.insert("NLA".to_string(), XXXX);
-        ret.insert("BLBNB".to_string(), 4619);
-        ret.insert("BNC".to_string(), 9984);
-        ret.insert("BNCHL".to_string(), 7369);
-        ret.insert("ERRR".to_string(), 6394);
-        // ret.insert("BNF".to_string(), 268); // Deactivated for now; eg Q136170149 / 6471159248261404870006 gives truncated ID
-        ret.insert("GRATEVE".to_string(), 3348);
-        ret.insert("N6I".to_string(), 10227);
-        ret.insert("NLI".to_string(), 949);
-        ret.insert("KRNLK".to_string(), 5034);
-        ret.insert("LNB".to_string(), 1368);
-        // ret.insert("LIH".to_string(), 7699); // Something is wrong there
-        ret.insert("BNL".to_string(), 7028);
-        ret.insert("MRBNR".to_string(), 7058);
-        ret.insert("W2Z".to_string(), 1015);
-        ret.insert("PTBNP".to_string(), 1005);
-        ret.insert("NLR".to_string(), 7029);
-        // ret.insert("BNE".to_string(), XXXX);
-        ret.insert("SELIBR".to_string(), 906);
-        ret.insert("NKC".to_string(), 691);
-        // ret.insert("NTA".to_string(), XXXX);
-        // ret.insert("NSZL".to_string(), XXXX);
-        ret.insert("NSK".to_string(), 1375);
-        ret.insert("UIY".to_string(), 7039);
-        // ret.insert("PERSEUS".to_string(), XXXX);
-        ret.insert("RERO".to_string(), 3065);
-        ret.insert("NYNYRILM".to_string(), 9171);
-        ret.insert("SKMASNL".to_string(), 7700);
-        ret.insert("SUDOC".to_string(), 269);
-        // ret.insert("SZ".to_string(), XXXX);
-        ret.insert("SRP".to_string(), 6934);
-        // ret.insert("JPG".to_string(), XXXX);
-        // ret.insert("UAE".to_string(), XXXX);
-        ret.insert("BAV".to_string(), 8034);
-        // ret.insert("WKP".to_string(), XXXX); // Maybe not?
+        ret.insert(String::from("DNB"), 227);
+        ret.insert(String::from("PLWABN"), 7293);
+        ret.insert(String::from("BIBSYS"), 1015);
+        ret.insert(String::from("ICCU"), 396);
+        ret.insert(String::from("DBC"), 3846);
+        ret.insert(String::from("FAST"), 2163);
+        ret.insert(String::from("VLACC"), 7024);
+        ret.insert(String::from("ISNI"), 213);
+        ret.insert(String::from("DE633"), 5504);
+        ret.insert(String::from("LNL"), 7026);
+        ret.insert(String::from("CAOONL"), 8179);
+        ret.insert(String::from("EGAXA"), 1309);
+        ret.insert(String::from("LC"), 244);
+        // ret.insert(String::from("NII"), XXXX);
+        ret.insert(String::from("SIMACOB"), 1280);
+        ret.insert(String::from("NUKAT"), 1207);
+        ret.insert(String::from("CYT"), 1048);
+        ret.insert(String::from("NDL"), 349);
+        // ret.insert(String::from("NLB"), XXXX);
+        // ret.insert(String::from("B2Q"), XXXX);
+        ret.insert(String::from("ARBABN"), 3788);
+        // ret.insert(String::from("NLA"), XXXX);
+        ret.insert(String::from("BLBNB"), 4619);
+        ret.insert(String::from("BNC"), 9984);
+        ret.insert(String::from("BNCHL"), 7369);
+        ret.insert(String::from("ERRR"), 6394);
+        // ret.insert(String::from("BNF"), 268); // Deactivated for now; eg Q136170149 / 6471159248261404870006 gives truncated ID
+        ret.insert(String::from("GRATEVE"), 3348);
+        ret.insert(String::from("N6I"), 10227);
+        ret.insert(String::from("NLI"), 949);
+        ret.insert(String::from("KRNLK"), 5034);
+        ret.insert(String::from("LNB"), 1368);
+        // ret.insert(String::from("LIH"), 7699); // Something is wrong there
+        ret.insert(String::from("BNL"), 7028);
+        ret.insert(String::from("MRBNR"), 7058);
+        ret.insert(String::from("W2Z"), 1015);
+        ret.insert(String::from("PTBNP"), 1005);
+        ret.insert(String::from("NLR"), 7029);
+        // ret.insert(String::from("BNE"), XXXX);
+        ret.insert(String::from("SELIBR"), 906);
+        ret.insert(String::from("NKC"), 691);
+        // ret.insert(String::from("NTA"), XXXX);
+        // ret.insert(String::from("NSZL"), XXXX);
+        ret.insert(String::from("NSK"), 1375);
+        ret.insert(String::from("UIY"), 7039);
+        // ret.insert(String::from("PERSEUS"), XXXX);
+        ret.insert(String::from("RERO"), 3065);
+        ret.insert(String::from("NYNYRILM"), 9171);
+        ret.insert(String::from("SKMASNL"), 7700);
+        ret.insert(String::from("SUDOC"), 269);
+        // ret.insert(String::from("SZ"), XXXX);
+        ret.insert(String::from("SRP"), 6934);
+        // ret.insert(String::from("JPG"), XXXX);
+        // ret.insert(String::from("UAE"), XXXX);
+        ret.insert(String::from("BAV"), 8034);
+        // ret.insert(String::from("WKP"), XXXX); // Maybe not?
         ret
     };
 }
@@ -81,26 +82,23 @@ pub struct VIAF {
     graph: FastGraph,
 }
 
-unsafe impl Send for VIAF {}
-unsafe impl Sync for VIAF {}
-
 #[async_trait]
 impl ExternalImporter for VIAF {
     fn my_property(&self) -> usize {
-        214
+        P_VIAF
     }
     fn my_stated_in(&self) -> &str {
         "Q54919"
     }
     fn primary_language(&self) -> String {
-        "en".to_string()
+        String::from("en")
     }
     fn get_key_url(&self, _key: &str) -> String {
         format!("http://viaf.org/viaf/{}", self.id)
     }
 
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
     fn graph(&self) -> &FastGraph {
         &self.graph
@@ -128,7 +126,7 @@ impl VIAF {
         let mut graph: FastGraph = FastGraph::new();
         let _ = xml::parser::parse_str(&response).add_to_graph(&mut graph)?;
         Ok(Self {
-            id: id.to_string(),
+            id: String::from(id),
             graph,
         })
     }
@@ -138,7 +136,7 @@ impl VIAF {
         KEY2PROP
             .iter()
             .find(|&(_, v)| *v == property)
-            .map(|(k, _)| k.to_string())
+            .map(|(k, _)| k.clone())
     }
 
     fn external_ids(&self, ret: &mut MetaItem) -> Result<()> {
@@ -178,7 +176,7 @@ mod tests {
     #[tokio::test]
     async fn test_my_property() {
         let viaf = VIAF::new(TEST_ID).await.unwrap();
-        assert_eq!(viaf.my_property(), 214);
+        assert_eq!(viaf.my_property(), P_VIAF);
     }
 
     #[tokio::test]

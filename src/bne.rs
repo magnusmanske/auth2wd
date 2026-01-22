@@ -1,6 +1,7 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use anyhow::Result;
 use async_trait::async_trait;
 use sophia::api::prelude::*;
@@ -13,17 +14,14 @@ pub struct BNE {
     graph: FastGraph,
 }
 
-unsafe impl Send for BNE {}
-unsafe impl Sync for BNE {}
-
 #[async_trait]
 impl ExternalImporter for BNE {
     fn my_property(&self) -> usize {
-        950
+        P_BNE
     }
 
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
 
     fn my_stated_in(&self) -> &str {
@@ -35,7 +33,7 @@ impl ExternalImporter for BNE {
     }
 
     fn primary_language(&self) -> String {
-        "es".to_string()
+        String::from("es")
     }
 
     fn get_key_url(&self, _key: &str) -> String {
@@ -52,13 +50,13 @@ impl ExternalImporter for BNE {
 
         // Nationality
         for text in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
-            let _ = ret.add_prop_text(ExternalId::new(27, &text));
+            let _ = ret.add_prop_text(ExternalId::new(P_COUNTRY_OF_CITIZENSHIP, &text));
         }
 
         // Born/died
         let birth_death = [
-            ("https://datos.bne.es/def/P5010", 569),
-            ("https://datos.bne.es/def/P5011", 570),
+            ("https://datos.bne.es/def/P5010", P_DATE_OF_BIRTH),
+            ("https://datos.bne.es/def/P5011", P_DATE_OF_DEATH),
         ];
         for bd in birth_death {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
@@ -130,7 +128,7 @@ mod tests {
     #[tokio::test]
     async fn test_my_property() {
         let bne = get_test_bne().await.unwrap();
-        assert_eq!(bne.my_property(), 950);
+        assert_eq!(bne.my_property(), P_BNE);
     }
 
     #[tokio::test]

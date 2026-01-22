@@ -1,6 +1,7 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use anyhow::Result;
 use async_trait::async_trait;
 use sophia::api::prelude::*;
@@ -13,17 +14,14 @@ pub struct IdRef {
     graph: FastGraph,
 }
 
-unsafe impl Send for IdRef {}
-unsafe impl Sync for IdRef {}
-
 #[async_trait]
 impl ExternalImporter for IdRef {
     fn my_property(&self) -> usize {
-        269
+        P_IDREF
     }
 
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
 
     fn my_stated_in(&self) -> &str {
@@ -35,7 +33,7 @@ impl ExternalImporter for IdRef {
     }
 
     fn primary_language(&self) -> String {
-        "fr".to_string()
+        String::from("fr")
     }
 
     fn get_key_url(&self, key: &str) -> String {
@@ -50,17 +48,19 @@ impl ExternalImporter for IdRef {
             match self.url2external_id(&url) {
                 Some(extid) => {
                     let _ = match extid.get_item_for_external_id_value().await {
-                        Some(item) => ret.add_claim(self.new_statement_item(27, &item)),
-                        None => ret.add_prop_text(ExternalId::new(27, &url)),
+                        Some(item) => {
+                            ret.add_claim(self.new_statement_item(P_COUNTRY_OF_CITIZENSHIP, &item))
+                        }
+                        None => ret.add_prop_text(ExternalId::new(P_COUNTRY_OF_CITIZENSHIP, &url)),
                     };
                 }
                 None => {
-                    let _ = ret.add_prop_text(ExternalId::new(27, &url));
+                    let _ = ret.add_prop_text(ExternalId::new(P_COUNTRY_OF_CITIZENSHIP, &url));
                 }
             }
         }
 
-        let birth_death = [("birth", 569), ("death", 570)];
+        let birth_death = [("birth", P_DATE_OF_BIRTH), ("death", P_DATE_OF_DEATH)];
         for bd in birth_death {
             for s in self.triples_subject_literals(
                 &format!("http://www.idref.fr/{}/{}", self.id, bd.0),
@@ -110,7 +110,7 @@ mod tests {
     #[tokio::test]
     async fn test_my_property() {
         let idref = IdRef::new(TEST_ID).await.unwrap();
-        assert_eq!(idref.my_property(), 269);
+        assert_eq!(idref.my_property(), P_IDREF);
     }
 
     #[tokio::test]

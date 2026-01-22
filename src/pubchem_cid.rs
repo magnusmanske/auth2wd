@@ -1,5 +1,6 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::Value;
@@ -12,25 +13,22 @@ pub struct PubChemCid {
     json: Value,
 }
 
-unsafe impl Send for PubChemCid {}
-unsafe impl Sync for PubChemCid {}
-
 #[async_trait]
 impl ExternalImporter for PubChemCid {
     fn my_property(&self) -> usize {
-        662
+        P_PUBCHEM_CID
     }
     fn my_stated_in(&self) -> &str {
         "Q278487"
     }
     fn primary_language(&self) -> String {
-        "en".to_string()
+        String::from("en")
     }
     fn get_key_url(&self, _key: &str) -> String {
         format!("https://pubchem.ncbi.nlm.nih.gov/compound/{}", self.id)
     }
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
 
     async fn run(&self) -> Result<MetaItem> {
@@ -58,18 +56,18 @@ impl PubChemCid {
     }
 
     fn add_p31(&self, ret: &mut MetaItem) -> Option<()> {
-        ret.add_claim(self.new_statement_item(31, "Q113145171"));
+        ret.add_claim(self.new_statement_item(P_INSTANCE_OF, "Q113145171"));
         Some(())
     }
 
     fn add_p279(&self, ret: &mut MetaItem) -> Option<()> {
-        ret.add_claim(self.new_statement_item(279, "Q11173"));
+        ret.add_claim(self.new_statement_item(P_SUBCLASS_OF, "Q11173"));
         Some(())
     }
 
     fn add_label(&self, ret: &mut MetaItem) -> Option<()> {
         let name = self.json["Record"]["RecordTitle"].as_str()?;
-        let label = LocaleString::new("en".to_string(), name.to_string());
+        let label = LocaleString::new("en", name);
         ret.item.labels_mut().push(label);
         Some(())
     }
@@ -89,9 +87,11 @@ impl PubChemCid {
             .next()?;
         for o in computed_descriptors.iter() {
             match o["TOCHeading"].as_str() {
-                Some("SMILES") => self.extract_information_as_string_values(ret, o, 233),
-                Some("InChI") => self.extract_information_as_string_values(ret, o, 234),
-                Some("InChIKey") => self.extract_information_as_string_values(ret, o, 235),
+                Some("SMILES") => {
+                    self.extract_information_as_string_values(ret, o, P_CANONICAL_SMILES);
+                }
+                Some("InChI") => self.extract_information_as_string_values(ret, o, P_INCHI),
+                Some("InChIKey") => self.extract_information_as_string_values(ret, o, P_INCHIKEY),
                 _ => {} // Ignore
             }
         }
@@ -103,7 +103,7 @@ impl PubChemCid {
             .next()?;
         for o in other_identifiers.iter() {
             if let Some("Nikkaji Number") = o["TOCHeading"].as_str() {
-                self.extract_information_as_string_values(ret, o, 2085);
+                self.extract_information_as_string_values(ret, o, P_NIKKAJI);
             }
         }
 
@@ -134,7 +134,7 @@ mod tests {
     #[tokio::test]
     async fn test_all() {
         let gbif = PubChemCid::new(TEST_ID).await.unwrap();
-        assert_eq!(gbif.my_property(), 662);
+        assert_eq!(gbif.my_property(), P_PUBCHEM_CID);
         assert_eq!(gbif.my_stated_in(), "Q278487");
         assert_eq!(gbif.primary_language(), "en");
         assert_eq!(gbif.my_id(), TEST_ID);

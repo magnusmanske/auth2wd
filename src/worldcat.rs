@@ -1,5 +1,6 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use crate::ExternalId;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -13,32 +14,29 @@ pub struct WorldCat {
     json: Value,
 }
 
-unsafe impl Send for WorldCat {}
-unsafe impl Sync for WorldCat {}
-
 #[async_trait]
 impl ExternalImporter for WorldCat {
     fn my_property(&self) -> usize {
-        10832
+        P_WORLDCAT
     }
     fn my_stated_in(&self) -> &str {
         "Q112122720"
     }
     fn primary_language(&self) -> String {
-        "en".to_string()
+        String::from("en")
     }
     fn get_key_url(&self, _key: &str) -> String {
         format!("https://id.oclc.org/worldcat/entity/{}", self.id)
     }
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
 
     async fn run(&self) -> Result<MetaItem> {
         let mut ret = MetaItem::new();
         self.add_own_id(&mut ret)?;
-        let _ = self.add_date(&mut ret, "dateOfBirth", 569);
-        let _ = self.add_date(&mut ret, "dateOfDeath", 570);
+        let _ = self.add_date(&mut ret, "dateOfBirth", P_DATE_OF_BIRTH);
+        let _ = self.add_date(&mut ret, "dateOfDeath", P_DATE_OF_DEATH);
         let _ = self.add_p31(&mut ret);
         let _ = self.add_labels(&mut ret);
         let _ = self.add_aliases(&mut ret);
@@ -65,10 +63,10 @@ impl WorldCat {
             if let Some(the_type) = the_type.as_str() {
                 match the_type {
                     "Person" => {
-                        let _ = ret.add_claim(self.new_statement_item(31, "Q5"));
+                        let _ = ret.add_claim(self.new_statement_item(P_INSTANCE_OF, "Q5"));
                     }
                     other => {
-                        let ext_id = ExternalId::new(31, other);
+                        let ext_id = ExternalId::new(P_INSTANCE_OF, other);
                         let _ = ret.add_prop_text(ext_id);
                     }
                 }
@@ -161,7 +159,7 @@ mod tests {
     #[tokio::test]
     async fn test_my_property() {
         let worldcat = WorldCat::new(TEST_ID).await.unwrap();
-        assert_eq!(worldcat.my_property(), 10832);
+        assert_eq!(worldcat.my_property(), P_WORLDCAT);
     }
 
     #[tokio::test]

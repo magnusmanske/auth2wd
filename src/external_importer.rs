@@ -1,5 +1,6 @@
 use crate::external_id::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -20,44 +21,44 @@ lazy_static! {
     static ref EXTERNAL_ID_REGEXPS : Vec<(Regex,String,usize)> = {
         // NOTE: The pattern always needs to cover the whole string, so use ^$
         vec![
-            (Regex::new(r"^https?://viaf.org/viaf/(\d+)$").unwrap(),"${1}".to_string(),214),
-            (Regex::new(r"^https?://www.viaf.org/viaf/(\d+)$").unwrap(),"${1}".to_string(),214),
-            (Regex::new(r"^https?://isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),"${1}${2}${3}${4}".to_string(),213),
-            (Regex::new(r"^https?://isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),"${1}${2}${3}${4}".to_string(),213),
-            (Regex::new(r"^https?://www.isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),"${1}${2}${3}${4}".to_string(),213),
-            (Regex::new(r"^https?://isni-url.oclc.nl/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),"${1}${2}${3}${4}".to_string(),213),
-            (Regex::new(r"^https?://d-nb.info/gnd/(1[012]?\d{7}[0-9X]|[47]\d{6}-\d|[1-9]\d{0,7}-[0-9X]|3\d{7}[0-9X])$").unwrap(),"${1}".to_string(),227),
-            (Regex::new(r"^https?://id.loc.gov/authorities/names/(gf|n|nb|nr|no|ns|sh|sj)([4-9][0-9]|00|20[0-2][0-9])([0-9]{6})$").unwrap(),"${1}${2}${3}".to_string(),244),
-            (Regex::new(r"^https?://id.loc.gov/rwo/agents/(gf|n|nb|nr|no|ns|sh|sj)([4-9][0-9]|00|20[0-2][0-9])([0-9]{6})(\.html)?$").unwrap(),"${1}${2}${3}".to_string(),244),
-            (Regex::new(r"^https?://vocab.getty.edu/ulan/(\d+).*$").unwrap(),"${1}".to_string(),245),
-            (Regex::new(r"^https?://www.getty.edu/vow/ULANFullDisplay\?find=&role=&nation=&subjectid=(\d+)$").unwrap(),"${1}".to_string(),245),
-            (Regex::new(r"^https?://viaf.org/processed/JPG|(\d+)$").unwrap(),"${1}".to_string(),245),
-            (Regex::new(r"^https?://data.bnf.fr/(\d{8,9}).*$").unwrap(),"${1}".to_string(),268),
-            (Regex::new(r"^https?://data.bnf.fr/ark:/12148/cb(\d{8,9}[0-9bcdfghjkmnpqrstvwxz]).*$").unwrap(),"${1}".to_string(),268),
-            (Regex::new(r"^https?://idref.fr/(\d{8}[\dX]).*$").unwrap(),"${1}".to_string(),269),
-            (Regex::new(r"^https?://www.idref.fr/(\d{8}[\dX]).*$").unwrap(),"${1}".to_string(),269),
-            (Regex::new(r"^https?://id.ndl.go.jp/auth/entity/([a1s]*\d+{7,9})$").unwrap(),"${1}".to_string(),349),
-            (Regex::new(r"^https?://id.ndl.go.jp/auth/ndlna/([a1s]*\d+{7,9})$").unwrap(),"${1}".to_string(),349),
-            (Regex::new(r"^https?://orcid.org/(\d{4}-\d{4}-\d{4}-\d{3}[0-9X])$").unwrap(),"${1}".to_string(),496),
-            (Regex::new(r"^https?://www.orcid.org/(\d{4}-\d{4}-\d{4}-\d{3}[0-9X])$").unwrap(),"${1}".to_string(),496),
-            (Regex::new(r"^https?://libris.kb.se/resource/auth/([1-9]\d{4,5})$").unwrap(),"${1}".to_string(),906),
-            (Regex::new(r"^https?://datos.bne.es/resource/(.+?)$").unwrap(),"${1}".to_string(),950),
-            (Regex::new(r"^https?://data.bibsys.no/data/notrbib/authorityentry/x([1-9]\d*)$").unwrap(),"${1}".to_string(),1015),
-            (Regex::new(r"^https?://authority.bibsys.no/authority/rest/authorities/html/([1-9]\d*)$").unwrap(),"${1}".to_string(),1015),
-            (Regex::new(r"^https?://www.scopus.com/authid/detail.uri\?authorId=([1-9]\d{9,10}).*$").unwrap(),"${1}".to_string(),1153),
-            (Regex::new(r"^https?://data.cerl.org/thesaurus/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),"${1}".to_string(),1871),
-            (Regex::new(r"^https?://data.cerl.org/thesaurus/(.*)$").unwrap(),"${1}".to_string(),1871),
-            (Regex::new(r"^https?://thesaurus.cerl.org/record/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),"${1}".to_string(),1871),
-            (Regex::new(r"^https?://authority\.bibsys\.no/authority/rest/authorities/html/([1-9]\d*).*$").unwrap(),"${1}".to_string(),1015),
-            (Regex::new(r"^https?://(?:www\.)?viaf\.org/processed/BIBSYS%7C([1-9]\d*)$").unwrap(),"${1}".to_string(),1015),
-            (Regex::new(r"^https?://authority.bibsys.no/authority/rest/authorities/html/(\d+).*$").unwrap(),"${1}".to_string(),1015),
-            (Regex::new(r"^https?://entities.oclc.org/worldcat/entity/([^.]+)$").unwrap(),"${1}".to_string(),10832),
-            (Regex::new(r"^https?://entities.oclc.org/worldcat/entity/([^.]+).html$").unwrap(),"${1}".to_string(),10832),
-            (Regex::new(r"^https?://entities.oclc.org/worldcat/entity/([^.]+).jsonld$").unwrap(),"${1}".to_string(),10832),
-            (Regex::new(r"^https?://www.filmportal.de/([A-Za-z0-9]+)$").unwrap(),"${1}".to_string(),2639),
-            (Regex::new(r"^https?://nektar.oszk.hu/resource/auth/([1-9]\d*)$").unwrap(),"${1}".to_string(),3133),
-            (Regex::new(r"^https?://viaf.org/en/viaf/LC%7C(.+)$").unwrap(),"${1}".to_string(),244),
-            (Regex::new(r"^https?://www.persee.fr/authority/(\d+)$").unwrap(),"${1}".to_string(),2732),
+            (Regex::new(r"^https?://viaf.org/viaf/(\d+)$").unwrap(),String::from("${1}"),P_VIAF),
+            (Regex::new(r"^https?://www.viaf.org/viaf/(\d+)$").unwrap(),String::from("${1}"),P_VIAF),
+            (Regex::new(r"^https?://isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),String::from("${1}${2}${3}${4}"),P_ISNI),
+            (Regex::new(r"^https?://isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),String::from("${1}${2}${3}${4}"),P_ISNI),
+            (Regex::new(r"^https?://www.isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),String::from("${1}${2}${3}${4}"),P_ISNI),
+            (Regex::new(r"^https?://isni-url.oclc.nl/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),String::from("${1}${2}${3}${4}"),P_ISNI),
+            (Regex::new(r"^https?://d-nb.info/gnd/(1[012]?\d{7}[0-9X]|[47]\d{6}-\d|[1-9]\d{0,7}-[0-9X]|3\d{7}[0-9X])$").unwrap(),String::from("${1}"),P_GND),
+            (Regex::new(r"^https?://id.loc.gov/authorities/names/(gf|n|nb|nr|no|ns|sh|sj)([4-9][0-9]|00|20[0-2][0-9])([0-9]{6})$").unwrap(),String::from("${1}${2}${3}"),P_LOC),
+            (Regex::new(r"^https?://id.loc.gov/rwo/agents/(gf|n|nb|nr|no|ns|sh|sj)([4-9][0-9]|00|20[0-2][0-9])([0-9]{6})(\.html)?$").unwrap(),String::from("${1}${2}${3}"),P_LOC),
+            (Regex::new(r"^https?://vocab.getty.edu/ulan/(\d+).*$").unwrap(),String::from("${1}"),P_ULAN),
+            (Regex::new(r"^https?://www.getty.edu/vow/ULANFullDisplay\?find=&role=&nation=&subjectid=(\d+)$").unwrap(),String::from("${1}"),P_ULAN),
+            (Regex::new(r"^https?://viaf.org/processed/JPG|(\d+)$").unwrap(),String::from("${1}"),P_ULAN),
+            (Regex::new(r"^https?://data.bnf.fr/(\d{8,9}).*$").unwrap(),String::from("${1}"),P_BNF),
+            (Regex::new(r"^https?://data.bnf.fr/ark:/12148/cb(\d{8,9}[0-9bcdfghjkmnpqrstvwxz]).*$").unwrap(),String::from("${1}"),P_BNF),
+            (Regex::new(r"^https?://idref.fr/(\d{8}[\dX]).*$").unwrap(),String::from("${1}"),P_IDREF),
+            (Regex::new(r"^https?://www.idref.fr/(\d{8}[\dX]).*$").unwrap(),String::from("${1}"),P_IDREF),
+            (Regex::new(r"^https?://id.ndl.go.jp/auth/entity/([a1s]*\d+{7,9})$").unwrap(),String::from("${1}"),P_NDL),
+            (Regex::new(r"^https?://id.ndl.go.jp/auth/ndlna/([a1s]*\d+{7,9})$").unwrap(),String::from("${1}"),P_NDL),
+            (Regex::new(r"^https?://orcid.org/(\d{4}-\d{4}-\d{4}-\d{3}[0-9X])$").unwrap(),String::from("${1}"),P_ORCID),
+            (Regex::new(r"^https?://www.orcid.org/(\d{4}-\d{4}-\d{4}-\d{3}[0-9X])$").unwrap(),String::from("${1}"),P_ORCID),
+            (Regex::new(r"^https?://libris.kb.se/resource/auth/([1-9]\d{4,5})$").unwrap(),String::from("${1}"),P_SELIBR),
+            (Regex::new(r"^https?://datos.bne.es/resource/(.+?)$").unwrap(),String::from("${1}"),P_BNE),
+            (Regex::new(r"^https?://data.bibsys.no/data/notrbib/authorityentry/x([1-9]\d*)$").unwrap(),String::from("${1}"),P_NORAF),
+            (Regex::new(r"^https?://authority.bibsys.no/authority/rest/authorities/html/([1-9]\d*)$").unwrap(),String::from("${1}"),P_NORAF),
+            (Regex::new(r"^https?://www.scopus.com/authid/detail.uri\?authorId=([1-9]\d{9,10}).*$").unwrap(),String::from("${1}"),P_SCOPUS),
+            (Regex::new(r"^https?://data.cerl.org/thesaurus/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),String::from("${1}"),P_CERL),
+            (Regex::new(r"^https?://data.cerl.org/thesaurus/(.*)$").unwrap(),String::from("${1}"),P_CERL),
+            (Regex::new(r"^https?://thesaurus.cerl.org/record/(c(?:af|nc|ni|nl|np)0\d{7})$").unwrap(),String::from("${1}"),P_CERL),
+            (Regex::new(r"^https?://authority\.bibsys\.no/authority/rest/authorities/html/([1-9]\d*).*$").unwrap(),String::from("${1}"),P_NORAF),
+            (Regex::new(r"^https?://(?:www\.)?viaf\.org/processed/BIBSYS%7C([1-9]\d*)$").unwrap(),String::from("${1}"),P_NORAF),
+            (Regex::new(r"^https?://authority.bibsys.no/authority/rest/authorities/html/(\d+).*$").unwrap(),String::from("${1}"),P_NORAF),
+            (Regex::new(r"^https?://entities.oclc.org/worldcat/entity/([^.]+)$").unwrap(),String::from("${1}"),P_WORLDCAT),
+            (Regex::new(r"^https?://entities.oclc.org/worldcat/entity/([^.]+).html$").unwrap(),String::from("${1}"),P_WORLDCAT),
+            (Regex::new(r"^https?://entities.oclc.org/worldcat/entity/([^.]+).jsonld$").unwrap(),String::from("${1}"),P_WORLDCAT),
+            (Regex::new(r"^https?://www.filmportal.de/([A-Za-z0-9]+)$").unwrap(),String::from("${1}"),P_FILMPORTAL),
+            (Regex::new(r"^https?://nektar.oszk.hu/resource/auth/([1-9]\d*)$").unwrap(),String::from("${1}"),P_NSZL),
+            (Regex::new(r"^https?://viaf.org/en/viaf/LC%7C(.+)$").unwrap(),String::from("${1}"),P_LOC),
+            (Regex::new(r"^https?://www.persee.fr/authority/(\d+)$").unwrap(),String::from("${1}"),P_PERSEE),
         ]
     };
 
@@ -480,41 +481,41 @@ pub trait ExternalImporter: Send + Sync {
     async fn add_gender(&self, ret: &mut MetaItem) -> Result<()> {
         for s in self.triples_literals("http://xmlns.com/foaf/0.1/gender")? {
             let _ = match s.as_str() {
-                "male" => ret.add_claim(self.new_statement_item(21, "Q6581097")),
-                "female" => ret.add_claim(self.new_statement_item(21, "Q6581072")),
-                _ => ret.add_prop_text(ExternalId::new(21, &s)),
+                "male" => ret.add_claim(self.new_statement_item(P_SEX_OR_GENDER, "Q6581097")),
+                "female" => ret.add_claim(self.new_statement_item(P_SEX_OR_GENDER, "Q6581072")),
+                _ => ret.add_prop_text(ExternalId::new(P_SEX_OR_GENDER, &s)),
             };
         }
 
         for s in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50116")? {
             let _ = match s.as_str() {
-                "Masculino" => ret.add_claim(self.new_statement_item(21, "Q6581097")),
-                "Femenino" => ret.add_claim(self.new_statement_item(21, "Q6581072")),
-                _ => ret.add_prop_text(ExternalId::new(21, &s)),
+                "Masculino" => ret.add_claim(self.new_statement_item(P_SEX_OR_GENDER, "Q6581097")),
+                "Femenino" => ret.add_claim(self.new_statement_item(P_SEX_OR_GENDER, "Q6581072")),
+                _ => ret.add_prop_text(ExternalId::new(P_SEX_OR_GENDER, &s)),
             };
         }
 
         for url in self.triples_iris("https://d-nb.info/standards/elementset/gnd#gender")? {
             let _ = match url.as_str() {
                 "https://d-nb.info/standards/vocab/gnd/gender#male" => {
-                    ret.add_claim(self.new_statement_item(21, "Q6581097"))
+                    ret.add_claim(self.new_statement_item(P_SEX_OR_GENDER, "Q6581097"))
                 }
                 "https://d-nb.info/standards/vocab/gnd/gender#female" => {
-                    ret.add_claim(self.new_statement_item(21, "Q6581072"))
+                    ret.add_claim(self.new_statement_item(P_SEX_OR_GENDER, "Q6581072"))
                 }
-                _ => ret.add_prop_text(ExternalId::new(21, &url)),
+                _ => ret.add_prop_text(ExternalId::new(P_SEX_OR_GENDER, &url)),
             };
         }
 
         for url in self.triples_iris("http://schema.org/gender")? {
             let _ = match url.as_str() {
                 "http://vocab.getty.edu/aat/300189559" => {
-                    ret.add_claim(self.new_statement_item(21, "Q6581097"))
+                    ret.add_claim(self.new_statement_item(P_SEX_OR_GENDER, "Q6581097"))
                 }
                 "http://vocab.getty.edu/aat/500446177" => {
-                    ret.add_claim(self.new_statement_item(21, "Q6581072"))
+                    ret.add_claim(self.new_statement_item(P_SEX_OR_GENDER, "Q6581072"))
                 }
-                _ => ret.add_prop_text(ExternalId::new(21, &url)),
+                _ => ret.add_prop_text(ExternalId::new(P_SEX_OR_GENDER, &url)),
             };
         }
 
@@ -689,15 +690,19 @@ pub trait ExternalImporter: Send + Sync {
     async fn add_instance_of(&self, ret: &mut MetaItem) -> Result<()> {
         for url in self.triples_iris("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")? {
             let _ = match url.as_str() {
-                "http://schema.org/Person" => ret.add_claim(self.new_statement_item(31, "Q5")),
+                "http://schema.org/Person" => {
+                    ret.add_claim(self.new_statement_item(P_INSTANCE_OF, "Q5"))
+                }
                 "http://xmlns.com/foaf/0.1/Person" => {
-                    ret.add_claim(self.new_statement_item(31, "Q5"))
+                    ret.add_claim(self.new_statement_item(P_INSTANCE_OF, "Q5"))
                 }
-                "https://id.kb.se/vocab/Person" => ret.add_claim(self.new_statement_item(31, "Q5")),
+                "https://id.kb.se/vocab/Person" => {
+                    ret.add_claim(self.new_statement_item(P_INSTANCE_OF, "Q5"))
+                }
                 "https://d-nb.info/standards/elementset/gnd#DifferentiatedPerson" => {
-                    ret.add_claim(self.new_statement_item(31, "Q5"))
+                    ret.add_claim(self.new_statement_item(P_INSTANCE_OF, "Q5"))
                 }
-                s => ret.add_prop_text(ExternalId::new(31, s)),
+                s => ret.add_prop_text(ExternalId::new(P_INSTANCE_OF, s)),
             };
         }
         Ok(())
@@ -705,7 +710,7 @@ pub trait ExternalImporter: Send + Sync {
 
     fn add_language(&self, ret: &mut MetaItem) -> Result<()> {
         for s in self.triples_literals("http://www.rdaregistry.info/Elements/a/P50102")? {
-            let _ = ret.add_prop_text(ExternalId::new(1412, &s));
+            let _ = ret.add_prop_text(ExternalId::new(P_LANGUAGES, &s));
         }
         Ok(())
     }
@@ -715,9 +720,9 @@ pub trait ExternalImporter: Send + Sync {
         mi.cleanup();
         for ext_id in &mi.prop_text.to_owned() {
             let p31s = match ext_id.property() {
-                1412 => vec!["Q34770"],          // Language spoken or written => laguage
-                131 => vec!["Q1549591", "Q515"], // Located in => city
-                27 => vec!["Q6256"],             // Nationality
+                P_LANGUAGES => vec!["Q34770"], // Language spoken or written => laguage
+                P_LOCATED_IN => vec!["Q1549591", "Q515"], // Located in => city
+                P_COUNTRY_OF_CITIZENSHIP => vec!["Q6256"], // Nationality
                 _ => {
                     new_prop_text.push(ext_id.to_owned());
                     continue;
@@ -758,7 +763,7 @@ pub trait ExternalImporter: Send + Sync {
             client.post(url).json(&payload).send().await?.json().await?;
         if let Some(viaf_id) = response["queryResult"]["viafID"].as_i64() {
             let viaf_id = viaf_id.to_string();
-            ret.add_claim(self.new_statement_string(214, &viaf_id));
+            ret.add_claim(self.new_statement_string(P_VIAF, &viaf_id));
         }
         Ok(())
     }

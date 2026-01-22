@@ -1,5 +1,6 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -19,20 +20,20 @@ pub struct LOC {
 #[async_trait]
 impl ExternalImporter for LOC {
     fn my_property(&self) -> usize {
-        244
+        P_LOC
     }
     fn my_stated_in(&self) -> &str {
         "Q13219454"
     }
     fn primary_language(&self) -> String {
-        "en".to_string()
+        String::from("en")
     }
     fn get_key_url(&self, _key: &str) -> String {
         format!("http://id.loc.gov/authorities/names/{}", self.id)
     }
 
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
     fn graph(&self) -> &FastGraph {
         &self.graph

@@ -1,6 +1,7 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
@@ -22,17 +23,14 @@ pub struct ISNI {
     html: String,
 }
 
-unsafe impl Send for ISNI {}
-unsafe impl Sync for ISNI {}
-
 #[async_trait]
 impl ExternalImporter for ISNI {
     fn my_property(&self) -> usize {
-        213
+        P_ISNI
     }
 
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
 
     fn my_stated_in(&self) -> &str {
@@ -44,7 +42,7 @@ impl ExternalImporter for ISNI {
     }
 
     fn primary_language(&self) -> String {
-        "en".to_string()
+        String::from("en")
     }
 
     fn get_key_url(&self, _key: &str) -> String {
@@ -100,8 +98,8 @@ impl ISNI {
     fn parse_dates(&self, ret: &mut MetaItem) -> Option<()> {
         let dates = RE_BORN_DIED.captures(&self.html)?.get(1)?;
         let (born, died) = dates.as_str().split_once('-')?;
-        self.add_year_from_string(ret, 569, born);
-        self.add_year_from_string(ret, 570, died);
+        self.add_year_from_string(ret, P_DATE_OF_BIRTH, born);
+        self.add_year_from_string(ret, P_DATE_OF_DEATH, died);
         None
     }
 
@@ -116,21 +114,21 @@ impl ISNI {
     fn parse_external_ids(&self, ret: &mut MetaItem) {
         if let Some(captures) = RE_VIAF.captures(&self.html) {
             if let Some(id) = captures.get(1) {
-                let extid = ExternalId::new(214, id.as_str());
+                let extid = ExternalId::new(P_VIAF, id.as_str());
                 ret.add_claim(self.new_statement_string(extid.property(), extid.id()));
             }
         }
 
         if let Some(captures) = RE_GND.captures(&self.html) {
             if let Some(id) = captures.get(1) {
-                let extid = ExternalId::new(227, id.as_str());
+                let extid = ExternalId::new(P_GND, id.as_str());
                 ret.add_claim(self.new_statement_string(extid.property(), extid.id()));
             }
         }
 
         if let Some(captures) = RE_LOC.captures(&self.html) {
             if let Some(id) = captures.get(1) {
-                let extid = ExternalId::new(244, id.as_str());
+                let extid = ExternalId::new(P_LOC, id.as_str());
                 ret.add_claim(self.new_statement_string(extid.property(), extid.id()));
             }
         }
@@ -156,7 +154,7 @@ mod tests {
     #[tokio::test]
     async fn test_my_property() {
         let isni = ISNI::new(TEST_ID).await.unwrap();
-        assert_eq!(isni.my_property(), 213);
+        assert_eq!(isni.my_property(), P_ISNI);
     }
 
     #[tokio::test]
@@ -197,6 +195,6 @@ mod tests {
         isni.try_viaf(&mut mi).await.unwrap();
         let ext_ids = mi.get_external_ids();
         assert_eq!(ext_ids.len(), 1); // VIAF
-        assert_eq!(ext_ids[0], ExternalId::new(214, "27063124"));
+        assert_eq!(ext_ids[0], ExternalId::new(P_VIAF, "27063124"));
     }
 }

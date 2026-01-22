@@ -1,6 +1,7 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use crate::utility::Utility;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -15,26 +16,23 @@ pub struct SELIBR {
     graph: FastGraph,
 }
 
-unsafe impl Send for SELIBR {}
-unsafe impl Sync for SELIBR {}
-
 #[async_trait]
 impl ExternalImporter for SELIBR {
     fn my_property(&self) -> usize {
-        906
+        P_SELIBR
     }
     fn my_stated_in(&self) -> &str {
         "Q1798125"
     }
     fn primary_language(&self) -> String {
-        "sv".to_string()
+        String::from("sv")
     }
     fn get_key_url(&self, _key: &str) -> String {
         format!("{}#it", self.key)
     }
 
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
     fn graph(&self) -> &FastGraph {
         &self.graph
@@ -48,7 +46,7 @@ impl ExternalImporter for SELIBR {
         self.add_the_usual(&mut ret).await?;
 
         for url in self.triples_iris("https://id.kb.se/vocab/nationality")? {
-            ret.add_prop_text(ExternalId::new(27, &url));
+            ret.add_prop_text(ExternalId::new(P_COUNTRY_OF_CITIZENSHIP, &url));
         }
 
         self.try_rescue_prop_text(&mut ret).await?;
@@ -81,7 +79,7 @@ impl SELIBR {
             &format!("http://libris.kb.se/auth/{id}"),
         )?;
         match ids.first() {
-            Some(first_id) => ret.key = first_id.to_owned(),
+            Some(first_id) => ret.key = first_id.clone(),
             None => return Err(anyhow!("could not find main key for '{id}'")),
         }
 
@@ -103,7 +101,7 @@ mod tests {
     #[tokio::test]
     async fn test_my_property() {
         let selibr = SELIBR::new(TEST_ID).await.unwrap();
-        assert_eq!(selibr.my_property(), 906);
+        assert_eq!(selibr.my_property(), P_SELIBR);
     }
 
     #[tokio::test]

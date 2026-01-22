@@ -1,6 +1,7 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -23,17 +24,14 @@ pub struct GND {
     graph: FastGraph,
 }
 
-unsafe impl Send for GND {}
-unsafe impl Sync for GND {}
-
 #[async_trait]
 impl ExternalImporter for GND {
     fn my_property(&self) -> usize {
-        227
+        P_GND
     }
 
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
 
     fn my_stated_in(&self) -> &str {
@@ -45,7 +43,7 @@ impl ExternalImporter for GND {
     }
 
     fn primary_language(&self) -> String {
-        "de".to_string()
+        String::from("de")
     }
 
     fn get_key_url(&self, _key: &str) -> String {
@@ -81,9 +79,11 @@ impl ExternalImporter for GND {
         )? {
             let country_code = RE_COUNTRY.replace(&url, "${1}");
             if country_code != url {
-                let ext_id = ExternalId::new(297, &country_code);
+                let ext_id = ExternalId::new(P_ISO_3166_1_ALPHA_2, &country_code);
                 let _ = match ext_id.get_item_for_external_id_value().await {
-                    Some(item) => ret.add_claim(self.new_statement_item(27, &item)),
+                    Some(item) => {
+                        ret.add_claim(self.new_statement_item(P_COUNTRY_OF_CITIZENSHIP, &item))
+                    }
                     None => ret.add_prop_text(ext_id),
                 };
             }
@@ -93,11 +93,11 @@ impl ExternalImporter for GND {
         let birth_death = [
             (
                 "https://d-nb.info/standards/elementset/gnd#dateOfBirth",
-                569,
+                P_DATE_OF_BIRTH,
             ),
             (
                 "https://d-nb.info/standards/elementset/gnd#dateOfDeath",
-                570,
+                P_DATE_OF_DEATH,
             ),
         ];
         for bd in birth_death {
@@ -115,31 +115,31 @@ impl ExternalImporter for GND {
         let key_prop = [
             (
                 "https://d-nb.info/standards/elementset/gnd#placeOfBirth",
-                19,
+                P_PLACE_OF_BIRTH,
             ),
             (
                 "https://d-nb.info/standards/elementset/gnd#placeOfDeath",
-                20,
+                P_PLACE_OF_DEATH,
             ),
             (
                 "https://d-nb.info/standards/elementset/agrelon#hasChild",
-                40,
+                P_CHILD,
             ),
             (
                 "https://d-nb.info/standards/elementset/agrelon#hasSibling",
-                3373,
+                P_SIBLING,
             ),
             (
                 "https://d-nb.info/standards/elementset/gnd#fieldOfStudy",
-                101,
+                P_FIELD_OF_WORK,
             ),
             (
                 "https://d-nb.info/standards/elementset/gnd#professionOrOccupation",
-                106,
+                P_OCCUPATION,
             ),
             (
                 "https://d-nb.info/standards/elementset/gnd#placeOfActivity",
-                937,
+                P_WORK_LOCATION,
             ),
             // TODO parent
         ];
@@ -181,17 +181,22 @@ impl GND {
                 if let Some(year) = year.get(1) {
                     if let Some((time, precision)) = ret.parse_date(year.as_str()) {
                         ret.add_claim(self.new_statement_time(1317, &time, precision));
+                        // P1317 floruit
                     }
                 }
             } else if let Some(result) = RE_YEAR_RANGE.captures(lit) {
                 if let Some(start_year) = result.get(1) {
                     if let Some((time, precision)) = ret.parse_date(start_year.as_str()) {
-                        ret.add_claim(self.new_statement_time(2031, &time, precision));
+                        ret.add_claim(self.new_statement_time(
+                            P_WORK_PERIOD_START,
+                            &time,
+                            precision,
+                        ));
                     }
                 }
                 if let Some(end_year) = result.get(2) {
                     if let Some((time, precision)) = ret.parse_date(end_year.as_str()) {
-                        ret.add_claim(self.new_statement_time(2032, &time, precision));
+                        ret.add_claim(self.new_statement_time(P_WORK_PERIOD_END, &time, precision));
                     }
                 }
             }
@@ -247,7 +252,7 @@ impl GND {
             "https://d-nb.info/standards/elementset/gnd#gndIdentifier",
         )?;
         if ids.len() == 1 {
-            self.id = ids[0].to_owned();
+            self.id = ids[0].clone();
         }
         Ok(())
     }
@@ -316,7 +321,7 @@ mod tests {
     #[tokio::test]
     async fn test_my_property() {
         let gnd = get_test_gnd().await.unwrap();
-        assert_eq!(gnd.my_property(), 227);
+        assert_eq!(gnd.my_property(), P_GND);
     }
 
     #[tokio::test]

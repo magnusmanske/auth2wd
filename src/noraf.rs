@@ -1,5 +1,6 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
@@ -15,17 +16,14 @@ pub struct NORAF {
     j: Value,
 }
 
-unsafe impl Send for NORAF {}
-unsafe impl Sync for NORAF {}
-
 #[async_trait]
 impl ExternalImporter for NORAF {
     fn my_property(&self) -> usize {
-        1015
+        P_NORAF
     }
 
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
 
     fn my_stated_in(&self) -> &str {
@@ -40,7 +38,7 @@ impl ExternalImporter for NORAF {
     }
 
     fn primary_language(&self) -> String {
-        "no".to_string()
+        String::from("no")
     }
 
     fn get_key_url(&self, _key: &str) -> String {
@@ -113,11 +111,11 @@ impl NORAF {
             let born = ret.parse_date(caps.get(1).unwrap().as_str()); // unwrap is safe
             let died = ret.parse_date(caps.get(2).unwrap().as_str()); // unwrap is safe
             if let Some((time, precision)) = born {
-                let statement = self.new_statement_time(569, &time, precision);
+                let statement = self.new_statement_time(P_DATE_OF_BIRTH, &time, precision);
                 ret.item.claims_mut().push(statement);
             }
             if let Some((time, precision)) = died {
-                let statement = self.new_statement_time(570, &time, precision);
+                let statement = self.new_statement_time(P_DATE_OF_DEATH, &time, precision);
                 ret.item.claims_mut().push(statement);
             }
         }

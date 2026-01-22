@@ -94,9 +94,6 @@ pub struct SupportedProperty {
     demo_name: String,
 }
 
-unsafe impl Send for SupportedProperty {}
-unsafe impl Sync for SupportedProperty {}
-
 impl SupportedProperty {
     fn new(
         property: usize,

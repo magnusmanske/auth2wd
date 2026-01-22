@@ -1,6 +1,7 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use crate::utility::Utility;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -23,17 +24,14 @@ pub struct BNF {
     graph: FastGraph,
 }
 
-unsafe impl Send for BNF {}
-unsafe impl Sync for BNF {}
-
 #[async_trait]
 impl ExternalImporter for BNF {
     fn my_property(&self) -> usize {
-        268
+        P_BNF
     }
 
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
 
     fn my_stated_in(&self) -> &str {
@@ -45,7 +43,7 @@ impl ExternalImporter for BNF {
     }
 
     fn primary_language(&self) -> String {
-        "fr".to_string()
+        String::from("fr")
     }
 
     fn get_key_url(&self, _key: &str) -> String {
@@ -62,8 +60,14 @@ impl ExternalImporter for BNF {
 
         // Born/died
         let birth_death_rdvocab = [
-            ("http://rdvocab.info/ElementsGr2/dateOfBirth", 569),
-            ("http://rdvocab.info/ElementsGr2/dateOfDeath", 570),
+            (
+                "http://rdvocab.info/ElementsGr2/dateOfBirth",
+                P_DATE_OF_BIRTH,
+            ),
+            (
+                "http://rdvocab.info/ElementsGr2/dateOfDeath",
+                P_DATE_OF_DEATH,
+            ),
         ];
         for bd in birth_death_rdvocab {
             for s in self.triples_subject_iris(&self.get_id_url(), bd.0)? {
@@ -77,8 +81,8 @@ impl ExternalImporter for BNF {
         }
 
         let birth_death_vocab = [
-            ("http://vocab.org/bio/0.1/birth", 569),
-            ("http://vocab.org/bio/0.1/death", 570),
+            ("http://vocab.org/bio/0.1/birth", P_DATE_OF_BIRTH),
+            ("http://vocab.org/bio/0.1/death", P_DATE_OF_DEATH),
         ];
         for bd in birth_death_vocab {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
@@ -92,8 +96,14 @@ impl ExternalImporter for BNF {
         }
 
         let born_died_in = [
-            ("http://rdvocab.info/ElementsGr2/placeOfBirth", 19),
-            ("http://rdvocab.info/ElementsGr2/placeOfDeath", 20),
+            (
+                "http://rdvocab.info/ElementsGr2/placeOfBirth",
+                P_PLACE_OF_BIRTH,
+            ),
+            (
+                "http://rdvocab.info/ElementsGr2/placeOfDeath",
+                P_PLACE_OF_DEATH,
+            ),
         ];
         for (key, prop) in born_died_in {
             for s in self.triples_subject_literals(&self.get_id_url(), key)? {
@@ -153,11 +163,11 @@ mod tests {
         assert_eq!(meta_item.prop_text.len(), 2);
         assert_eq!(
             meta_item.prop_text[0],
-            ExternalId::new(19, "Rivesaltes (Pyrénées-Orientales)")
+            ExternalId::new(P_PLACE_OF_BIRTH, "Rivesaltes (Pyrénées-Orientales)")
         );
         assert_eq!(
             meta_item.prop_text[1],
-            ExternalId::new(20, "Grenoble (Isère)")
+            ExternalId::new(P_PLACE_OF_DEATH, "Grenoble (Isère)")
         );
 
         // println!("{:?}", meta_item.prop_text);
@@ -171,7 +181,7 @@ mod tests {
     #[tokio::test]
     async fn test_my_property() {
         let bnf = BNF::new(TEST_ID).await.unwrap();
-        assert_eq!(bnf.my_property(), 268);
+        assert_eq!(bnf.my_property(), P_BNF);
     }
 
     #[tokio::test]

@@ -1,5 +1,6 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use crate::utility::Utility;
 use crate::ExternalId;
 use anyhow::{anyhow, Result};
@@ -23,25 +24,22 @@ pub struct INaturalist {
     json: Value,
 }
 
-unsafe impl Send for INaturalist {}
-unsafe impl Sync for INaturalist {}
-
 #[async_trait]
 impl ExternalImporter for INaturalist {
     fn my_property(&self) -> usize {
-        3151 // iNaturalist taxon ID
+        P_INATURALIST_TAXON
     }
     fn my_stated_in(&self) -> &str {
         "Q16958215"
     }
     fn primary_language(&self) -> String {
-        "en".to_string()
+        String::from("en")
     }
     fn get_key_url(&self, _key: &str) -> String {
         format!("https://www.inaturalist.org/taxa/{}", self.id)
     }
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
 
     async fn run(&self) -> Result<MetaItem> {
@@ -82,9 +80,12 @@ impl INaturalist {
 
     async fn add_parent_taxon(&self, ret: &mut MetaItem) -> Option<()> {
         let parent_id = self.json.get("parent_id")?.as_u64()?;
-        let query = format!("haswbstatement:P3151={parent_id} haswbstatement:P31=Q16521");
+        let query = format!(
+            "haswbstatement:P{}={parent_id} haswbstatement:P{}=Q16521",
+            P_INATURALIST_TAXON, P_INSTANCE_OF
+        );
         let item = ExternalId::search_wikidata_single_item(&query).await?;
-        ret.add_claim(self.new_statement_item(171, &item));
+        ret.add_claim(self.new_statement_item(P_PARENT_TAXON, &item));
         Some(())
     }
 
@@ -115,7 +116,7 @@ impl INaturalist {
             .or_else(|| photo.get("large_url")?.as_str())
             .or_else(|| photo.get("medium_url")?.as_str())?;
         let attribution = photo.get("attribution")?.as_str()?;
-        let mut statement = self.new_statement_string(4765, image_url);
+        let mut statement = self.new_statement_string(P_COMMONS_COMPATIBLE_IMAGE_URL, image_url);
         statement.add_qualifier_snak(Snak::new_item("P275", license_item));
         statement.add_qualifier_snak(Snak::new_string("P2093", attribution));
         statement.add_qualifier_snak(Snak::new_url("P2699", image_url));
@@ -130,19 +131,19 @@ impl INaturalist {
         let is_extinct = self.json.get("extinct")?.as_bool()?;
         if is_extinct {
             // Extinct taxon
-            ret.add_claim(self.new_statement_item(31, "Q98961713"));
+            ret.add_claim(self.new_statement_item(P_INSTANCE_OF, "Q98961713"));
         } else {
             // Taxon
-            ret.add_claim(self.new_statement_item(31, "Q16521"));
+            ret.add_claim(self.new_statement_item(P_INSTANCE_OF, "Q16521"));
         }
         Some(())
     }
 
     fn add_taxon_name_and_labels(&self, ret: &mut MetaItem) -> Option<()> {
         let name = self.json.get("name")?.as_str()?;
-        ret.add_claim(self.new_statement_string(225, name));
+        ret.add_claim(self.new_statement_string(P_TAXON_NAME, name));
         for lang in TAXON_LABEL_LANGUAGES {
-            let label = LocaleString::new(lang.to_string(), name.to_string());
+            let label = LocaleString::new(*lang, name);
             ret.item.labels_mut().push(label);
         }
         Some(())
@@ -151,7 +152,7 @@ impl INaturalist {
     fn add_taxon_rank(&self, ret: &mut MetaItem) -> Option<()> {
         let rank = self.json.get("rank")?.as_str()?.to_lowercase();
         let item = TAXON_MAP.get(rank.as_str())?;
-        ret.add_claim(self.new_statement_item(105, item));
+        ret.add_claim(self.new_statement_item(P_TAXON_RANK, item));
         Some(())
     }
 
@@ -160,7 +161,7 @@ impl INaturalist {
             .or_else(|| self.json.get("preferred_common_name")?.as_str())
             .or_else(|| self.json.get("english_common_name")?.as_str())?;
         ret.add_claim(self.new_statement_monolingual_text(
-            1843,
+            P_TAXON_COMMON_NAME,
             &self.primary_language(),
             common_name,
         ));
@@ -187,13 +188,15 @@ impl INaturalist {
                     if let Some(captures) = RE_IUCN_REDLIST_URL.captures(url) {
                         if let Some(s) = captures.get(1) {
                             let iucn_species_id = s.as_str();
-                            ret.add_claim(self.new_statement_string(627, iucn_species_id));
+                            ret.add_claim(
+                                self.new_statement_string(P_IUCN_TAXON_ID, iucn_species_id),
+                            );
                         }
                     }
                 }
                 // Get IUCN Red List status
                 let item = IUCN_REDLIST.get(status.as_str())?;
-                ret.add_claim(self.new_statement_item(141, item));
+                ret.add_claim(self.new_statement_item(P_IUCN_CONSERVATION_STATUS, item));
             }
             // TODO NatureServe https://www.wikidata.org/wiki/Property:P3648
             _other => {} // Ignore
@@ -216,7 +219,7 @@ mod tests {
     #[tokio::test]
     async fn test_my_property() {
         let inaturalist = INaturalist::new(TEST_ID).await.unwrap();
-        assert_eq!(inaturalist.my_property(), 3151);
+        assert_eq!(inaturalist.my_property(), P_INATURALIST_TAXON);
     }
 
     #[tokio::test]

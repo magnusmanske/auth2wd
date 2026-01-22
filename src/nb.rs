@@ -1,6 +1,7 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::*;
 use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -52,17 +53,14 @@ pub struct NB {
     data: Vec<Triple>,
 }
 
-unsafe impl Send for NB {}
-unsafe impl Sync for NB {}
-
 #[async_trait]
 impl ExternalImporter for NB {
     fn my_property(&self) -> usize {
-        1006
+        P_NB
     }
 
     fn my_id(&self) -> String {
-        self.id.to_owned()
+        self.id.clone()
     }
 
     fn my_stated_in(&self) -> &str {
@@ -74,7 +72,7 @@ impl ExternalImporter for NB {
     }
 
     fn primary_language(&self) -> String {
-        "nl".to_string()
+        String::from("nl")
     }
 
     fn get_key_url(&self, _key: &str) -> String {
@@ -99,7 +97,7 @@ impl ExternalImporter for NB {
             if triple.is_named_node("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
                 && triple.o.value == "http://schema.org/Person"
             {
-                ret.add_claim(self.new_statement_item(31, "Q5"));
+                ret.add_claim(self.new_statement_item(P_INSTANCE_OF, "Q5"));
             }
             if triple.is_named_node("http://schema.org/alternateName") {
                 ret.item
@@ -117,22 +115,22 @@ impl ExternalImporter for NB {
                     .push(LocaleString::new(&language, &triple.o.value));
             }
             if triple.is_named_node("http://schema.org/nationality") {
-                ret.add_prop_text(ExternalId::new(27, &triple.o.value));
+                ret.add_prop_text(ExternalId::new(P_COUNTRY_OF_CITIZENSHIP, &triple.o.value));
             }
             if triple.is_named_node("http://schema.org/birthDate") {
                 match ret.parse_date(&triple.o.value) {
                     Some((time, precision)) => {
-                        ret.add_claim(self.new_statement_time(569, &time, precision))
+                        ret.add_claim(self.new_statement_time(P_DATE_OF_BIRTH, &time, precision))
                     }
-                    None => ret.add_prop_text(ExternalId::new(569, &triple.o.value)),
+                    None => ret.add_prop_text(ExternalId::new(P_DATE_OF_BIRTH, &triple.o.value)),
                 };
             }
             if triple.is_named_node("http://schema.org/deathDate") {
                 match ret.parse_date(&triple.o.value) {
                     Some((time, precision)) => {
-                        ret.add_claim(self.new_statement_time(570, &time, precision))
+                        ret.add_claim(self.new_statement_time(P_DATE_OF_DEATH, &time, precision))
                     }
-                    None => ret.add_prop_text(ExternalId::new(570, &triple.o.value)),
+                    None => ret.add_prop_text(ExternalId::new(P_DATE_OF_DEATH, &triple.o.value)),
                 };
             }
             if triple.is_named_node("http://schema.org/sameAs")
@@ -188,7 +186,7 @@ mod tests {
     #[tokio::test]
     async fn test_my_property() {
         let nb = NB::new(TEST_ID).await.unwrap();
-        assert_eq!(nb.my_property(), 1006);
+        assert_eq!(nb.my_property(), P_NB);
     }
 
     #[tokio::test]
