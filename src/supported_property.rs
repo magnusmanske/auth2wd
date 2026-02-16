@@ -47,6 +47,13 @@ lazy_static! {
                 Some("Rainer Maria Rilke".into()),
             ),
             SupportedProperty::new(
+                1207,
+                "NUKAT",
+                "NUKAT Center of Warsaw University Library",
+                "n96637319",
+                Some("Al Gore".into()),
+            ),
+            SupportedProperty::new(
                 1006,
                 "NB",
                 "Nationale Thesaurus voor Auteurs ID",
@@ -127,6 +134,7 @@ impl SupportedProperty {
             950 => Box::new(crate::bne::BNE::new(id).await?),
             1006 => Box::new(crate::nb::NB::new(id).await?),
             1015 => Box::new(crate::noraf::NORAF::new(id).await?),
+            1207 => Box::new(crate::nukat::NUKAT::new(id).await?),
             3151 => Box::new(crate::inaturalist::INaturalist::new(id).await?),
             10832 => Box::new(crate::worldcat::WorldCat::new(id).await?),
             _ => return Err(anyhow!("no generator for property: 'P{}'", self.property)),

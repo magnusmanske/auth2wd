@@ -154,5 +154,8 @@ pub const P_FILMPORTAL: usize = 2639;
 // Persée author ID
 pub const P_PERSEE: usize = 2732;
 
+// NUKAT ID
+pub const P_NUKAT: usize = 1207;
+
 // National Library of Hungary ID
 pub const P_NSZL: usize = 3133;
