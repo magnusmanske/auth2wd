@@ -431,7 +431,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 cargo run -- combinator P950 XX990809
 
 TODO:
-P7545	askArt person ID (has JSON in HTML source)
+P7545	askArt person ID (has JSON in HTML source) DOES NOT WORK, BEHIND CLOUDFLARE
 
 https://vokabular.bs.no/bibbi/nb/page/22778
 
