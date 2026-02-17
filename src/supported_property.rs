@@ -21,6 +21,13 @@ lazy_static! {
             ),
             SupportedProperty::new(227, "GND", "Deutsche Nationalbibliothek", "118523813", None),
             SupportedProperty::new(244, "LoC", "Library of Congress", "n78095637", None),
+            SupportedProperty::new(
+                349,
+                "NDL",
+                "National Diet Library",
+                "00054222",
+                Some("Natsume Soseki".into()),
+            ),
             SupportedProperty::new(245, "ULAN", "Union List of Artist Names", "500228559", None),
             SupportedProperty::new(
                 268,
@@ -125,6 +132,7 @@ impl SupportedProperty {
             227 => Box::new(crate::gnd::GND::new(id).await?),
             244 => Box::new(crate::loc::LOC::new(id).await?),
             245 => Box::new(crate::ulan::ULAN::new(id).await?),
+            349 => Box::new(crate::ndl::NDL::new(id).await?),
             268 => Box::new(crate::bnf::BNF::new(id).await?),
             269 => Box::new(crate::id_ref::IdRef::new(id).await?),
             685 => Box::new(crate::ncbi_taxonomy::NCBItaxonomy::new(id).await?),
