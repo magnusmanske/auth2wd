@@ -42,7 +42,7 @@ lazy_static! {
             (Regex::new(r"^https?://orcid.org/(\d{4}-\d{4}-\d{4}-\d{3}[0-9X])$").unwrap(),String::from("${1}"),P_ORCID),
             (Regex::new(r"^https?://www.orcid.org/(\d{4}-\d{4}-\d{4}-\d{3}[0-9X])$").unwrap(),String::from("${1}"),P_ORCID),
             (Regex::new(r"^https?://libris.kb.se/resource/auth/([1-9]\d{4,5})$").unwrap(),String::from("${1}"),P_SELIBR),
-            (Regex::new(r"^https?://datos.bne.es/resource/(.+?)$").unwrap(),String::from("${1}"),P_BNE),
+            (Regex::new(r"^https?://datos.bne.es/resource/(XX\d+)$").unwrap(),String::from("${1}"),P_BNE),
             (Regex::new(r"^https?://data.bibsys.no/data/notrbib/authorityentry/x([1-9]\d*)$").unwrap(),String::from("${1}"),P_NORAF),
             (Regex::new(r"^https?://authority.bibsys.no/authority/rest/authorities/html/([1-9]\d*)$").unwrap(),String::from("${1}"),P_NORAF),
             (Regex::new(r"^https?://www.scopus.com/authid/detail.uri\?authorId=([1-9]\d{9,10}).*$").unwrap(),String::from("${1}"),P_SCOPUS),
