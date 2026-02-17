@@ -1,4 +1,5 @@
 use crate::external_importer::*;
+use crate::properties::*;
 use anyhow::Result;
 use std::future::Future;
 use std::pin::Pin;
@@ -7,13 +8,21 @@ use std::pin::Pin;
 type ImporterFactory =
     fn(&str) -> Pin<Box<dyn Future<Output = Result<Box<dyn ExternalImporter>>> + Send + '_>>;
 
-/// Macro to create an `ImporterFactory` for a given importer type.
+/// Macro to create a `SupportedProperty` entry from a type and its metadata.
+/// The property number is derived from the type's associated `P_*` constant via `$prop`.
 /// The type must have `pub async fn new(id: &str) -> Result<Self>` and implement `ExternalImporter`.
-macro_rules! importer_factory {
-    ($type:ty) => {
-        (|id: &str| -> Pin<Box<dyn Future<Output = Result<Box<dyn ExternalImporter>>> + Send + '_>> {
-            Box::pin(async move { Ok(Box::new(<$type>::new(id).await?) as Box<dyn ExternalImporter>) })
-        }) as ImporterFactory
+macro_rules! supported_property {
+    ($prop:expr, $type:ty, $name:expr, $source:expr, $demo_id:expr, $demo_name:expr) => {
+        SupportedProperty::new(
+            $prop,
+            $name,
+            $source,
+            $demo_id,
+            $demo_name,
+            (|id: &str| -> Pin<Box<dyn Future<Output = Result<Box<dyn ExternalImporter>>> + Send + '_>> {
+                Box::pin(async move { Ok(Box::new(<$type>::new(id).await?) as Box<dyn ExternalImporter>) })
+            }) as ImporterFactory,
+        )
     };
 }
 
@@ -21,108 +30,24 @@ lazy_static! {
     /// Examples of all supported properties
     pub static ref SUPPORTED_PROPERTIES: Vec<SupportedProperty> = {
         vec![
-            SupportedProperty::new(
-                213,
-                "ISNI",
-                "International Standard Name Identifier",
-                "0000000121251077",
-                None,
-                importer_factory!(crate::isni::ISNI),
-            ),
-            SupportedProperty::new(
-                214,
-                "VIAF",
-                "Virtual International Authority File",
-                "27063124",
-                None,
-                importer_factory!(crate::viaf::VIAF),
-            ),
-            SupportedProperty::new(227, "GND", "Deutsche Nationalbibliothek", "118523813", None, importer_factory!(crate::gnd::GND)),
-            SupportedProperty::new(244, "LoC", "Library of Congress", "n78095637", None, importer_factory!(crate::loc::LOC)),
-            SupportedProperty::new(
-                349,
-                "NDL",
-                "National Diet Library",
-                "00054222",
-                Some("Natsume Soseki".into()),
-                importer_factory!(crate::ndl::NDL),
-            ),
-            SupportedProperty::new(245, "ULAN", "Union List of Artist Names", "500228559", None, importer_factory!(crate::ulan::ULAN)),
-            SupportedProperty::new(
-                268,
-                "BnF",
-                "Bibliothèque nationale de France",
-                "11898689q",
-                None,
-                importer_factory!(crate::bnf::BNF),
-            ),
-            SupportedProperty::new(269, "IdRef", "IdRef/SUDOC", "026812304", None, importer_factory!(crate::id_ref::IdRef)),
-            SupportedProperty::new(662, "PubChem CID", "PubChem Compound ID", "22027196", Some("4-[1-(4-Hydroxyphenyl)heptyl]phenol".to_string()), importer_factory!(crate::pubchem_cid::PubChemCid)),
-            SupportedProperty::new(906, "SELIBR", "National Library of Sweden", "231727", None, importer_factory!(crate::selibr::SELIBR)),
-            SupportedProperty::new(
-                950,
-                "BNE",
-                "Biblioteca Nacional de España",
-                "XX990809",
-                None,
-                importer_factory!(crate::bne::BNE),
-            ),
-            SupportedProperty::new(
-                1015,
-                "NORAF",
-                "Norwegian Authority File",
-                "90053126",
-                Some("Rainer Maria Rilke".into()),
-                importer_factory!(crate::noraf::NORAF),
-            ),
-            SupportedProperty::new(
-                1207,
-                "NUKAT",
-                "NUKAT Center of Warsaw University Library",
-                "n96637319",
-                Some("Al Gore".into()),
-                importer_factory!(crate::nukat::NUKAT),
-            ),
-            SupportedProperty::new(
-                1006,
-                "NB",
-                "Nationale Thesaurus voor Auteurs ID",
-                "068364229",
-                None,
-                importer_factory!(crate::nb::NB),
-            ),
-            SupportedProperty::new(
-                10832,
-                "WorldCat",
-                "WorldCat Identities",
-                "E39PBJd87VvgDDTV6RxBYm6qcP",
-                None,
-                importer_factory!(crate::worldcat::WorldCat),
-            ),
-            SupportedProperty::new(
-                3151,
-                "INaturalist",
-                "INaturalist taxon ID",
-                "890",
-                Some("Ruffed Grouse".to_string()),
-                importer_factory!(crate::inaturalist::INaturalist),
-            ),
-            SupportedProperty::new(
-                685,
-                "NCBI taxonomy",
-                "NCBI taxon ID",
-                "1747344",
-                Some("Priocnessus nuperus".to_string()),
-                importer_factory!(crate::ncbi_taxonomy::NCBItaxonomy),
-            ),
-            SupportedProperty::new(
-                846,
-                "GBIF taxon",
-                "GBIF taxon ID",
-                "5141342",
-                Some("Battus philenor".to_string()),
-                importer_factory!(crate::gbif_taxon::GBIFtaxon),
-            ),
+            supported_property!(P_ISNI, crate::isni::ISNI, "ISNI", "International Standard Name Identifier", "0000000121251077", None),
+            supported_property!(P_VIAF, crate::viaf::VIAF, "VIAF", "Virtual International Authority File", "27063124", None),
+            supported_property!(P_GND, crate::gnd::GND, "GND", "Deutsche Nationalbibliothek", "118523813", None),
+            supported_property!(P_LOC, crate::loc::LOC, "LoC", "Library of Congress", "n78095637", None),
+            supported_property!(P_NDL, crate::ndl::NDL, "NDL", "National Diet Library", "00054222", Some("Natsume Soseki".into())),
+            supported_property!(P_ULAN, crate::ulan::ULAN, "ULAN", "Union List of Artist Names", "500228559", None),
+            supported_property!(P_BNF, crate::bnf::BNF, "BnF", "Bibliothèque nationale de France", "11898689q", None),
+            supported_property!(P_IDREF, crate::id_ref::IdRef, "IdRef", "IdRef/SUDOC", "026812304", None),
+            supported_property!(P_PUBCHEM_CID, crate::pubchem_cid::PubChemCid, "PubChem CID", "PubChem Compound ID", "22027196", Some("4-[1-(4-Hydroxyphenyl)heptyl]phenol".to_string())),
+            supported_property!(P_SELIBR, crate::selibr::SELIBR, "SELIBR", "National Library of Sweden", "231727", None),
+            supported_property!(P_BNE, crate::bne::BNE, "BNE", "Biblioteca Nacional de España", "XX990809", None),
+            supported_property!(P_NORAF, crate::noraf::NORAF, "NORAF", "Norwegian Authority File", "90053126", Some("Rainer Maria Rilke".into())),
+            supported_property!(P_NUKAT, crate::nukat::NUKAT, "NUKAT", "NUKAT Center of Warsaw University Library", "n96637319", Some("Al Gore".into())),
+            supported_property!(P_NB, crate::nb::NB, "NB", "Nationale Thesaurus voor Auteurs ID", "068364229", None),
+            supported_property!(P_WORLDCAT, crate::worldcat::WorldCat, "WorldCat", "WorldCat Identities", "E39PBJd87VvgDDTV6RxBYm6qcP", None),
+            supported_property!(P_INATURALIST_TAXON, crate::inaturalist::INaturalist, "INaturalist", "INaturalist taxon ID", "890", Some("Ruffed Grouse".to_string())),
+            supported_property!(P_NCBI_TAXONOMY, crate::ncbi_taxonomy::NCBItaxonomy, "NCBI taxonomy", "NCBI taxon ID", "1747344", Some("Priocnessus nuperus".to_string())),
+            supported_property!(P_GBIF_TAXON, crate::gbif_taxon::GBIFtaxon, "GBIF taxon", "GBIF taxon ID", "5141342", Some("Battus philenor".to_string())),
         ]
     };
 }
