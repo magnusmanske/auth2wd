@@ -136,7 +136,6 @@ impl Combinator {
         }
         for (_id, item) in self.items.iter() {
             let diff = base_item.merge(item);
-            diff.apply(&mut base_item.item);
             merge_diff.extend(&diff);
         }
         Some(merge_diff)
