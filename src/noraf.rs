@@ -112,11 +112,11 @@ impl NORAF {
             let died = ret.parse_date(caps.get(2).unwrap().as_str()); // unwrap is safe
             if let Some((time, precision)) = born {
                 let statement = self.new_statement_time(P_DATE_OF_BIRTH, &time, precision);
-                ret.item.claims_mut().push(statement);
+                ret.add_claim(statement);
             }
             if let Some((time, precision)) = died {
                 let statement = self.new_statement_time(P_DATE_OF_DEATH, &time, precision);
-                ret.item.claims_mut().push(statement);
+                ret.add_claim(statement);
             }
         }
     }
@@ -140,7 +140,7 @@ impl NORAF {
                 .for_each(|ext_id| {
                     let mut statement = self.new_statement_string(ext_id.property(), ext_id.id());
                     statement.set_datatype(SnakDataType::ExternalId);
-                    ret.item.add_claim(statement);
+                    ret.add_claim(statement);
                 });
         };
     }

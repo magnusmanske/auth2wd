@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::external_id::ExternalId;
 use crate::external_importer::*;
 use crate::meta_item::*;
@@ -12,6 +10,7 @@ use serde_json::json;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
+use std::collections::HashMap;
 
 lazy_static! {
     static ref KEY2PROP: HashMap<String, usize> = {

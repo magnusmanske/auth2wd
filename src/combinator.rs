@@ -125,7 +125,8 @@ impl Combinator {
         // self.items
         //     .iter_mut()
         //     .for_each(|(_id, mi)| mi.clear_fake_statement_ids());
-        let meta_item = self.items.iter().next().map(|(_, v)| v.to_owned())?;
+        let mut meta_item = self.items.iter().next().map(|(_, v)| v.to_owned())?;
+        meta_item.cleanup();
         Some((meta_item, merge_diff))
     }
 

@@ -182,6 +182,39 @@ impl MetaItem {
     pub fn cleanup(&mut self) {
         self.prop_text.sort();
         self.prop_text.dedup();
+        self.dedup_claims();
+    }
+
+    /// Removes duplicate claims from the item.
+    /// Two claims are considered duplicates if they have the same main snak and qualifiers.
+    /// When duplicates are found, references from the duplicate are merged into the first occurrence.
+    fn dedup_claims(&mut self) {
+        let mut unique_claims: Vec<Statement> = Vec::new();
+        for claim in self.item.claims().to_vec() {
+            let existing = unique_claims.iter_mut().find(|existing| {
+                ItemMerger::is_snak_identical(claim.main_snak(), existing.main_snak())
+                    && ItemMerger::are_qualifiers_identical(
+                        claim.qualifiers(),
+                        existing.qualifiers(),
+                    )
+            });
+            match existing {
+                Some(existing_claim) => {
+                    // Merge references from duplicate into the existing claim
+                    let mut refs = existing_claim.references().clone();
+                    for r in claim.references() {
+                        if !Self::reference_exists(&refs, r) {
+                            refs.push(r.to_owned());
+                        }
+                    }
+                    existing_claim.set_references(refs);
+                }
+                None => {
+                    unique_claims.push(claim);
+                }
+            }
+        }
+        *self.item.claims_mut() = unique_claims;
     }
 
     pub fn fix_images(&mut self, base_item: &MetaItem) {
