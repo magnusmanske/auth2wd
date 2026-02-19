@@ -1,6 +1,7 @@
 use crate::external_id::*;
 use crate::meta_item::*;
 use crate::properties::*;
+use crate::url_override::maybe_rewrite;
 use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -756,11 +757,16 @@ pub trait ExternalImporter: Send + Sync {
             None => return Ok(()), // No VIAF key for property found
         };
         let record_id = format!("{key}|{id}");
-        let url = "https://viaf.org/api/cluster-record";
+        let url = maybe_rewrite("https://viaf.org/api/cluster-record");
         let payload = json!({"reqValues":{"recordId":record_id,"isSourceId":true},"meta":{"pageIndex":0,"pageSize":1}});
         let client = Utility::get_reqwest_client()?;
-        let response: serde_json::Value =
-            client.post(url).json(&payload).send().await?.json().await?;
+        let response: serde_json::Value = client
+            .post(&url)
+            .json(&payload)
+            .send()
+            .await?
+            .json()
+            .await?;
         if let Some(viaf_id) = response["queryResult"]["viafID"].as_i64() {
             let viaf_id = viaf_id.to_string();
             ret.add_claim(self.new_statement_string(P_VIAF, &viaf_id));

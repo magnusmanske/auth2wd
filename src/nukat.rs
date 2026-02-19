@@ -1,6 +1,7 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
+use crate::url_override::maybe_rewrite;
 use crate::utility::Utility;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -66,15 +67,20 @@ impl NUKAT {
     }
 
     pub async fn new(id: &str) -> Result<Self> {
-        let url = "https://viaf.org/api/cluster-record";
+        let url = maybe_rewrite("https://viaf.org/api/cluster-record");
         let client = Utility::get_reqwest_client()?;
         let viaf_id = Self::id_for_viaf(id);
         let record_id = format!("NUKAT|{viaf_id}");
 
         // First, look up the VIAF cluster ID using the NUKAT source ID
         let payload = json!({"reqValues":{"recordId":record_id,"isSourceId":true},"meta":{"pageIndex":0,"pageSize":1}});
-        let response: serde_json::Value =
-            client.post(url).json(&payload).send().await?.json().await?;
+        let response: serde_json::Value = client
+            .post(&url)
+            .json(&payload)
+            .send()
+            .await?
+            .json()
+            .await?;
         let viaf_cluster_id = response["queryResult"]["viafID"]
             .as_i64()
             .ok_or_else(|| anyhow!("No VIAF cluster ID found for NUKAT ID '{id}'"))?
@@ -83,7 +89,7 @@ impl NUKAT {
         // Then, fetch the RDF data for the VIAF cluster
         let rdf_payload = json!({"reqValues":{"recordId":viaf_cluster_id,"isSourceId":false,"acceptFiletype":"rdf+xml"},"meta":{"pageIndex":0,"pageSize":1}});
         let rdf_response = client
-            .post(url)
+            .post(&url)
             .json(&rdf_payload)
             .send()
             .await?

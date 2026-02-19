@@ -1,6 +1,7 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
+use crate::url_override::maybe_rewrite;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::Value;
@@ -45,8 +46,9 @@ impl ExternalImporter for PubChemCid {
 
 impl PubChemCid {
     pub async fn new(id: &str) -> Result<Self> {
-        let url =
-            format!("https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/{id}/JSON/");
+        let url = maybe_rewrite(&format!(
+            "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/{id}/JSON/"
+        ));
         let resp = reqwest::get(&url).await?.text().await?;
         let json = serde_json::from_str(&resp)?;
         Ok(Self {

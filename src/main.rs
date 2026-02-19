@@ -27,7 +27,7 @@
     clippy::shadow_unrelated,
     clippy::similar_names,
     clippy::suspicious_operation_groupings,
-    unused_crate_dependencies,
+    // unused_crate_dependencies,
     unused_extern_crates,
     unused_import_braces,
     clippy::unused_self,
@@ -38,39 +38,10 @@
     // clippy::wildcard_imports
 )]
 
-#[macro_use]
-extern crate lazy_static;
-
-pub mod bne;
-pub mod bnf;
-pub mod combinator;
-pub mod external_id;
-pub mod external_importer;
-pub mod gbif_taxon;
-pub mod gnd;
-pub mod id_ref;
-pub mod inaturalist;
-pub mod isni;
-pub mod loc;
-pub mod meta_item;
-pub mod nb;
-pub mod ncbi_taxonomy;
-pub mod ndl;
-pub mod noraf;
-pub mod nukat;
-pub mod properties;
-pub mod pubchem_cid;
-pub mod selibr;
-pub mod supported_property;
-pub mod ulan;
-pub mod utility;
-pub mod viaf;
-pub mod worldcat;
-
+use auth2wd::*;
 use axum::Form;
 use axum::{extract::Path, response::Html, routing::get, Json, Router};
 use combinator::*;
-use external_id::*;
 use external_importer::*;
 use meta_item::MetaItem;
 use serde::{Deserialize, Serialize};
@@ -225,12 +196,21 @@ async fn merge_info() -> Html<String> {
 
     let mut base_item = base_item.to_json();
     let mut new_item = new_item.to_json();
-    base_item.as_object_mut().unwrap().remove("id");
-    new_item.as_object_mut().unwrap().remove("id");
+    if let Some(o) = base_item.as_object_mut() {
+        o.remove("id");
+    }
+    if let Some(o) = new_item.as_object_mut() {
+        o.remove("id");
+    }
 
-    let mut html: String = fs::read_to_string("./html/merge_info.html").unwrap();
-    html = html.replace("$1$", &serde_json::to_string_pretty(&base_item).unwrap());
-    html = html.replace("$2$", &serde_json::to_string_pretty(&new_item).unwrap());
+    let mut html: String = match fs::read_to_string("./html/merge_info.html") {
+        Ok(s) => s,
+        Err(e) => return Html(format!("Error reading template: {e}")),
+    };
+    let base_pretty = serde_json::to_string_pretty(&base_item).unwrap_or_default();
+    let new_pretty = serde_json::to_string_pretty(&new_item).unwrap_or_default();
+    html = html.replace("$1$", &base_pretty);
+    html = html.replace("$2$", &new_pretty);
     Html(wrap_html(&html))
 }
 
@@ -260,10 +240,10 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
         .layer(CompressionLayer::new())
         .layer(cors);
 
-    let port: u16 = match env::var("AC2WD_PORT") {
-        Ok(port) => port.as_str().parse::<u16>().unwrap_or(8000),
-        Err(_) => 8000,
-    };
+    let port: u16 = env::var("AC2WD_PORT")
+        .ok()
+        .and_then(|v| v.parse::<u16>().ok())
+        .unwrap_or(8000);
 
     let address = [0, 0, 0, 0]; // TODOO env::var("AC2WD_ADDRESS")
 
@@ -364,21 +344,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 combinator.items.len(),
                 combinator.items.keys()
             );
-            let (_other, diff) = combinator.combine().expect("No items to combine");
+            let (_other, diff) = combinator.combine().ok_or("No items to combine")?;
             println!(
                 "{} items: {:?}",
                 combinator.items.len(),
                 combinator.items.keys()
             );
-            //println!("{:?}",&other);
-            //println!("{:?}",&diff);
             println!(
                 "Altered: {}, added: {}",
                 diff.altered_statements.len(),
                 diff.added_statements.len()
             );
             let payload = json!(diff);
-            println!("{}", &serde_json::to_string_pretty(&payload).unwrap());
+            println!("{}", &serde_json::to_string_pretty(&payload)?);
         }
         Some("parser") => {
             // Single parser
@@ -396,11 +374,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some("list") => {
             // List
             let filename = argv.get(2).expect("USAGE: list LIST_FILE [START_ROW]");
-            let start = match argv.get(3) {
-                Some(s) => s.parse::<usize>().unwrap(),
-                None => 0,
-            };
-            let file = File::open(filename).unwrap();
+            let start = argv
+                .get(3)
+                .and_then(|s| s.parse::<usize>().ok())
+                .unwrap_or(0);
+            let file = File::open(filename)?;
             let reader = BufReader::new(file);
             let mut api = get_wikidata_api("config.json").await?;
             for (index, line) in reader.lines().enumerate() {
@@ -416,11 +394,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Some("extend") => {
             let item = argv.get(2).expect("Item argument required");
-            let diff = get_extend(item).await.unwrap();
-            println!("{}", &serde_json::to_string_pretty(&diff).unwrap());
+            let diff = get_extend(item).await?;
+            println!("{}", &serde_json::to_string_pretty(&diff)?);
         }
         Some("merge") => {
-            todo!();
+            return Err("The 'merge' CLI command is not yet implemented".into());
         }
         _ => run_server().await?,
     }

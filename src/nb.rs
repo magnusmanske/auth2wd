@@ -2,6 +2,7 @@ use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
+use crate::url_override::maybe_rewrite;
 use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -150,7 +151,7 @@ impl ExternalImporter for NB {
 
 impl NB {
     pub async fn new(id: &str) -> Result<Self> {
-        let url = format!("http://data.bibliotheken.nl/id/thes/p{id}");
+        let url = maybe_rewrite(&format!("http://data.bibliotheken.nl/id/thes/p{id}"));
         let client = Utility::get_reqwest_client()?;
         let mut headers = HeaderMap::new();
         headers.insert(ACCEPT, HeaderValue::from_static("application/json"));

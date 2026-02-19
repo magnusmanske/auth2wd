@@ -2,6 +2,7 @@ use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
+use crate::url_override::maybe_rewrite;
 use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
@@ -81,8 +82,15 @@ impl ISNI {
             graph: FastGraph::new(),
             html: String::new(),
         };
-        let url = ret.get_key_url(&id);
-        ret.html = reqwest::get(&url).await?.text().await?.replace("\n", " "); // Remove newlines
+        let url = maybe_rewrite(&ret.get_key_url(&id));
+        // Collapse all whitespace including newlines so regexes can match across lines
+        ret.html = reqwest::get(&url)
+            .await?
+            .text()
+            .await?
+            .split_whitespace()
+            .collect::<Vec<_>>()
+            .join(" ");
         Ok(ret)
     }
 

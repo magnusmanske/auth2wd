@@ -55,7 +55,7 @@ impl Combinator {
 
     async fn import_get_parsers(
         &self,
-        ids: &Vec<ExternalId>,
+        ids: &[ExternalId],
         ids_used: &mut HashSet<ExternalId>,
     ) -> Vec<Box<dyn ExternalImporter>> {
         let mut futures = vec![];
@@ -72,9 +72,8 @@ impl Combinator {
         parsers
     }
 
-    pub async fn import(&mut self, ids: Vec<ExternalId>) -> Result<()> {
+    pub async fn import(&mut self, mut ids: Vec<ExternalId>) -> Result<()> {
         let mut ids_used: HashSet<ExternalId> = HashSet::new();
-        let mut ids = ids.to_owned();
         while !ids.is_empty() {
             ids.sort();
             ids.dedup();
@@ -115,11 +114,12 @@ impl Combinator {
     pub fn combine(&mut self) -> Option<(MetaItem, MergeDiff)> {
         let mut merge_diff = MergeDiff::default();
         while self.items.len() > 1 {
-            let keys: Vec<String> = self.items.keys().cloned().collect();
-            let k1 = &keys[0];
-            let k2 = &keys[1];
-            let other = self.items.remove(k2)?;
-            let diff = self.items.get_mut(k1)?.merge(&other);
+            let mut key_iter = self.items.keys();
+            let k1 = key_iter.next()?.to_owned();
+            let k2 = key_iter.next()?.to_owned();
+            // drop(key_iter);
+            let other = self.items.remove(&k2)?;
+            let diff = self.items.get_mut(&k1)?.merge(&other);
             merge_diff.extend(&diff);
         }
         // self.items

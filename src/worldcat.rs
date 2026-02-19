@@ -1,6 +1,7 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
+use crate::url_override::maybe_rewrite;
 use crate::ExternalId;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -48,7 +49,7 @@ impl ExternalImporter for WorldCat {
 
 impl WorldCat {
     pub async fn new(id: &str) -> Result<Self> {
-        let url = format!("https://id.oclc.org/worldcat/entity/{id}.jsonld");
+        let url = maybe_rewrite(&format!("https://id.oclc.org/worldcat/entity/{id}.jsonld"));
         let resp = reqwest::get(&url).await?.text().await?;
         let j = serde_json::from_str(&resp)?;
         Ok(Self {

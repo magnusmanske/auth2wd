@@ -1,4 +1,5 @@
 use crate::external_id::*;
+use crate::properties::{P_DATE_OF_BIRTH, P_DATE_OF_DEATH};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_json::json;
 use std::str::FromStr;
@@ -137,7 +138,7 @@ impl MetaItem {
     /// Checks if a new claim has a more precise date than existing claims.
     fn check_new_claim_for_dates(&self, new_claim: &mut Statement) {
         let prop = new_claim.property();
-        if prop != "P569" && prop != "P570" {
+        if prop != format!("P{P_DATE_OF_BIRTH}") && prop != format!("P{P_DATE_OF_DEATH}") {
             return;
         }
         if let Some(data_value) = new_claim.main_snak().data_value() {
@@ -234,7 +235,7 @@ impl MetaItem {
     /// Fixes birth and death dates by deprecating less precise ones.
     /// <https://github.com/magnusmanske/auth2wd/issues/1>
     pub fn fix_dates(&mut self) {
-        for prop in ["P569", "P570"] {
+        for prop in [format!("P{P_DATE_OF_BIRTH}"), format!("P{P_DATE_OF_DEATH}")] {
             let mut best_precision = 0;
             let mut worst_precision = 255;
             self.item
@@ -308,7 +309,7 @@ impl MetaItem {
         let diff = im.merge(&other.item);
         self.item = im.item;
         // diff.apply(&mut self.item); // TODO FIXME
-        self.prop_text.append(&mut other.prop_text.clone());
+        self.prop_text.extend(other.prop_text.iter().cloned());
         self.prop_text.sort();
         self.prop_text.dedup();
         diff

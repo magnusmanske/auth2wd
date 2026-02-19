@@ -2,6 +2,7 @@ use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
+use crate::url_override::maybe_rewrite;
 use anyhow::Result;
 use async_trait::async_trait;
 use sophia::api::prelude::*;
@@ -77,7 +78,7 @@ impl ExternalImporter for BNE {
 
 impl BNE {
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = format!("https://datos.bne.es/resource/{id}.rdf");
+        let rdf_url = maybe_rewrite(&format!("https://datos.bne.es/resource/{id}.rdf"));
         let resp = reqwest::get(&rdf_url).await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;

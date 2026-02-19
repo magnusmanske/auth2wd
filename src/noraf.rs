@@ -1,6 +1,7 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
+use crate::url_override::maybe_rewrite;
 use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
@@ -65,7 +66,9 @@ impl ExternalImporter for NORAF {
 
 impl NORAF {
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = format!("https://authority.bibsys.no/authority/rest/authorities/v2/{id}");
+        let rdf_url = maybe_rewrite(&format!(
+            "https://authority.bibsys.no/authority/rest/authorities/v2/{id}"
+        ));
         let resp = reqwest::get(&rdf_url).await?.text().await?;
         let j: Value = serde_json::from_str(&resp)?;
         Ok(Self {
@@ -108,15 +111,12 @@ impl NORAF {
             static ref RE_BORN_DIED: Regex = Regex::new(r#"^(.*)-(.*)$"#).expect("Regexp error");
         }
         if let Some(caps) = RE_BORN_DIED.captures(date) {
-            let born = ret.parse_date(caps.get(1).unwrap().as_str()); // unwrap is safe
-            let died = ret.parse_date(caps.get(2).unwrap().as_str()); // unwrap is safe
-            if let Some((time, precision)) = born {
-                let statement = self.new_statement_time(P_DATE_OF_BIRTH, &time, precision);
-                ret.add_claim(statement);
+            // caps.get(1) and caps.get(2) are always Some when the regex matches
+            if let Some((time, precision)) = caps.get(1).and_then(|m| ret.parse_date(m.as_str())) {
+                ret.add_claim(self.new_statement_time(P_DATE_OF_BIRTH, &time, precision));
             }
-            if let Some((time, precision)) = died {
-                let statement = self.new_statement_time(P_DATE_OF_DEATH, &time, precision);
-                ret.add_claim(statement);
+            if let Some((time, precision)) = caps.get(2).and_then(|m| ret.parse_date(m.as_str())) {
+                ret.add_claim(self.new_statement_time(P_DATE_OF_DEATH, &time, precision));
             }
         }
     }

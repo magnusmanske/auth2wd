@@ -1,0 +1,99 @@
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:wdt="http://www.wikidata.org/prop/direct/" xmlns:umbel="http://umbel.org/umbel#" xmlns:schema="http://schema.org/" xmlns:re="http://oclcsrw.google.code/redirect" xmlns:pto="http://www.productontology.org/id/" xmlns:genont="http://www.w3.org/2006/gen/ont#" xmlns:dbo="http://dbpedia.org/ontology/" xmlns:bgn="http://bibliograph.net/">
+<rdf:Description rdf:about="http://viaf.org/viaf/30701597/">
+<rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Document"/>
+<rdf:type rdf:resource="http://www.w3.org/2006/gen/ont#InformationResource"/>
+<void:inDataset xmlns:void="http://rdfs.org/ns/void#" rdf:resource="http://viaf.org/viaf/data"/>
+<foaf:primaryTopic xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/30701597"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/30701597">
+<dcterms:identifier xmlns:dcterms="http://purl.org/dc/terms/">30701597</dcterms:identifier>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<schema:birthDate>1974-05-24</schema:birthDate>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'WKP' is undetermined. Name is 'Magnus Manske'.</rdfs:comment>
+<schema:name>Magnus Manske</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'WKP|Q13520818' is undetermined. Name is 'Magnus Manske'.</rdfs:comment>
+<schema:name>Magnus Manske</schema:name>
+<schema:name xml:lang="en">Magnus Manske</schema:name>
+<schema:description xml:lang="en">deutscher Biochemiker und Entwickler der ersten Version der MediaWiki-Software</schema:description>
+<schema:name xml:lang="en">Magnus Manske</schema:name>
+<schema:description xml:lang="en">deutscher Biochemiker und Entwickler der ersten Version der MediaWiki-Software</schema:description>
+<schema:familyName>Manske</schema:familyName>
+<schema:givenName>Magnus</schema:givenName>
+<schema:name xml:lang="de-DE">MagnusManske</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="de-DE">MagnusManske</skos:prefLabel>
+<schema:name xml:lang="de-DE">MagnusManske</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="de-DE">MagnusManske</skos:prefLabel>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>M.Manske</schema:alternateName>
+<schema:givenName>M.</schema:givenName>
+<schema:familyName>Manske</schema:familyName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnus Manske</schema:alternateName>
+<schema:alternateName>Magnuss Manske</schema:alternateName>
+<schema:alternateName>jan Manku Manke</schema:alternateName>
+<schema:alternateName>Μάγκνους Μάνσκε</schema:alternateName>
+<schema:alternateName>Магнус Манске</schema:alternateName>
+<schema:alternateName>Магнус Манске</schema:alternateName>
+<schema:alternateName>Մագնուս Մանսկե</schema:alternateName>
+<schema:alternateName>מגנוס מנסקה</schema:alternateName>
+<schema:alternateName>ماجنوس مانسك</schema:alternateName>
+<schema:alternateName>ماغنوس مانسك</schema:alternateName>
+<schema:alternateName>میگنس مانسک</schema:alternateName>
+<schema:alternateName>میگنَس مینِسکی</schema:alternateName>
+<schema:alternateName>ম্যাগনাস মানস্কে</schema:alternateName>
+<schema:alternateName>મેગ્નસ મેન્સકે</schema:alternateName>
+<schema:alternateName>மேக்னசு மான்சுகே</schema:alternateName>
+<schema:alternateName>ಮಾಗ್ನಸ್ ಮಾನ್ಸಕೆ</schema:alternateName>
+<schema:alternateName>มักนุส มันส์เคอ</schema:alternateName>
+<schema:alternateName>マグナス・マンスキー</schema:alternateName>
+<schema:alternateName>馬格努斯·曼斯克</schema:alternateName>
+<schema:sameAs>
+<rdf:Description rdf:about="http://d-nb.info/gnd/132539691"/>
+</schema:sameAs>
+<schema:sameAs>
+<rdf:Description rdf:about="http://isni.org/isni/0000000022760482"/>
+</schema:sameAs>
+<schema:sameAs>
+<rdf:Description rdf:about="http://www.wikidata.org/entity/Q13520818"/>
+</schema:sameAs>
+<schema:sameAs rdf:resource="http://dbpedia.org/resource/Magnus_Manske"/>
+<schema:sameAs rdf:resource="http://orcid.org/0000--000-1-59-16-0"/>
+<schema:gender rdf:resource="http://www.wikidata.org/entity/Q6581097"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/ISNI%7C0000000022760482#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/ISNI"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Magnus Manske deutscher Biochemiker und Entwickler der ersten Version der MediaWiki-Software</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Magnus ManskeGerman biochemist and developer of one of the first versions of the MediaWiki software</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Magnus Manskebiochimico e sviluppatore tedesco</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Magnus Manskebiochimiste et développeur allemand</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Magnus Mansketysk bioinformatiker og wiki-software udvikler</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Magnuss Manske</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Магнус Манскенемецкий биохимик и разработчик MediaWiki, участник Викиданных</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/30701597"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/DNB%7C132539691#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/DNB"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Manske, Magnus 1974-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Manske, M.1974-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/30701597"/>
+</rdf:Description>
+</rdf:RDF>
