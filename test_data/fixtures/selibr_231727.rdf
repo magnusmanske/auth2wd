@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:kbv="https://id.kb.se/vocab/"
+	xmlns:schema="http://schema.org/">
+
+<rdf:Description rdf:about="https://libris.kb.se/pm135sp73dmxqcf">
+	<kbv:sameAs rdf:resource="http://libris.kb.se/auth/231727"/>
+	<rdf:type rdf:resource="https://id.kb.se/vocab/Person"/>
+</rdf:Description>
+
+<rdf:Description rdf:about="https://libris.kb.se/pm135sp73dmxqcf#it">
+	<rdf:type rdf:resource="https://id.kb.se/vocab/Person"/>
+	<rdfs:label>Darwin, Charles, 1809-1882</rdfs:label>
+	<foaf:name>Darwin, Charles</foaf:name>
+	<schema:birthDate>1809-02-12</schema:birthDate>
+	<schema:deathDate>1882-04-19</schema:deathDate>
+	<owl:sameAs rdf:resource="http://viaf.org/viaf/27063124"/>
+	<owl:sameAs rdf:resource="https://d-nb.info/gnd/118523813"/>
+	<kbv:nationality rdf:resource="https://id.kb.se/nationality/e-uk-en"/>
+	<kbv:sameAs rdf:resource="http://libris.kb.se/auth/231727"/>
+</rdf:Description>
+
+</rdf:RDF>

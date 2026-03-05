@@ -23,6 +23,17 @@ pub fn register(from: impl Into<String>, to: impl Into<String>) {
         .insert(from.into(), to.into());
 }
 
+/// Remove a single registered override by its `from` prefix.
+///
+/// Only called from test code (unit tests and integration tests).
+/// Compiled into the library so integration tests in `tests/` can use it.
+pub fn unregister(from: &str) {
+    overrides()
+        .lock()
+        .expect("url_override mutex poisoned")
+        .remove(from);
+}
+
 /// Remove all registered overrides.
 ///
 /// Only called from test code (unit tests and integration tests).

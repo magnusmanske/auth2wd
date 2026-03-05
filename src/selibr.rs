@@ -2,6 +2,7 @@ use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
+use crate::url_override::maybe_rewrite;
 use crate::utility::Utility;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -57,7 +58,7 @@ impl ExternalImporter for SELIBR {
 
 impl SELIBR {
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = format!("http://libris.kb.se/resource/auth/{id}/data.rdf");
+        let rdf_url = maybe_rewrite(&format!("http://libris.kb.se/resource/auth/{id}/data.rdf"));
         let client = Utility::get_reqwest_client()?;
         let resp = client
             .get(&rdf_url)
@@ -90,52 +91,78 @@ impl SELIBR {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "231727";
 
+    async fn mock_selibr() -> (MockServer, SELIBR) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/selibr_231727.rdf");
+
+        Mock::given(method("GET"))
+            .and(path("/resource/auth/231727/data.rdf"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        url_override::register("http://libris.kb.se", server.uri());
+
+        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        (server, selibr)
+    }
+
     #[tokio::test]
     async fn test_new() {
-        assert!(SELIBR::new(TEST_ID).await.is_ok());
+        let (_server, _selibr) = mock_selibr().await;
+        url_override::unregister("http://libris.kb.se");
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        let (_server, selibr) = mock_selibr().await;
         assert_eq!(selibr.my_property(), P_SELIBR);
+        url_override::unregister("http://libris.kb.se");
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        let (_server, selibr) = mock_selibr().await;
         assert_eq!(selibr.my_stated_in(), "Q1798125");
+        url_override::unregister("http://libris.kb.se");
     }
 
     #[tokio::test]
     async fn test_primary_language() {
-        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        let (_server, selibr) = mock_selibr().await;
         assert_eq!(selibr.primary_language(), "sv");
+        url_override::unregister("http://libris.kb.se");
     }
 
     #[tokio::test]
     async fn test_get_key_url() {
-        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        let (_server, selibr) = mock_selibr().await;
         assert_eq!(
             selibr.get_key_url(TEST_ID),
             "https://libris.kb.se/pm135sp73dmxqcf#it"
         );
+        url_override::unregister("http://libris.kb.se");
     }
 
     #[tokio::test]
     async fn test_my_id() {
-        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        let (_server, selibr) = mock_selibr().await;
         assert_eq!(selibr.my_id(), TEST_ID);
+        url_override::unregister("http://libris.kb.se");
     }
 
     #[tokio::test]
     async fn test_transform_label() {
-        let selibr = SELIBR::new(TEST_ID).await.unwrap();
+        let (_server, selibr) = mock_selibr().await;
         assert_eq!(selibr.transform_label("Månsson, Magnus"), "Magnus Månsson");
         assert_eq!(selibr.transform_label("Månsson,Magnus"), "Månsson,Magnus");
         assert_eq!(selibr.transform_label("Magnus Månsson"), "Magnus Månsson");
+        url_override::unregister("http://libris.kb.se");
     }
 }

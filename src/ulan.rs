@@ -176,7 +176,6 @@ mod tests {
                 .mount(&server)
                 .await;
 
-            url_override::clear();
             url_override::register("https://vocab.getty.edu", server.uri());
             url_override::register("https://viaf.org", server.uri());
 
@@ -211,7 +210,8 @@ mod tests {
                 panic!("expected data value on VIAF snak");
             }
 
-            url_override::clear();
+            url_override::unregister("https://vocab.getty.edu");
+            url_override::unregister("https://viaf.org");
         }
 
         // ── Case 2: VIAF returns no viafID ─────────────────────────────────
@@ -230,7 +230,6 @@ mod tests {
                 .mount(&server)
                 .await;
 
-            url_override::clear();
             url_override::register("https://vocab.getty.edu", server.uri());
             url_override::register("https://viaf.org", server.uri());
 
@@ -252,7 +251,8 @@ mod tests {
                 "expected no VIAF claim when VIAF returns no ID"
             );
 
-            url_override::clear();
+            url_override::unregister("https://vocab.getty.edu");
+            url_override::unregister("https://viaf.org");
         }
     }
 }
