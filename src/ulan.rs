@@ -144,6 +144,7 @@ impl ULAN {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wikimisc::wikibase::{EntityTrait, Statement, Value};
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -172,12 +173,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let (_server, _ulan) = mock_ulan().await;
         cleanup();
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_viaf_id_from_ulan() {
         let ulan_fixture = include_str!("../test_data/fixtures/ulan_500228559.rdf");
 

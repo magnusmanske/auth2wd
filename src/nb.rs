@@ -177,6 +177,7 @@ mod tests {
 
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -217,12 +218,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let (_server, _nb) = mock_nb().await;
         cleanup();
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_property() {
         let (_server, nb) = mock_nb().await;
         assert_eq!(nb.my_property(), P_NB);
@@ -230,6 +233,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_stated_in() {
         let (_server, nb) = mock_nb().await;
         assert_eq!(nb.my_stated_in(), "Q105488572");
@@ -237,6 +241,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_primary_language() {
         let (_server, nb) = mock_nb().await;
         assert_eq!(nb.primary_language(), "nl");
@@ -244,6 +249,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_get_key_url() {
         let (_server, nb) = mock_nb().await;
         assert_eq!(
@@ -254,6 +260,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_run() {
         let (_server, nb) = mock_nb().await;
         let meta_item = nb.run().await.unwrap();

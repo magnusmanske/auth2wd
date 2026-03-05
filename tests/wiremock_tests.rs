@@ -15,6 +15,7 @@ use anyhow::Result;
 use auth2wd::external_importer::ExternalImporter;
 use auth2wd::meta_item::MetaItem;
 use auth2wd::url_override;
+use serial_test::serial;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -38,6 +39,7 @@ where
 // ── GND ────────────────────────────────────────────────────────────────────
 
 #[tokio::test]
+#[serial]
 async fn test_gnd_new_with_mock() {
     let server = MockServer::start().await;
     let fixture = include_str!("../test_data/fixtures/gnd_132539691.rdf");
@@ -58,6 +60,7 @@ async fn test_gnd_new_with_mock() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_gnd_run_with_mock() {
     let server = MockServer::start().await;
     let fixture = include_str!("../test_data/fixtures/gnd_132539691.rdf");
@@ -91,6 +94,7 @@ async fn test_gnd_run_with_mock() {
 // ── VIAF ───────────────────────────────────────────────────────────────────
 
 #[tokio::test]
+#[serial]
 async fn test_viaf_new_with_mock() {
     let server = MockServer::start().await;
     let fixture = include_str!("../test_data/fixtures/viaf_30701597.rdf");
@@ -110,6 +114,7 @@ async fn test_viaf_new_with_mock() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_viaf_run_with_mock() {
     let server = MockServer::start().await;
     let fixture = include_str!("../test_data/fixtures/viaf_30701597.rdf");
@@ -134,6 +139,7 @@ async fn test_viaf_run_with_mock() {
 // ── NORAF ──────────────────────────────────────────────────────────────────
 
 #[tokio::test]
+#[serial]
 async fn test_noraf_new_with_mock() {
     let server = MockServer::start().await;
     let fixture = include_str!("../test_data/fixtures/noraf_90053126.json");
@@ -153,6 +159,7 @@ async fn test_noraf_new_with_mock() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_noraf_run_with_mock() {
     let server = MockServer::start().await;
     let fixture = include_str!("../test_data/fixtures/noraf_90053126.json");
@@ -198,6 +205,7 @@ async fn test_noraf_run_with_mock() {
 // ── WorldCat ───────────────────────────────────────────────────────────────
 
 #[tokio::test]
+#[serial]
 async fn test_worldcat_new_with_mock() {
     let server = MockServer::start().await;
     let fixture = include_str!("../test_data/fixtures/worldcat_E39PBJrcqvXdm3kkwGr7HVG8md.jsonld");
@@ -217,6 +225,7 @@ async fn test_worldcat_new_with_mock() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_worldcat_run_with_mock() {
     let server = MockServer::start().await;
     let fixture = include_str!("../test_data/fixtures/worldcat_E39PBJrcqvXdm3kkwGr7HVG8md.jsonld");
@@ -262,6 +271,7 @@ async fn test_worldcat_run_with_mock() {
 // ── BNF ────────────────────────────────────────────────────────────────────
 
 #[tokio::test]
+#[serial]
 async fn test_bnf_new_with_mock() {
     let server = MockServer::start().await;
     let fixture = include_str!("../test_data/fixtures/bnf_11898689q.rdf");
@@ -281,6 +291,7 @@ async fn test_bnf_new_with_mock() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_bnf_run_with_mock() {
     let server = MockServer::start().await;
     let fixture = include_str!("../test_data/fixtures/bnf_11898689q.rdf");
@@ -313,6 +324,7 @@ async fn test_bnf_run_with_mock() {
 // ── NB ─────────────────────────────────────────────────────────────────────
 
 #[tokio::test]
+#[serial]
 async fn test_nb_new_with_mock() {
     let server = MockServer::start().await;
     let fixture = include_str!("../test_data/fixtures/nb_068364229.json");
@@ -336,6 +348,7 @@ async fn test_nb_new_with_mock() {
 }
 
 #[tokio::test]
+#[serial]
 async fn test_nb_run_with_mock() {
     let server = MockServer::start().await;
     let fixture = include_str!("../test_data/fixtures/nb_068364229.json");

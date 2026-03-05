@@ -150,6 +150,7 @@ impl WorldCat {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -177,12 +178,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let (_server, _worldcat) = mock_worldcat().await;
         cleanup();
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_property() {
         let (_server, worldcat) = mock_worldcat().await;
         assert_eq!(worldcat.my_property(), P_WORLDCAT);
@@ -190,6 +193,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_stated_in() {
         let (_server, worldcat) = mock_worldcat().await;
         assert_eq!(worldcat.my_stated_in(), "Q112122720");
@@ -197,6 +201,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_primary_language() {
         let (_server, worldcat) = mock_worldcat().await;
         assert_eq!(worldcat.primary_language(), "en");
@@ -204,6 +209,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_get_key_url() {
         let (_server, worldcat) = mock_worldcat().await;
         assert_eq!(
@@ -214,6 +220,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_id() {
         let (_server, worldcat) = mock_worldcat().await;
         assert_eq!(worldcat.my_id(), TEST_ID);
@@ -221,6 +228,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_run() {
         let (_server, worldcat) = mock_worldcat().await;
         let meta_item = worldcat.run().await.unwrap();

@@ -176,6 +176,7 @@ impl NCBItaxonomy {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, query_param};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -203,6 +204,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_all() {
         let (_server, ncbi_taxonomy) = mock_ncbi().await;
         assert_eq!(ncbi_taxonomy.my_property(), P_NCBI_TAXONOMY);

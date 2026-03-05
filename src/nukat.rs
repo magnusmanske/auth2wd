@@ -110,8 +110,9 @@ impl NUKAT {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wikimisc::wikibase::EntityTrait;
-    use wiremock::matchers::{method, path};
+    use wiremock::matchers::{body_partial_json, method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "n96637319";
@@ -119,24 +120,27 @@ mod tests {
     async fn mock_nukat() -> (MockServer, NUKAT) {
         let server = MockServer::start().await;
 
-        // First POST: NUKAT source-ID lookup → returns VIAF cluster ID
+        // First POST: NUKAT source-ID lookup (isSourceId: true) → returns VIAF cluster ID
         let lookup_fixture = include_str!("../test_data/fixtures/viaf_lookup_nukat_n96637319.json");
-        // Second POST: fetch RDF for that VIAF cluster
+        // Second POST: fetch RDF for that VIAF cluster (isSourceId: false)
         let rdf_fixture = include_str!("../test_data/fixtures/viaf_98777888.rdf");
 
-        // wiremock matches requests in reverse-mount order, so mount the RDF
-        // responder first (it will be tried second) and the lookup responder
-        // last (it will be tried first).
+        // Distinguish the two POSTs by matching on the `isSourceId` field in the JSON body.
         Mock::given(method("POST"))
             .and(path("/api/cluster-record"))
-            .respond_with(ResponseTemplate::new(200).set_body_string(rdf_fixture))
+            .and(body_partial_json(
+                serde_json::json!({"reqValues":{"isSourceId":true}}),
+            ))
+            .respond_with(ResponseTemplate::new(200).set_body_string(lookup_fixture))
             .mount(&server)
             .await;
 
         Mock::given(method("POST"))
             .and(path("/api/cluster-record"))
-            .respond_with(ResponseTemplate::new(200).set_body_string(lookup_fixture))
-            .expect(1)
+            .and(body_partial_json(
+                serde_json::json!({"reqValues":{"isSourceId":false}}),
+            ))
+            .respond_with(ResponseTemplate::new(200).set_body_string(rdf_fixture))
             .mount(&server)
             .await;
 
@@ -151,12 +155,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let (_server, _nukat) = mock_nukat().await;
         cleanup();
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_property() {
         let (_server, nukat) = mock_nukat().await;
         assert_eq!(nukat.my_property(), P_NUKAT);
@@ -164,6 +170,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_stated_in() {
         let (_server, nukat) = mock_nukat().await;
         assert_eq!(nukat.my_stated_in(), "Q11789729");
@@ -171,6 +178,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_primary_language() {
         let (_server, nukat) = mock_nukat().await;
         assert_eq!(nukat.primary_language(), "pl");
@@ -178,6 +186,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_id() {
         let (_server, nukat) = mock_nukat().await;
         assert_eq!(nukat.my_id(), TEST_ID);
@@ -192,6 +201,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_run() {
         let (_server, nukat) = mock_nukat().await;
         let meta_item = nukat.run().await.unwrap();

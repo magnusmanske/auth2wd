@@ -151,6 +151,7 @@ impl ISNI {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wikimisc::wikibase::EntityTrait;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -189,12 +190,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let (_server, _isni) = mock_isni().await;
         cleanup();
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_property() {
         let (_server, isni) = mock_isni().await;
         assert_eq!(isni.my_property(), P_ISNI);
@@ -202,6 +205,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_stated_in() {
         let (_server, isni) = mock_isni().await;
         assert_eq!(isni.my_stated_in(), "Q423048");
@@ -209,6 +213,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_id() {
         let (_server, isni) = mock_isni().await;
         assert_eq!(isni.my_id(), TEST_ID);
@@ -216,6 +221,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_run() {
         let (_server, isni) = mock_isni().await;
         let meta_item = isni.run().await.unwrap();
@@ -231,6 +237,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_try_viaf() {
         let (_server, isni) = mock_isni().await;
         let mut mi = MetaItem::new();

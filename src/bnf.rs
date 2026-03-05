@@ -139,6 +139,7 @@ mod tests {
 
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -175,6 +176,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_run() {
         let fixture = include_str!("../test_data/fixtures/bnf_11898689q.rdf");
         let (_server, bnf) = mock_bnf(TEST_ID, fixture).await;
@@ -187,6 +189,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_run_birth_death_place() {
         let fixture = include_str!("../test_data/fixtures/bnf_15585136v.rdf");
         let (_server, bnf) = mock_bnf(TEST_ID2, fixture).await;
@@ -208,6 +211,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let fixture = include_str!("../test_data/fixtures/bnf_11898689q.rdf");
         let (_server, _bnf) = mock_bnf(TEST_ID, fixture).await;
@@ -215,6 +219,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_property() {
         let fixture = include_str!("../test_data/fixtures/bnf_11898689q.rdf");
         let (_server, bnf) = mock_bnf(TEST_ID, fixture).await;
@@ -223,6 +228,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_stated_in() {
         let fixture = include_str!("../test_data/fixtures/bnf_11898689q.rdf");
         let (_server, bnf) = mock_bnf(TEST_ID, fixture).await;
@@ -231,6 +237,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_id() {
         let fixture = include_str!("../test_data/fixtures/bnf_11898689q.rdf");
         let (_server, bnf) = mock_bnf(TEST_ID, fixture).await;

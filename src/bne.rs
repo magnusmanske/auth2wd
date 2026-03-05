@@ -93,6 +93,7 @@ impl BNE {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wikimisc::wikibase::{EntityTrait, LocaleString};
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -129,12 +130,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let (_server, _bne) = mock_bne().await;
         cleanup();
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_property() {
         let (_server, bne) = mock_bne().await;
         assert_eq!(bne.my_property(), P_BNE);
@@ -142,6 +145,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_stated_in() {
         let (_server, bne) = mock_bne().await;
         assert_eq!(bne.my_stated_in(), "Q50358336");
@@ -149,6 +153,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_run() {
         let (_server, bne) = mock_bne().await;
         let meta_item = bne.run().await.unwrap();

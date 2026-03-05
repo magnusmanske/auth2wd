@@ -210,6 +210,7 @@ impl INaturalist {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -236,12 +237,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let (_server, _inaturalist) = mock_inaturalist().await;
         cleanup();
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_property() {
         let (_server, inaturalist) = mock_inaturalist().await;
         assert_eq!(inaturalist.my_property(), P_INATURALIST_TAXON);
@@ -249,6 +252,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_stated_in() {
         let (_server, inaturalist) = mock_inaturalist().await;
         assert_eq!(inaturalist.my_stated_in(), "Q16958215");
@@ -256,6 +260,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_primary_language() {
         let (_server, inaturalist) = mock_inaturalist().await;
         assert_eq!(inaturalist.primary_language(), "en");
@@ -263,6 +268,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_get_key_url() {
         let (_server, inaturalist) = mock_inaturalist().await;
         assert_eq!(
@@ -273,6 +279,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_id() {
         let (_server, inaturalist) = mock_inaturalist().await;
         assert_eq!(inaturalist.my_id(), TEST_ID);
@@ -280,6 +287,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_run_inaturalist() {
         let (_server, inaturalist) = mock_inaturalist().await;
         let meta_item = inaturalist.run().await.unwrap();

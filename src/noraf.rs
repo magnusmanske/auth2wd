@@ -150,6 +150,7 @@ impl NORAF {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -169,6 +170,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_add_dates() {
         // Use a minimal valid JSON fixture just for this unit test
         let fixture = r#"{"marcdata":[],"identifiersMap":{}}"#;

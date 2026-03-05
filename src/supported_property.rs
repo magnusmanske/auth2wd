@@ -118,6 +118,7 @@ impl SupportedProperty {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -134,6 +135,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_generator_creates_correct_importer() {
         // Use VIAF as a quick test: the factory should produce an importer
         // whose my_property() matches the SupportedProperty's property.

@@ -101,6 +101,7 @@ mod tests {
 
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -136,12 +137,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let (_server, _idref) = mock_idref().await;
         cleanup();
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_property() {
         let (_server, idref) = mock_idref().await;
         assert_eq!(idref.my_property(), P_IDREF);
@@ -149,6 +152,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_stated_in() {
         let (_server, idref) = mock_idref().await;
         assert_eq!(idref.my_stated_in(), "Q47757534");
@@ -156,6 +160,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_id() {
         let (_server, idref) = mock_idref().await;
         assert_eq!(idref.my_id(), TEST_ID);
@@ -163,6 +168,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_run() {
         let (_server, idref) = mock_idref().await;
         let meta_item = idref.run().await.unwrap();

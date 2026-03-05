@@ -131,6 +131,7 @@ impl PubChemCid {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -157,6 +158,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_all() {
         let (_server, pubchem) = mock_pubchem().await;
         assert_eq!(pubchem.my_property(), P_PUBCHEM_CID);

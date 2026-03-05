@@ -285,6 +285,7 @@ impl GND {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wikimisc::wikibase::{EntityTrait, LocaleString};
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -321,12 +322,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let (_server, _gnd) = mock_gnd().await;
         cleanup();
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_property() {
         let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.my_property(), P_GND);
@@ -334,6 +337,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_stated_in() {
         let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.my_stated_in(), "Q36578");
@@ -341,6 +345,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_primary_language() {
         let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.primary_language(), "de");
@@ -348,6 +353,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_get_key_url() {
         let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.get_key_url(TEST_ID), "https://d-nb.info/gnd/132539691");
@@ -355,6 +361,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_id() {
         let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.my_id(), TEST_ID);
@@ -362,6 +369,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_transform_label() {
         let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.transform_label("Manske, Magnus"), "Magnus Manske");
@@ -371,6 +379,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_run() {
         let (_server, gnd) = mock_gnd().await;
         let meta_item = gnd.run().await.unwrap();

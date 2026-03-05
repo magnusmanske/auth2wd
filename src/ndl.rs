@@ -89,6 +89,7 @@ impl NDL {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wikimisc::wikibase::EntityTrait;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -126,12 +127,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let (_server, _ndl) = mock_ndl().await;
         cleanup();
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_property() {
         let (_server, ndl) = mock_ndl().await;
         assert_eq!(ndl.my_property(), P_NDL);
@@ -139,6 +142,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_stated_in() {
         let (_server, ndl) = mock_ndl().await;
         assert_eq!(ndl.my_stated_in(), "Q477675");
@@ -146,6 +150,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_primary_language() {
         let (_server, ndl) = mock_ndl().await;
         assert_eq!(ndl.primary_language(), "ja");
@@ -153,6 +158,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_get_key_url() {
         let (_server, ndl) = mock_ndl().await;
         assert_eq!(
@@ -163,6 +169,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_id() {
         let (_server, ndl) = mock_ndl().await;
         assert_eq!(ndl.my_id(), TEST_ID);
@@ -170,6 +177,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_transform_label() {
         let (_server, ndl) = mock_ndl().await;
         assert_eq!(ndl.transform_label("Natsume, Soseki"), "Soseki Natsume");
@@ -179,6 +187,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_run() {
         let (_server, ndl) = mock_ndl().await;
         let meta_item = ndl.run().await.unwrap();

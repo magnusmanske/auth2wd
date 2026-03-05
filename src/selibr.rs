@@ -92,6 +92,7 @@ impl SELIBR {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -114,12 +115,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let (_server, _selibr) = mock_selibr().await;
         url_override::unregister("http://libris.kb.se");
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_property() {
         let (_server, selibr) = mock_selibr().await;
         assert_eq!(selibr.my_property(), P_SELIBR);
@@ -127,6 +130,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_stated_in() {
         let (_server, selibr) = mock_selibr().await;
         assert_eq!(selibr.my_stated_in(), "Q1798125");
@@ -134,6 +138,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_primary_language() {
         let (_server, selibr) = mock_selibr().await;
         assert_eq!(selibr.primary_language(), "sv");
@@ -141,6 +146,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_get_key_url() {
         let (_server, selibr) = mock_selibr().await;
         assert_eq!(
@@ -151,6 +157,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_id() {
         let (_server, selibr) = mock_selibr().await;
         assert_eq!(selibr.my_id(), TEST_ID);
@@ -158,6 +165,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_transform_label() {
         let (_server, selibr) = mock_selibr().await;
         assert_eq!(selibr.transform_label("Månsson, Magnus"), "Magnus Månsson");

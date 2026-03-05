@@ -172,6 +172,7 @@ mod tests {
 
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -194,12 +195,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_new() {
         let (_server, _viaf) = mock_viaf().await;
         url_override::unregister("https://viaf.org");
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_property() {
         let (_server, viaf) = mock_viaf().await;
         assert_eq!(viaf.my_property(), P_VIAF);
@@ -207,6 +210,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_stated_in() {
         let (_server, viaf) = mock_viaf().await;
         assert_eq!(viaf.my_stated_in(), "Q54919");
@@ -214,6 +218,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_primary_language() {
         let (_server, viaf) = mock_viaf().await;
         assert_eq!(viaf.primary_language(), "en");
@@ -221,6 +226,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_get_key_url() {
         let (_server, viaf) = mock_viaf().await;
         assert_eq!(viaf.get_key_url(TEST_ID), "http://viaf.org/viaf/30701597");
@@ -228,6 +234,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_my_id() {
         let (_server, viaf) = mock_viaf().await;
         assert_eq!(viaf.my_id(), TEST_ID);
@@ -235,6 +242,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_transform_label() {
         let (_server, viaf) = mock_viaf().await;
         assert_eq!(viaf.transform_label("Manske, Magnus"), "Magnus Manske");
@@ -244,6 +252,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_run() {
         let (_server, viaf) = mock_viaf().await;
         let meta_item = viaf.run().await.unwrap();

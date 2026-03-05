@@ -156,6 +156,7 @@ impl GBIFtaxon {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, path, query_param};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -190,6 +191,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_all() {
         let (_server, gbif) = mock_gbif().await;
         assert_eq!(gbif.my_property(), P_GBIF_TAXON);

@@ -37,6 +37,7 @@ futures = "*"
 
 [dev-dependencies]
 async-once-cell = "*"
+serial_test = "3"
 wiremock = "0.6"
 
 [profile.dev]

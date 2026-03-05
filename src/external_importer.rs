@@ -779,6 +779,7 @@ pub trait ExternalImporter: Send + Sync {
 mod tests {
     use super::*;
     use crate::url_override;
+    use serial_test::serial;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -825,6 +826,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_url2external_id() {
         let (_server, t) = mock_viaf_for_tests().await;
         assert_eq!(
@@ -843,6 +845,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_lowercase_first_letter() {
         let (_server, t) = mock_viaf_for_tests().await;
         assert_eq!("foo", t.lowercase_first_letter("Foo"));
