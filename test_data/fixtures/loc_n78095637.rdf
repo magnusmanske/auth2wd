@@ -1,0 +1,760 @@
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:bf="http://id.loc.gov/ontologies/bibframe/" xmlns:bflc="http://id.loc.gov/ontologies/bflc/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:cc="http://creativecommons.org/ns#" xmlns:foaf="http://xmlns.com/foaf/0.1/">
+  <madsrdf:PersonalName rdf:about="http://id.loc.gov/authorities/names/n78095637" xmlns:madsrdf="http://www.loc.gov/mads/rdf/v1#">
+    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+    <madsrdf:authoritativeLabel>Darwin, Charles, 1809-1882</madsrdf:authoritativeLabel>
+    <madsrdf:authoritativeLabel xml:lang="zxx-Hani">達爾文, 1809-1882</madsrdf:authoritativeLabel>
+    <bflc:marcKey xml:lang="zxx-Hani">4001 $a達爾文,$d1809-1882</bflc:marcKey>
+    <madsrdf:authoritativeLabel xml:lang="zxx-Hebr">דארווין, טשארלז, 1809-1882</madsrdf:authoritativeLabel>
+    <bflc:marcKey xml:lang="zxx-Hebr">4001 $aדארווין, טשארלז,$d1809-1882</bflc:marcKey>
+    <madsrdf:authoritativeLabel xml:lang="zxx-Arab">داروين، چارلز، 1809-1882</madsrdf:authoritativeLabel>
+    <bflc:marcKey xml:lang="zxx-Arab">4001 $aداروين، چارلز،$d1809-1882</bflc:marcKey>
+    <madsrdf:elementList rdf:parseType="Collection">
+      <madsrdf:FullNameElement>
+	<madsrdf:elementValue>Darwin, Charles,</madsrdf:elementValue>
+      </madsrdf:FullNameElement>
+      <madsrdf:DateNameElement>
+	<madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+      </madsrdf:DateNameElement>
+    </madsrdf:elementList>
+    <bflc:marcKey>1001 $aDarwin, Charles,$d1809-1882</bflc:marcKey>
+    <madsrdf:identifiesRWO>
+      <madsrdf:RWO rdf:about="http://id.loc.gov/rwo/agents/n78095637">
+	<rdf:type rdf:resource="http://id.loc.gov/ontologies/bibframe/Person"/>
+	<rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+	<rdfs:label>Darwin, Charles, 1809-1882</rdfs:label>
+	<madsrdf:birthDate rdf:datatype="http://id.loc.gov/datatypes/edtf">1809-02-12</madsrdf:birthDate>
+	<madsrdf:deathDate rdf:datatype="http://id.loc.gov/datatypes/edtf">1882-04-19</madsrdf:deathDate>
+	<madsrdf:entityDescriptor>
+	  <madsrdf:Authority rdf:about="http://id.loc.gov/authorities/demographicTerms/dg2015060386">
+	    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	    <madsrdf:authoritativeLabel xml:lang="en">English</madsrdf:authoritativeLabel>
+	  </madsrdf:Authority>
+	</madsrdf:entityDescriptor>
+	<madsrdf:entityDescriptor>
+	  <madsrdf:Authority rdf:about="http://id.loc.gov/authorities/demographicTerms/dg2015060373">
+	    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	    <madsrdf:authoritativeLabel xml:lang="en">Britons</madsrdf:authoritativeLabel>
+	  </madsrdf:Authority>
+	</madsrdf:entityDescriptor>
+	<madsrdf:birthPlace>
+	  <madsrdf:Geographic rdf:about="http://id.loc.gov/authorities/names/n50076938">
+	    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	    <madsrdf:authoritativeLabel>Shrewsbury (England)</madsrdf:authoritativeLabel>
+	    <madsrdf:code rdf:datatype="http://id.loc.gov/datatypes/codes/gac">e-uk-en</madsrdf:code>
+	  </madsrdf:Geographic>
+	</madsrdf:birthPlace>
+	<madsrdf:associatedLocale>
+	  <madsrdf:Geographic>
+	    <rdfs:label>Downe (London, England)</rdfs:label>
+	    <madsrdf:identifiesRWO rdf:resource="http://www.wikidata.org/entity/Q125344"/>
+	  </madsrdf:Geographic>
+	</madsrdf:associatedLocale>
+	<madsrdf:associatedLocale>
+	  <madsrdf:Geographic rdf:about="http://id.loc.gov/authorities/names/n82068148">
+	    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	    <madsrdf:authoritativeLabel>England</madsrdf:authoritativeLabel>
+	    <madsrdf:code rdf:datatype="http://id.loc.gov/datatypes/codes/gac">e-uk-en</madsrdf:code>
+	  </madsrdf:Geographic>
+	</madsrdf:associatedLocale>
+	<madsrdf:associatedLocale>
+	  <madsrdf:Geographic rdf:about="http://id.loc.gov/authorities/names/n79023147">
+	    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	    <madsrdf:authoritativeLabel>Great Britain</madsrdf:authoritativeLabel>
+	    <madsrdf:authoritativeLabel xml:lang="zxx-Jpan">イギリス</madsrdf:authoritativeLabel>
+	    <madsrdf:authoritativeLabel xml:lang="zxx-Hebr">בריטניה</madsrdf:authoritativeLabel>
+	    <madsrdf:code rdf:datatype="http://id.loc.gov/datatypes/codes/gac">e-uk---</madsrdf:code>
+	  </madsrdf:Geographic>
+	</madsrdf:associatedLocale>
+	<madsrdf:associatedLocale>
+	  <madsrdf:Geographic rdf:about="http://id.loc.gov/authorities/names/n82058890">
+	    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	    <madsrdf:authoritativeLabel>Galapagos Islands</madsrdf:authoritativeLabel>
+	    <madsrdf:code rdf:datatype="http://id.loc.gov/datatypes/codes/gac">pogg---</madsrdf:code>
+	  </madsrdf:Geographic>
+	</madsrdf:associatedLocale>
+	<madsrdf:fieldOfActivity>
+	  <rdf:Description>
+	    <madsrdf:fieldOfActivity>
+	      <madsrdf:Topic rdf:about="http://id.loc.gov/authorities/subjects/sh90004042">
+		<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+		<madsrdf:authoritativeLabel xml:lang="en">Evolution (Biology)</madsrdf:authoritativeLabel>
+	      </madsrdf:Topic>
+	    </madsrdf:fieldOfActivity>
+	  </rdf:Description>
+	</madsrdf:fieldOfActivity>
+	<madsrdf:fieldOfActivity>
+	  <rdf:Description>
+	    <madsrdf:fieldOfActivity>
+	      <madsrdf:Topic rdf:about="http://id.loc.gov/authorities/subjects/sh85090222">
+		<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+		<madsrdf:authoritativeLabel xml:lang="en">Natural history</madsrdf:authoritativeLabel>
+	      </madsrdf:Topic>
+	    </madsrdf:fieldOfActivity>
+	  </rdf:Description>
+	</madsrdf:fieldOfActivity>
+	<madsrdf:fieldOfActivity>
+	  <rdf:Description>
+	    <madsrdf:fieldOfActivity>
+	      <madsrdf:Topic rdf:about="http://id.loc.gov/authorities/subjects/sh85054037">
+		<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+		<madsrdf:authoritativeLabel xml:lang="en">Geology</madsrdf:authoritativeLabel>
+	      </madsrdf:Topic>
+	    </madsrdf:fieldOfActivity>
+	  </rdf:Description>
+	</madsrdf:fieldOfActivity>
+	<madsrdf:occupation>
+	  <rdf:Description>
+	    <madsrdf:occupation>
+	      <madsrdf:Topic rdf:about="http://id.loc.gov/authorities/subjects/sh85090273">
+		<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+		<madsrdf:authoritativeLabel xml:lang="en">Naturalists</madsrdf:authoritativeLabel>
+	      </madsrdf:Topic>
+	    </madsrdf:occupation>
+	  </rdf:Description>
+	</madsrdf:occupation>
+	<madsrdf:occupation>
+	  <rdf:Description>
+	    <madsrdf:occupation>
+	      <madsrdf:Topic rdf:about="http://id.loc.gov/authorities/subjects/sh85054036">
+		<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+		<madsrdf:authoritativeLabel xml:lang="en">Geologists</madsrdf:authoritativeLabel>
+	      </madsrdf:Topic>
+	    </madsrdf:occupation>
+	  </rdf:Description>
+	</madsrdf:occupation>
+	<madsrdf:associatedLanguage>
+	  <madsrdf:Language rdf:about="http://id.loc.gov/vocabulary/languages/eng">
+	    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	    <madsrdf:authoritativeLabel xml:lang="en">English</madsrdf:authoritativeLabel>
+	    <madsrdf:authoritativeLabel xml:lang="de">Englisch</madsrdf:authoritativeLabel>
+	    <madsrdf:code rdf:datatype="http://www.w3.org/2001/XMLSchema#string">eng</madsrdf:code>
+	  </madsrdf:Language>
+	</madsrdf:associatedLanguage>
+	<madsrdf:isIdentifiedByAuthority>
+	  <madsrdf:PersonalName rdf:about="http://id.loc.gov/authorities/names/n78095637">
+	    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	    <madsrdf:authoritativeLabel>Darwin, Charles, 1809-1882</madsrdf:authoritativeLabel>
+	    <madsrdf:authoritativeLabel xml:lang="zxx-Hani">達爾文, 1809-1882</madsrdf:authoritativeLabel>
+	    <madsrdf:authoritativeLabel xml:lang="zxx-Hebr">דארווין, טשארלז, 1809-1882</madsrdf:authoritativeLabel>
+	    <madsrdf:authoritativeLabel xml:lang="zxx-Arab">داروين، چارلز، 1809-1882</madsrdf:authoritativeLabel>
+	  </madsrdf:PersonalName>
+	</madsrdf:isIdentifiedByAuthority>
+      </madsrdf:RWO>
+    </madsrdf:identifiesRWO>
+    <madsrdf:fullerName>
+      <madsrdf:PersonalName>
+	<rdfs:label>Charles Robert</rdfs:label>
+      </madsrdf:PersonalName>
+    </madsrdf:fullerName>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Latn">Daerwen, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Daerwen,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Latn">4001 $aDaerwen,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Latn">Darvin, Čarls, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Darvin, Čarls,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Latn">4001 $aDarvin, Čarls,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Latn">Darvin, Charlʼz, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Darvin, Charlʼz,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Latn">4001 $aDarvin, Charlʼz,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Latn">Darvin, Tsharlz, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Darvin, Tsharlz,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Latn">4001 $aDarvin, Tsharlz,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Latn">Darwin, Carlos R., 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Darwin, Carlos R.,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Latn">4001 $aDarwin, Carlos R.,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Latn">Darwin, Charles Robert, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Darwin, Charles Robert,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Latn">4001 $wnna$aDarwin, Charles Robert,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Latn">Darwin, Karol, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Darwin, Karol,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Latn">4001 $aDarwin, Karol,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Latn">Dāwin, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Dāwin,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Latn">4001 $aDāwin,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Latn">Sdar-win, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Sdar-win,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Latn">4000 $aSdar-win,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Latn">Sdar-win, Char-le-si Ro-sbe-thi, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Sdar-win, Char-le-si Ro-sbe-thi,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Latn">4001 $aSdar-win, Char-le-si Ro-sbe-thi,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Latn">Ṭārvin̲, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Ṭārvin̲,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Latn">4001 $aṬārvin̲,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Latn">Ṭārvin̲, Cārlas, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Ṭārvin̲, Cārlas,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Latn">4001 $aṬārvin̲, Cārlas,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Hebr">דארווין, צארלס, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>דארווין, צארלס,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Hebr">4001 $aדארווין, צארלס,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Hebr">דארווין, טשארלז, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>דארווין, טשארלז,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Hebr">4001 $aדארווין, טשארלז,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Hebr">דרוין, טשרלס, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>דרוין, טשרלס,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Hebr">4001 $aדרוין, טשרלס,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Arab">داروين، چارلز، 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>داروين، چارلز،</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Arab">4001 $aداروين، چارلز،$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasVariant>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel xml:lang="zxx-Hani">達爾文, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>達爾文,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+	<bflc:marcKey xml:lang="zxx-Hani">4001 $a達爾文,$d1809-1882</bflc:marcKey>
+      </madsrdf:PersonalName>
+    </madsrdf:hasVariant>
+    <madsrdf:hasEarlierEstablishedForm>
+      <madsrdf:PersonalName>
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Variant"/>
+	<madsrdf:variantLabel>Darwin, Charles Robert, 1809-1882</madsrdf:variantLabel>
+	<madsrdf:elementList rdf:parseType="Collection">
+	  <madsrdf:FullNameElement>
+	    <madsrdf:elementValue>Darwin, Charles Robert,</madsrdf:elementValue>
+	  </madsrdf:FullNameElement>
+	  <madsrdf:DateNameElement>
+	    <madsrdf:elementValue>1809-1882</madsrdf:elementValue>
+	  </madsrdf:DateNameElement>
+	</madsrdf:elementList>
+      </madsrdf:PersonalName>
+    </madsrdf:hasEarlierEstablishedForm>
+    <madsrdf:hasSource>
+      <madsrdf:Source>
+	<madsrdf:citationStatus>found</madsrdf:citationStatus>
+	<madsrdf:citationSource>Proiskhozhdenie chelovi︠e︡ka i ... 1945.</madsrdf:citationSource>
+      </madsrdf:Source>
+    </madsrdf:hasSource>
+    <madsrdf:hasSource>
+      <madsrdf:Source>
+	<madsrdf:citationStatus>found</madsrdf:citationStatus>
+	<madsrdf:citationSource>nuc88-102505: His Viaje de un naturalista ... c1977</madsrdf:citationSource>
+	<madsrdf:citationNote>(hdg. on MiEM rept.: Darwin, Charles, 1809-1882; usage: Carlos R. Darwin)</madsrdf:citationNote>
+      </madsrdf:Source>
+    </madsrdf:hasSource>
+    <madsrdf:hasSource>
+      <madsrdf:Source>
+	<madsrdf:citationStatus>found</madsrdf:citationStatus>
+	<madsrdf:citationSource>Ramaruku dōbutsu tetsugaku, Dāwin shu no kigen, 1985.</madsrdf:citationSource>
+      </madsrdf:Source>
+    </madsrdf:hasSource>
+    <madsrdf:hasSource>
+      <madsrdf:Source>
+	<madsrdf:citationStatus>found</madsrdf:citationStatus>
+	<madsrdf:citationSource>Listy wybrane, 1999:</madsrdf:citationSource>
+	<madsrdf:citationNote>t.p. (Karol Darwin)</madsrdf:citationNote>
+      </madsrdf:Source>
+    </madsrdf:hasSource>
+    <madsrdf:hasSource>
+      <madsrdf:Source>
+	<madsrdf:citationStatus>found</madsrdf:citationStatus>
+	<madsrdf:citationSource>Cārlas Ṭārvin̲, 1997.</madsrdf:citationSource>
+      </madsrdf:Source>
+    </madsrdf:hasSource>
+    <madsrdf:hasSource>
+      <madsrdf:Source>
+	<madsrdf:citationStatus>found</madsrdf:citationStatus>
+	<madsrdf:citationSource>Cintan̲aiyāḷar Ṭārvin̲, 2002.</madsrdf:citationSource>
+      </madsrdf:Source>
+    </madsrdf:hasSource>
+    <madsrdf:hasSource>
+      <madsrdf:Source>
+	<madsrdf:citationStatus>found</madsrdf:citationStatus>
+	<madsrdf:citationSource>Skye dṅos rigs kyi ʼbyuṅ khuṅs, 2000:</madsrdf:citationSource>
+	<madsrdf:citationNote>t.p. (Sdar-win) p. 963 (Char-le-si Ro-sbe-thi Sdar-win)</madsrdf:citationNote>
+      </madsrdf:Source>
+    </madsrdf:hasSource>
+    <madsrdf:hasSource>
+      <madsrdf:Source>
+	<madsrdf:citationStatus>found</madsrdf:citationStatus>
+	<madsrdf:citationSource>Čovekovo poreklo, 1931:</madsrdf:citationSource>
+	<madsrdf:citationNote>t.p. (Čarls Darvin)</madsrdf:citationNote>
+      </madsrdf:Source>
+    </madsrdf:hasSource>
+    <madsrdf:hasSource>
+      <madsrdf:Source>
+	<madsrdf:citationStatus>found</madsrdf:citationStatus>
+	<madsrdf:citationSource>Wikipedia, July 3, 2015</madsrdf:citationSource>
+	<madsrdf:citationNote>(Charles Darwin; Charles Robert Darwin, FRS 12 February 1809-19 April 1882); English naturalist and geologist, best known for his contributions to evolutionary theory; born The Mount, Shrewsbury, Shropshire, United Kingdom; died Down House, Luxted Road, Downe, Kent, UK)</madsrdf:citationNote>
+      </madsrdf:Source>
+    </madsrdf:hasSource>
+    <madsrdf:hasSource>
+      <madsrdf:Source>
+	<madsrdf:citationStatus>found</madsrdf:citationStatus>
+	<madsrdf:citationSource>Canadiana, April 8, 2020</madsrdf:citationSource>
+	<madsrdf:citationNote>(access point: Darwin, Charles, 1809-1882; variants: Darwin, Charles R.; Darwin, Charles Robert; Darwin, Charles Robert, 1809-1882)</madsrdf:citationNote>
+      </madsrdf:Source>
+    </madsrdf:hasSource>
+    <madsrdf:hasSource>
+      <madsrdf:Source>
+	<madsrdf:citationStatus>found</madsrdf:citationStatus>
+	<madsrdf:citationSource>Wikipedia, August 9, 2021</madsrdf:citationSource>
+	<madsrdf:citationNote>(under Galápagos Islands: the islands are known for their large number of endemic species that were studied by Charles Darwin during the second voyage of HMS Beagle. His observations and collections contributed to the inception of Darwin's theory of evolution by means of natural selection)</madsrdf:citationNote>
+      </madsrdf:Source>
+    </madsrdf:hasSource>
+    <madsrdf:editorialNote>[URIs added to 3XX fields of this record for the PCC URI MARC Pilot. Please do not remove or edit the URIs.]</madsrdf:editorialNote>
+    <madsrdf:editorialNote>[Machine-derived non-Latin script reference project.]</madsrdf:editorialNote>
+    <madsrdf:editorialNote>[Non-Latin script references not evaluated.]</madsrdf:editorialNote>
+    <identifiers:lccn xmlns:identifiers="http://id.loc.gov/vocabulary/identifiers/">n 78095637</identifiers:lccn>
+    <madsrdf:isMemberOfMADSCollection rdf:resource="http://id.loc.gov/authorities/names/collection_NamesAuthorizedHeadings"/>
+    <madsrdf:isMemberOfMADSScheme rdf:resource="http://id.loc.gov/authorities/names"/>
+    <madsrdf:isMemberOfMADSCollection rdf:resource="http://id.loc.gov/authorities/names/collection_LCNAF"/>
+    <madsrdf:hasExactExternalAuthority rdf:resource="http://viaf.org/en/viaf/LC%7Cn%20%2078095637"/>
+    <madsrdf:hasExactExternalAuthority rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+    <madsrdf:hasExactExternalAuthority>
+      <madsrdf:PersonalName rdf:about="http://id.worldcat.org/fast/29136">
+	<bflc:marcKey>1001 $aDarwin, Charles,$d1809-1882</bflc:marcKey>
+	<madsrdf:authoritativeLabel>Darwin, Charles, 1809-1882</madsrdf:authoritativeLabel>
+      </madsrdf:PersonalName>
+    </madsrdf:hasExactExternalAuthority>
+    <madsrdf:identifiesRWO rdf:resource="http://dbpedia.org/resource/Charles_Darwin"/>
+    <madsrdf:identifiesRWO rdf:resource="http://www.wikidata.org/entity/Q1035"/>
+    <madsrdf:identifiesRWO rdf:resource="http://www.viaf.org/viaf/27063124"/>
+    <madsrdf:identifiesRWO rdf:resource="http://isni.org/isni/0000000121251077"/>
+    <madsrdf:identifiesRWO rdf:resource="http://thesaurus.cerl.org/record/cnp01430658"/>
+    <madsrdf:identifiesRWO rdf:resource="http://vocab.getty.edu/ulan/500228559-agent"/>
+    <madsrdf:hasRelatedAuthority>
+      <madsrdf:NameTitle rdf:about="http://id.loc.gov/authorities/names/no2018125856">
+	<rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	<madsrdf:authoritativeLabel>Tort, Patrick. Voilier nommé Désir</madsrdf:authoritativeLabel>
+      </madsrdf:NameTitle>
+    </madsrdf:hasRelatedAuthority>
+    <madsrdf:hasCloseExternalAuthority>
+      <madsrdf:PersonalName rdf:about="http://id.worldcat.org/fast/29136">
+	<bflc:marcKey>1001 $aDarwin, Charles,$d1809-1882</bflc:marcKey>
+	<madsrdf:authoritativeLabel>Darwin, Charles, 1809-1882</madsrdf:authoritativeLabel>
+      </madsrdf:PersonalName>
+    </madsrdf:hasCloseExternalAuthority>
+    <madsrdf:hasCloseExternalAuthority rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+    <madsrdf:identifiesRWO>
+      <madsrdf:PersonalName rdf:about="https://d-nb.info/gnd/118523813">
+	<rdfs:label>Darwin, Charles</rdfs:label>
+	<madsrdf:authoritativeLabel>Darwin, Charles</madsrdf:authoritativeLabel>
+      </madsrdf:PersonalName>
+    </madsrdf:identifiesRWO>
+    <madsrdf:hasCloseExternalAuthority>
+      <madsrdf:PersonalName rdf:about="https://id.ndl.go.jp/auth/ndlna/00437248">
+	<bflc:marcKey>1001 $aDarwin, Charles,$d1809-1882</bflc:marcKey>
+	<madsrdf:authoritativeLabel>Darwin, Charles, 1809-1882</madsrdf:authoritativeLabel>
+      </madsrdf:PersonalName>
+    </madsrdf:hasCloseExternalAuthority>
+    <madsrdf:identifiesRWO rdf:resource="https://isni.org/isni/0000000121251077"/>
+    <madsrdf:adminMetadata>
+      <ri:RecordInfo xmlns:ri="http://id.loc.gov/ontologies/RecordInfo#">
+	<ri:recordChangeDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1978-12-18T00:00:00</ri:recordChangeDate>
+	<ri:recordStatus rdf:datatype="http://www.w3.org/2001/XMLSchema#string">new</ri:recordStatus>
+	<ri:recordContentSource>
+	  <madsrdf:CorporateName rdf:about="http://id.loc.gov/vocabulary/organizations/dlc">
+	    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	    <madsrdf:authoritativeLabel>United States, Library of Congress</madsrdf:authoritativeLabel>
+	    <madsrdf:code rdf:datatype="http://id.loc.gov/datatypes/orgs/code">DLC</madsrdf:code>
+	    <madsrdf:code rdf:datatype="http://id.loc.gov/datatypes/orgs/normalized">dlc</madsrdf:code>
+	    <madsrdf:code rdf:datatype="http://id.loc.gov/datatypes/orgs/iso15511">US-dlc</madsrdf:code>
+	  </madsrdf:CorporateName>
+	</ri:recordContentSource>
+	<ri:languageOfCataloging>
+	  <madsrdf:Language rdf:about="http://id.loc.gov/vocabulary/iso639-2/eng">
+	    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	    <rdf:type rdf:resource="http://id.loc.gov/vocabulary/iso639-2/iso639-2_Language"/>
+	    <madsrdf:authoritativeLabel xml:lang="en">English</madsrdf:authoritativeLabel>
+	    <madsrdf:authoritativeLabel xml:lang="fr">anglais</madsrdf:authoritativeLabel>
+	    <madsrdf:authoritativeLabel xml:lang="de">Englisch</madsrdf:authoritativeLabel>
+	    <madsrdf:code rdf:datatype="http://www.w3.org/2001/XMLSchema#string">eng</madsrdf:code>
+	  </madsrdf:Language>
+	</ri:languageOfCataloging>
+      </ri:RecordInfo>
+    </madsrdf:adminMetadata>
+    <madsrdf:adminMetadata>
+      <ri:RecordInfo xmlns:ri="http://id.loc.gov/ontologies/RecordInfo#">
+	<ri:recordChangeDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2025-08-04T23:14:30</ri:recordChangeDate>
+	<ri:recordStatus rdf:datatype="http://www.w3.org/2001/XMLSchema#string">revised</ri:recordStatus>
+	<ri:recordContentSource>
+	  <madsrdf:CorporateName rdf:about="http://id.loc.gov/vocabulary/organizations/dlc">
+	    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	    <madsrdf:authoritativeLabel>United States, Library of Congress</madsrdf:authoritativeLabel>
+	    <madsrdf:code rdf:datatype="http://id.loc.gov/datatypes/orgs/code">DLC</madsrdf:code>
+	    <madsrdf:code rdf:datatype="http://id.loc.gov/datatypes/orgs/normalized">dlc</madsrdf:code>
+	    <madsrdf:code rdf:datatype="http://id.loc.gov/datatypes/orgs/iso15511">US-dlc</madsrdf:code>
+	  </madsrdf:CorporateName>
+	</ri:recordContentSource>
+	<ri:languageOfCataloging>
+	  <madsrdf:Language rdf:about="http://id.loc.gov/vocabulary/iso639-2/eng">
+	    <rdf:type rdf:resource="http://www.loc.gov/mads/rdf/v1#Authority"/>
+	    <rdf:type rdf:resource="http://id.loc.gov/vocabulary/iso639-2/iso639-2_Language"/>
+	    <madsrdf:authoritativeLabel xml:lang="en">English</madsrdf:authoritativeLabel>
+	    <madsrdf:authoritativeLabel xml:lang="fr">anglais</madsrdf:authoritativeLabel>
+	    <madsrdf:authoritativeLabel xml:lang="de">Englisch</madsrdf:authoritativeLabel>
+	    <madsrdf:code rdf:datatype="http://www.w3.org/2001/XMLSchema#string">eng</madsrdf:code>
+	  </madsrdf:Language>
+	</ri:languageOfCataloging>
+      </ri:RecordInfo>
+    </madsrdf:adminMetadata>
+    <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+    <skos:prefLabel>Darwin, Charles, 1809-1882</skos:prefLabel>
+    <skos:prefLabel xml:lang="zxx-Hani">達爾文, 1809-1882</skos:prefLabel>
+    <skos:prefLabel xml:lang="zxx-Hebr">דארווין, טשארלז, 1809-1882</skos:prefLabel>
+    <skos:prefLabel xml:lang="zxx-Arab">داروين، چارلز، 1809-1882</skos:prefLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Latn">Daerwen, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Latn">Darvin, Čarls, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Latn">Darvin, Charlʼz, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Latn">Darvin, Tsharlz, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Latn">Darwin, Carlos R., 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Latn">Darwin, Charles Robert, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Latn">Darwin, Karol, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Latn">Dāwin, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Latn">Sdar-win, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Latn">Sdar-win, Char-le-si Ro-sbe-thi, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Latn">Ṭārvin̲, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Latn">Ṭārvin̲, Cārlas, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Hebr">דארווין, צארלס, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Hebr">דארווין, טשארלז, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Hebr">דרוין, טשרלס, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Arab">داروين، چارلز، 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skosxl:altLabel xmlns:skosxl="http://www.w3.org/2008/05/skos-xl#">
+      <rdf:Description>
+	<rdf:type rdf:resource="http://www.w3.org/2008/05/skos-xl#Label"/>
+	<skosxl:literalForm xml:lang="zxx-Hani">達爾文, 1809-1882</skosxl:literalForm>
+      </rdf:Description>
+    </skosxl:altLabel>
+    <skos:semanticRelation>
+      <rdf:Description rdf:about="http://id.loc.gov/authorities/names/no2018125856">
+	<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+	<skos:prefLabel>Tort, Patrick. Voilier nommé Désir</skos:prefLabel>
+      </rdf:Description>
+    </skos:semanticRelation>
+    <skos:exactMatch rdf:resource="http://viaf.org/en/viaf/LC%7Cn%20%2078095637"/>
+    <skos:exactMatch rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+    <skos:exactMatch>
+      <rdf:Description rdf:about="http://id.worldcat.org/fast/29136">
+	<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+	<skos:prefLabel>Darwin, Charles, 1809-1882</skos:prefLabel>
+      </rdf:Description>
+    </skos:exactMatch>
+    <skos:closeMatch>
+      <rdf:Description rdf:about="http://id.worldcat.org/fast/29136">
+	<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+	<skos:prefLabel>Darwin, Charles, 1809-1882</skos:prefLabel>
+      </rdf:Description>
+    </skos:closeMatch>
+    <skos:closeMatch rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+    <skos:closeMatch>
+      <rdf:Description rdf:about="https://id.ndl.go.jp/auth/ndlna/00437248">
+	<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+	<skos:prefLabel>Darwin, Charles, 1809-1882</skos:prefLabel>
+      </rdf:Description>
+    </skos:closeMatch>
+    <skos:editorialNote>[URIs added to 3XX fields of this record for the PCC URI MARC Pilot. Please do not remove or edit the URIs.]</skos:editorialNote>
+    <skos:editorialNote>[Machine-derived non-Latin script reference project.]</skos:editorialNote>
+    <skos:editorialNote>[Non-Latin script references not evaluated.]</skos:editorialNote>
+    <skos:inScheme rdf:resource="http://id.loc.gov/authorities/names"/>
+    <skos:altLabel xml:lang="zxx-Latn">Daerwen, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Latn">Darvin, Čarls, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Latn">Darvin, Charlʼz, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Latn">Darvin, Tsharlz, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Latn">Darwin, Carlos R., 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Latn">Darwin, Charles Robert, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Latn">Darwin, Karol, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Latn">Dāwin, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Latn">Sdar-win, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Latn">Sdar-win, Char-le-si Ro-sbe-thi, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Latn">Ṭārvin̲, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Latn">Ṭārvin̲, Cārlas, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Hebr">דארווין, צארלס, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Hebr">דארווין, טשארלז, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Hebr">דרוין, טשרלס, 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Arab">داروين، چارلز، 1809-1882</skos:altLabel>
+    <skos:altLabel xml:lang="zxx-Hani">達爾文, 1809-1882</skos:altLabel>
+    <skos:changeNote>
+      <cs:ChangeSet xmlns:cs="http://purl.org/vocab/changeset/schema#">
+	<cs:subjectOfChange rdf:resource="http://id.loc.gov/authorities/names/n78095637"/>
+	<cs:creatorName>United States, Library of CongressDLCdlcUS-dlc</cs:creatorName>
+	<cs:createdDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1978-12-18T00:00:00</cs:createdDate>
+	<cs:changeReason rdf:datatype="http://www.w3.org/2001/XMLSchema#string">new</cs:changeReason>
+      </cs:ChangeSet>
+    </skos:changeNote>
+    <skos:changeNote>
+      <cs:ChangeSet xmlns:cs="http://purl.org/vocab/changeset/schema#">
+	<cs:subjectOfChange rdf:resource="http://id.loc.gov/authorities/names/n78095637"/>
+	<cs:creatorName>United States, Library of CongressDLCdlcUS-dlc</cs:creatorName>
+	<cs:createdDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2025-08-04T23:14:30</cs:createdDate>
+	<cs:changeReason rdf:datatype="http://www.w3.org/2001/XMLSchema#string">revised</cs:changeReason>
+      </cs:ChangeSet>
+    </skos:changeNote>
+  </madsrdf:PersonalName>
+</rdf:RDF>

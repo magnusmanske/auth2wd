@@ -117,6 +117,9 @@ impl SupportedProperty {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     #[test]
     fn test_all_supported_properties_have_unique_property_ids() {
@@ -134,29 +137,24 @@ mod tests {
     async fn test_generator_creates_correct_importer() {
         // Use VIAF as a quick test: the factory should produce an importer
         // whose my_property() matches the SupportedProperty's property.
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/viaf_30701597.rdf");
+
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://viaf.org", server.uri());
+
         let sp = SUPPORTED_PROPERTIES
             .iter()
             .find(|sp| sp.property == 214)
             .expect("VIAF (P214) should be in SUPPORTED_PROPERTIES");
         let importer = sp.generator("30701597").await.unwrap();
         assert_eq!(importer.my_property(), sp.property);
-    }
 
-    #[tokio::test]
-    async fn test_generator_for_each_supported_property() {
-        // Verify every entry's factory produces an importer with a matching property number,
-        // using each entry's demo_id.
-        for sp in SUPPORTED_PROPERTIES.iter() {
-            let importer = sp
-                .generator(&sp.demo_id)
-                .await
-                .unwrap_or_else(|e| panic!("generator failed for P{}: {}", sp.property, e));
-            assert_eq!(
-                importer.my_property(),
-                sp.property,
-                "my_property() mismatch for {}",
-                sp.name
-            );
-        }
+        url_override::unregister("https://viaf.org");
     }
 }

@@ -1,0 +1,103 @@
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:xl="http://www.w3.org/2008/05/skos-xl#"
+  xmlns:rdag1="http://RDVocab.info/ElementsGr1/"
+  xmlns:rda="http://RDVocab.info/ElementsGr2/"
+  xmlns:rdaa="http://rdaregistry.info/Elements/a/"
+  xmlns:frbrent="http://RDVocab.info/uri/schema/FRBRentitiesRDA/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:ndl="http://ndl.go.jp/dcndl/terms/"
+  xmlns:dct="http://purl.org/dc/terms/"
+>
+<skos:Concept rdf:about="http://id.ndl.go.jp/auth/ndlna/00054222">
+	<foaf:primaryTopic>
+		<foaf:Person rdf:about="http://id.ndl.go.jp/auth/entity/00054222">
+			<foaf:name>夏目漱石</foaf:name>
+			<rda:dateOfBirth>1867</rda:dateOfBirth>
+			<rda:dateOfDeath>1916</rda:dateOfDeath>
+		</foaf:Person>
+	</foaf:primaryTopic>
+	<dct:modified>2025-12-16T09:49:30</dct:modified>
+	<dct:created>1979-04-01</dct:created>
+	<xl:prefLabel>
+		<rdf:Description>
+			<xl:literalForm>夏目, 漱石, 1867-1916</xl:literalForm>
+			<ndl:transcription xml:lang="ja-Kana">ナツメ, ソウセキ, 1867-1916</ndl:transcription>
+			<ndl:transcription xml:lang="ja-Latn">Natsume, Soseki, 1867-1916</ndl:transcription>
+		</rdf:Description>
+	</xl:prefLabel>
+	<rdfs:label>夏目, 漱石, 1867-1916</rdfs:label>
+	<xl:altLabel>
+		<rdf:Description>
+			<xl:literalForm>夏目, 金之助</xl:literalForm>
+			<ndl:transcription xml:lang="ja-Kana">ナツメ, キンノスケ</ndl:transcription>
+			<ndl:transcription xml:lang="ja-Latn">Natsume, Kinnosuke</ndl:transcription>
+			<dct:description>本名</dct:description>
+		</rdf:Description>
+	</xl:altLabel>
+	<xl:altLabel>
+		<rdf:Description>
+			<xl:literalForm>Natsume, Soseki</xl:literalForm>
+		</rdf:Description>
+	</xl:altLabel>
+	<xl:altLabel>
+		<rdf:Description>
+			<xl:literalForm>Soseki Natsume</xl:literalForm>
+		</rdf:Description>
+	</xl:altLabel>
+	<xl:altLabel>
+		<rdf:Description>
+			<xl:literalForm>Нацумэ, Сосэки</xl:literalForm>
+			<ndl:transcription xml:lang="ja-Latn">Natsumė, Sosėki</ndl:transcription>
+		</rdf:Description>
+	</xl:altLabel>
+	<xl:altLabel>
+		<rdf:Description>
+			<xl:literalForm>Nacume, Soseki</xl:literalForm>
+		</rdf:Description>
+	</xl:altLabel>
+	<xl:altLabel>
+		<rdf:Description>
+			<xl:literalForm>나츠메, 소오세키</xl:literalForm>
+		</rdf:Description>
+	</xl:altLabel>
+	<xl:altLabel>
+		<rdf:Description>
+			<xl:literalForm>نتصميه, صوسك</xl:literalForm>
+			<ndl:transcription xml:lang="ja-Latn">Natṣumīh, Ṣūsiki</ndl:transcription>
+		</rdf:Description>
+	</xl:altLabel>
+	<xl:altLabel>
+		<rdf:Description>
+			<xl:literalForm>Нацуме, Сосеки</xl:literalForm>
+			<ndl:transcription xml:lang="ja-Latn">Nat︠s︡ume Soseki</ndl:transcription>
+		</rdf:Description>
+	</xl:altLabel>
+	<xl:altLabel>
+		<rdf:Description>
+			<xl:literalForm>Νατσουμε, Σοσεκι</xl:literalForm>
+			<ndl:transcription xml:lang="ja-Latn">Natsoume, Soseki</ndl:transcription>
+		</rdf:Description>
+	</xl:altLabel>
+	<xl:altLabel>
+		<rdf:Description>
+			<xl:literalForm>نتصوميه, صوسيكي</xl:literalForm>
+			<ndl:transcription xml:lang="ja-Latn">Natṣūmīh, Ṣūsīkī</ndl:transcription>
+		</rdf:Description>
+	</xl:altLabel>
+	<xl:altLabel>
+		<rdf:Description>
+			<xl:literalForm>Natsume, Sōseki</xl:literalForm>
+		</rdf:Description>
+	</xl:altLabel>
+	<dct:source>坊ちゃん</dct:source>
+	<dct:source>文化人名録 第26版</dct:source>
+	<skos:exactMatch rdf:resource="http://id.loc.gov/authorities/names/n79084664"/>
+	<skos:exactMatch rdf:resource="http://viaf.org/viaf/sourceID/NDL%7C00054222#skos:Concept"/>
+	<skos:inScheme rdf:resource="http://id.ndl.go.jp/auth#personalNames"/>
+</skos:Concept>
+</rdf:RDF>
+

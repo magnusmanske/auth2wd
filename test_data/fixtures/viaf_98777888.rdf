@@ -1,0 +1,1014 @@
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:wdt="http://www.wikidata.org/prop/direct/" xmlns:umbel="http://umbel.org/umbel#" xmlns:schema="http://schema.org/" xmlns:re="http://oclcsrw.google.code/redirect" xmlns:pto="http://www.productontology.org/id/" xmlns:genont="http://www.w3.org/2006/gen/ont#" xmlns:dbo="http://dbpedia.org/ontology/" xmlns:bgn="http://bibliograph.net/">
+<rdf:Description rdf:about="http://viaf.org/viaf/98777888/">
+<rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Document"/>
+<rdf:type rdf:resource="http://www.w3.org/2006/gen/ont#InformationResource"/>
+<void:inDataset xmlns:void="http://rdfs.org/ns/void#" rdf:resource="http://viaf.org/viaf/data"/>
+<foaf:primaryTopic xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/98777888">
+<dcterms:identifier xmlns:dcterms="http://purl.org/dc/terms/">98777888</dcterms:identifier>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<schema:description>American politician, born 1948</schema:description>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<dbo:notableWork>
+<rdf:Description rdf:about="http://viaf.org/viaf/201886975">
+<rdfs:label xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">Earth in the balance</rdfs:label>
+</rdf:Description>
+</dbo:notableWork>
+<dbo:notableWork>
+<rdf:Description rdf:about="http://viaf.org/viaf/212921220">
+<rdfs:label xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">Inconvenient truth : the crisis of global warming</rdfs:label>
+</rdf:Description>
+</dbo:notableWork>
+<dbo:notableWork>
+<rdf:Description rdf:about="http://viaf.org/viaf/715159477542927990000">
+<rdfs:label xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">Our choice.</rdfs:label>
+</rdf:Description>
+</dbo:notableWork>
+<dbo:notableWork>
+<rdf:Description rdf:about="http://viaf.org/viaf/776145424548586830667">
+<rdfs:label xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">Assault on reason</rdfs:label>
+</rdf:Description>
+</dbo:notableWork>
+<dbo:notableWork>
+<rdf:Description rdf:about="http://viaf.org/viaf/6447159478332627990007">
+<rdfs:label xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">Future.</rdfs:label>
+</rdf:Description>
+</dbo:notableWork>
+<dbo:notableWork>
+<rdf:Description rdf:about="http://viaf.org/viaf/1831147484277349360009">
+<rdfs:label xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">Inconvenient truth.</rdfs:label>
+</rdf:Description>
+</dbo:notableWork>
+<rdf:type rdf:resource="http://schema.org/Person"/>
+<schema:birthDate>1948-03-31</schema:birthDate>
+<schema:name xml:lang="en">Al Gore</schema:name>
+<schema:name xml:lang="en">Al Gore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'WKP' is undetermined. Name is 'Al Gore'.</rdfs:comment>
+<schema:name>Al Gore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'WKP|Q19673' is undetermined. Name is 'Al Gore'.</rdfs:comment>
+<schema:name>Al Gore</schema:name>
+<schema:name xml:lang="it-IT">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="it-IT">AlGore</skos:prefLabel>
+<schema:name xml:lang="it-IT">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="it-IT">AlGore</skos:prefLabel>
+<schema:name xml:lang="fr-FR">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="fr-FR">AlGore</skos:prefLabel>
+<schema:name xml:lang="fr-FR">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="fr-FR">AlGore</skos:prefLabel>
+<schema:name xml:lang="lt-LT">AlbertGore</schema:name>
+<schema:name xml:lang="lt-LT">AlbertGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Al</schema:givenName>
+<schema:name xml:lang="hr-HR">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="hr-HR">AlGore</skos:prefLabel>
+<schema:name xml:lang="hr-HR">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="hr-HR">AlGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Al</schema:givenName>
+<schema:name xml:lang="da-DK">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="da-DK">AlGore</skos:prefLabel>
+<schema:name xml:lang="da-DK">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="da-DK">AlGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Al</schema:givenName>
+<schema:name xml:lang="no-NO">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="no-NO">AlGore</skos:prefLabel>
+<schema:name xml:lang="no-NO">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="no-NO">AlGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Al</schema:givenName>
+<schema:name xml:lang="no-NO">AlGore</schema:name>
+<schema:name xml:lang="no-NO">AlGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Al</schema:givenName>
+<schema:name xml:lang="nl-NL">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="nl-NL">AlGore</skos:prefLabel>
+<schema:name xml:lang="nl-NL">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="nl-NL">AlGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Al,</schema:givenName>
+<schema:name xml:lang="sl-SL">AlGore</schema:name>
+<schema:name xml:lang="sl-SL">AlGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Al,</schema:givenName>
+<schema:name xml:lang="lv-LV">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="lv-LV">AlGore</skos:prefLabel>
+<schema:name xml:lang="lv-LV">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="lv-LV">AlGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Al,</schema:givenName>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'J9U' is undetermined. Name is 'AlGore'.</rdfs:comment>
+<schema:name>AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'J9U|987007261939705171' is undetermined. Name is 'AlGore'.</rdfs:comment>
+<schema:name>AlGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Al,</schema:givenName>
+<schema:name xml:lang="cs-CZ">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="cs-CZ">AlGore</skos:prefLabel>
+<schema:name xml:lang="cs-CZ">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="cs-CZ">AlGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Al,</schema:givenName>
+<schema:name xml:lang="fr-CA">AlGore</schema:name>
+<schema:name xml:lang="fr-CA">AlGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Al,</schema:givenName>
+<schema:name xml:lang="en-US">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="en-US">AlGore</skos:prefLabel>
+<schema:name xml:lang="en-US">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="en-US">AlGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Al,</schema:givenName>
+<schema:name xml:lang="fr-FR">AlGore</schema:name>
+<schema:name xml:lang="fr-FR">AlGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert</schema:givenName>
+<schema:name xml:lang="fr-CH">AlbertGore</schema:name>
+<schema:name xml:lang="fr-CH">AlbertGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert</schema:givenName>
+<schema:name xml:lang="ja-JP">AlbertGore</schema:name>
+<schema:name xml:lang="ja-JP">AlbertGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert Arnold (Al)</schema:givenName>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'NYNYRILM' is undetermined. Name is 'Albert Arnold (Al)Gore'.</rdfs:comment>
+<schema:name>Albert Arnold (Al)Gore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'NYNYRILM|27706' is undetermined. Name is 'Albert Arnold (Al)Gore'.</rdfs:comment>
+<schema:name>Albert Arnold (Al)Gore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert</schema:givenName>
+<schema:name xml:lang="pl-PL">AlbertGore</schema:name>
+<schema:name xml:lang="pl-PL">AlbertGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert</schema:givenName>
+<schema:name xml:lang="pl-PL">AlbertGore</schema:name>
+<schema:name xml:lang="pl-PL">AlbertGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert</schema:givenName>
+<schema:name xml:lang="de-DE">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="de-DE">AlbertGore</skos:prefLabel>
+<schema:name xml:lang="de-DE">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="de-DE">AlbertGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert</schema:givenName>
+<schema:name xml:lang="fr-CH">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="fr-CH">AlbertGore</skos:prefLabel>
+<schema:name xml:lang="fr-CH">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="fr-CH">AlbertGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert</schema:givenName>
+<schema:name xml:lang="en-KR">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="en-KR">AlbertGore</skos:prefLabel>
+<schema:name xml:lang="en-KR">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="en-KR">AlbertGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert</schema:givenName>
+<schema:name xml:lang="en-US">AlbertGore</schema:name>
+<schema:name xml:lang="en-US">AlbertGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert,</schema:givenName>
+<schema:name xml:lang="is-IS">AlbertGore</schema:name>
+<schema:name xml:lang="is-IS">AlbertGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert,</schema:givenName>
+<schema:name xml:lang="en-AU">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="en-AU">AlbertGore</skos:prefLabel>
+<schema:name xml:lang="en-AU">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="en-AU">AlbertGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert,</schema:givenName>
+<schema:name xml:lang="ja-JP">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="ja-JP">AlbertGore</skos:prefLabel>
+<schema:name xml:lang="ja-JP">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="ja-JP">AlbertGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert,</schema:givenName>
+<schema:name xml:lang="ca-ES">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="ca-ES">AlbertGore</skos:prefLabel>
+<schema:name xml:lang="ca-ES">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="ca-ES">AlbertGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert,</schema:givenName>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'UAE' is undetermined. Name is 'AlbertGore'.</rdfs:comment>
+<schema:name>AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'UAE|Mill_a10001140' is undetermined. Name is 'AlbertGore'.</rdfs:comment>
+<schema:name>AlbertGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert,</schema:givenName>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'GRATEVE' is undetermined. Name is 'AlbertGore'.</rdfs:comment>
+<schema:name>AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'GRATEVE|69707' is undetermined. Name is 'AlbertGore'.</rdfs:comment>
+<schema:name>AlbertGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert,</schema:givenName>
+<schema:name xml:lang="et-EE">AlbertGore</schema:name>
+<schema:name xml:lang="et-EE">AlbertGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert,</schema:givenName>
+<schema:name xml:lang="pt-BR">AlbertGore</schema:name>
+<schema:name xml:lang="pt-BR">AlbertGore</schema:name>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert,</schema:givenName>
+<schema:name xml:lang="sv-SE">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="sv-SE">AlbertGore</skos:prefLabel>
+<schema:name xml:lang="sv-SE">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="sv-SE">AlbertGore</skos:prefLabel>
+<schema:familyName>Gore</schema:familyName>
+<schema:givenName>Albert,</schema:givenName>
+<schema:name xml:lang="es-CL">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="es-CL">AlbertGore</skos:prefLabel>
+<schema:name xml:lang="es-CL">AlbertGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="es-CL">AlbertGore</skos:prefLabel>
+<schema:name xml:lang="pt-PT">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="pt-PT">AlGore</skos:prefLabel>
+<schema:name xml:lang="pt-PT">AlGore</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="pt-PT">AlGore</skos:prefLabel>
+<schema:familyName>גור</schema:familyName>
+<schema:givenName>אל,</schema:givenName>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'J9U' is undetermined. Name is 'אלגור'.</rdfs:comment>
+<schema:name>אלגור</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'J9U|987007261939705171' is undetermined. Name is 'אלגור'.</rdfs:comment>
+<schema:name>אלגור</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'J9U' is undetermined. Name is 'جور، آل'.</rdfs:comment>
+<schema:name>جور، آل</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">BCP47 tag for 'J9U|987007261939705171' is undetermined. Name is 'جور، آل'.</rdfs:comment>
+<schema:name>جور، آل</schema:name>
+<schema:name xml:lang="ar-EG">جور، آل،</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="ar-EG">جور، آل،</skos:prefLabel>
+<schema:name xml:lang="ar-EG">جور، آل،</schema:name>
+<rdfs:comment xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Warning: skos:prefLabels are not ensured against change!</rdfs:comment>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#" xml:lang="ar-EG">جور، آل،</skos:prefLabel>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Albert Arnold Gore</schema:alternateName>
+<schema:alternateName>Els Gors</schema:alternateName>
+<schema:alternateName>Albert ArnoldGore Jr.</schema:alternateName>
+<schema:givenName>Albert Arnold</schema:givenName>
+<schema:familyName>Gore Jr.</schema:familyName>
+<schema:alternateName>Gore'as</schema:alternateName>
+<schema:alternateName>Gore'as</schema:alternateName>
+<schema:alternateName>AlGore</schema:alternateName>
+<schema:givenName>Al</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>AlGore</schema:alternateName>
+<schema:givenName>Al</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>AlGore</schema:alternateName>
+<schema:givenName>Al</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>AlbertGore</schema:alternateName>
+<schema:givenName>Albert</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>Albert A.Gore</schema:alternateName>
+<schema:givenName>Albert A.</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>Albert ArnoldGore</schema:alternateName>
+<schema:givenName>Albert Arnold</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>Albert Arnold JrGore</schema:alternateName>
+<schema:givenName>Albert Arnold Jr</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>Albert Arnold jrGore</schema:alternateName>
+<schema:givenName>Albert Arnold jr</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>Albert ArnoldGore</schema:alternateName>
+<schema:givenName>Albert Arnold</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>Albert ArnoldGore</schema:alternateName>
+<schema:givenName>Albert Arnold</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>Albert ArnoldGore</schema:alternateName>
+<schema:givenName>Albert Arnold</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>Albert ArnoldGore</schema:alternateName>
+<schema:givenName>Albert Arnold</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>Albert J.Gore</schema:alternateName>
+<schema:givenName>Albert J.</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>AlbertGore</schema:alternateName>
+<schema:givenName>Albert</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>AlbertGore</schema:alternateName>
+<schema:givenName>Albert</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>AlbertGore</schema:alternateName>
+<schema:givenName>Albert</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>AlbertGore</schema:alternateName>
+<schema:givenName>Albert</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>AlGore</schema:alternateName>
+<schema:givenName>Al</schema:givenName>
+<schema:familyName>Gore</schema:familyName>
+<schema:alternateName>Gore</schema:alternateName>
+<schema:alternateName>Gore</schema:alternateName>
+<schema:alternateName>Gore</schema:alternateName>
+<schema:alternateName>Gore</schema:alternateName>
+<schema:alternateName>Gore</schema:alternateName>
+<schema:alternateName>Gore</schema:alternateName>
+<schema:alternateName>Gore</schema:alternateName>
+<schema:alternateName>Gore</schema:alternateName>
+<schema:alternateName>Gore</schema:alternateName>
+<schema:alternateName>Gore</schema:alternateName>
+<schema:alternateName>Gore</schema:alternateName>
+<schema:alternateName>Gore</schema:alternateName>
+<schema:alternateName>A.Gors</schema:alternateName>
+<schema:givenName>A.</schema:givenName>
+<schema:familyName>Gors</schema:familyName>
+<schema:alternateName>AlansGors</schema:alternateName>
+<schema:givenName>Alans</schema:givenName>
+<schema:familyName>Gors</schema:familyName>
+<schema:alternateName>Alberts ArnoldsGors</schema:alternateName>
+<schema:givenName>Alberts Arnolds</schema:givenName>
+<schema:familyName>Gors</schema:familyName>
+<schema:alternateName>AlbertsGors</schema:alternateName>
+<schema:givenName>Alberts</schema:givenName>
+<schema:familyName>Gors</schema:familyName>
+<schema:alternateName>AlsGors</schema:alternateName>
+<schema:givenName>Als</schema:givenName>
+<schema:familyName>Gors</schema:familyName>
+<schema:alternateName>AlsGors</schema:alternateName>
+<schema:givenName>Als</schema:givenName>
+<schema:familyName>Gors</schema:familyName>
+<schema:alternateName>ElsGors</schema:alternateName>
+<schema:givenName>Els</schema:givenName>
+<schema:familyName>Gors</schema:familyName>
+<schema:alternateName>ĀlǦūr</schema:alternateName>
+<schema:givenName>Āl</schema:givenName>
+<schema:familyName>Ǧūr</schema:familyName>
+<schema:alternateName>ĀlǦūr</schema:alternateName>
+<schema:givenName>Āl</schema:givenName>
+<schema:familyName>Ǧūr</schema:familyName>
+<schema:alternateName>Αλ Γκορ</schema:alternateName>
+<schema:alternateName>Альберт Гор</schema:alternateName>
+<schema:alternateName>А.Гор</schema:alternateName>
+<schema:givenName>А.</schema:givenName>
+<schema:familyName>Гор</schema:familyName>
+<schema:alternateName>АлГор</schema:alternateName>
+<schema:givenName>Ал</schema:givenName>
+<schema:familyName>Гор</schema:familyName>
+<schema:alternateName>АлГор</schema:alternateName>
+<schema:givenName>Ал</schema:givenName>
+<schema:familyName>Гор</schema:familyName>
+<schema:alternateName>АлГор</schema:alternateName>
+<schema:givenName>Ал</schema:givenName>
+<schema:familyName>Гор</schema:familyName>
+<schema:alternateName>АлбертГор</schema:alternateName>
+<schema:givenName>Алберт</schema:givenName>
+<schema:familyName>Гор</schema:familyName>
+<schema:alternateName>АльбертГор</schema:alternateName>
+<schema:givenName>Альберт</schema:givenName>
+<schema:familyName>Гор</schema:familyName>
+<schema:alternateName>АльбертГор</schema:alternateName>
+<schema:givenName>Альберт</schema:givenName>
+<schema:familyName>Гор</schema:familyName>
+<schema:alternateName>АльбертГор</schema:alternateName>
+<schema:givenName>Альберт</schema:givenName>
+<schema:familyName>Гор</schema:familyName>
+<schema:alternateName>Гор</schema:alternateName>
+<schema:alternateName>Эл Гор</schema:alternateName>
+<schema:alternateName>אל גור</schema:alternateName>
+<schema:alternateName>אלגור</schema:alternateName>
+<schema:givenName>אל</schema:givenName>
+<schema:familyName>גור</schema:familyName>
+<schema:alternateName>آل جور،</schema:alternateName>
+<schema:alternateName>جور، آل</schema:alternateName>
+<schema:alternateName>جور، ألبرت،</schema:alternateName>
+<schema:alternateName>جور، ألبرت،</schema:alternateName>
+<schema:alternateName>جور، البيرت،</schema:alternateName>
+<schema:alternateName>غور، آل،</schema:alternateName>
+<schema:alternateName>غور، آل،</schema:alternateName>
+<schema:alternateName>غور، آلبرت،</schema:alternateName>
+<schema:alternateName>আল গোর</schema:alternateName>
+<schema:alternateName>ਅਲ ਗੋਰ</schema:alternateName>
+<schema:alternateName>อัลกอร์</schema:alternateName>
+<schema:givenName>อัล</schema:givenName>
+<schema:familyName>กอร์</schema:familyName>
+<schema:alternateName>อัล กอร์</schema:alternateName>
+<schema:alternateName>アル・ゴア</schema:alternateName>
+<schema:alternateName>アルゴア</schema:alternateName>
+<schema:givenName>アル</schema:givenName>
+<schema:familyName>ゴア</schema:familyName>
+<schema:alternateName>アルゴア</schema:alternateName>
+<schema:givenName>アル</schema:givenName>
+<schema:familyName>ゴア</schema:familyName>
+<schema:alternateName>알버트고어</schema:alternateName>
+<schema:givenName>알버트</schema:givenName>
+<schema:familyName>고어</schema:familyName>
+<schema:alternateName>앨버트고어</schema:alternateName>
+<schema:givenName>앨버트</schema:givenName>
+<schema:familyName>고어</schema:familyName>
+<schema:alternateName>앨고어</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Al Gore</schema:alternateName>
+<schema:alternateName>Albert Arnold Gore</schema:alternateName>
+<schema:alternateName>Albert Gore</schema:alternateName>
+<schema:alternateName>Albert Qor</schema:alternateName>
+<schema:alternateName>Albertus Arnoldus Gore</schema:alternateName>
+<schema:alternateName>Els Gors</schema:alternateName>
+<schema:alternateName>Αλ Γκορ</schema:alternateName>
+<schema:alternateName>Ал Гор</schema:alternateName>
+<schema:alternateName>Ал Гор</schema:alternateName>
+<schema:alternateName>Аль Гор</schema:alternateName>
+<schema:alternateName>Альберт Гор</schema:alternateName>
+<schema:alternateName>Альберт Ґор</schema:alternateName>
+<schema:alternateName>Альбэрт Гор</schema:alternateName>
+<schema:alternateName>Ալբերտ Գոռ</schema:alternateName>
+<schema:alternateName>אל גור</schema:alternateName>
+<schema:alternateName>על גאר</schema:alternateName>
+<schema:alternateName>آل جور</schema:alternateName>
+<schema:alternateName>آل جور</schema:alternateName>
+<schema:alternateName>ئەل گۆر</schema:alternateName>
+<schema:alternateName>ال قور</schema:alternateName>
+<schema:alternateName>ال گور</schema:alternateName>
+<schema:alternateName>ال گور</schema:alternateName>
+<schema:alternateName>ایل گور</schema:alternateName>
+<schema:alternateName>अल गोर</schema:alternateName>
+<schema:alternateName>अल गोर</schema:alternateName>
+<schema:alternateName>अल्बर्ट गोर</schema:alternateName>
+<schema:alternateName>अॅल गोर</schema:alternateName>
+<schema:alternateName>एल गोर</schema:alternateName>
+<schema:alternateName>আল গোর</schema:alternateName>
+<schema:alternateName>ਏ ਐੱਲ ਗੋਰ</schema:alternateName>
+<schema:alternateName>ஆல் கோர்</schema:alternateName>
+<schema:alternateName>ఆల్ గోర్</schema:alternateName>
+<schema:alternateName>ಆಲ್ ಗೊರ್</schema:alternateName>
+<schema:alternateName>അൽ ഗോർ</schema:alternateName>
+<schema:alternateName>อัล กอร์</schema:alternateName>
+<schema:alternateName>ཨཱལ་གྷོར།</schema:alternateName>
+<schema:alternateName>အယ်လ် ဂိုး</schema:alternateName>
+<schema:alternateName>ალბერტ გორი</schema:alternateName>
+<schema:alternateName>ᱟᱞ ᱜᱳᱨ</schema:alternateName>
+<schema:alternateName>アル・ゴア</schema:alternateName>
+<schema:alternateName>戈爾</schema:alternateName>
+<schema:alternateName>艾戈</schema:alternateName>
+<schema:alternateName>阿尔·戈尔</schema:alternateName>
+<schema:alternateName>阿尔·戈尔</schema:alternateName>
+<schema:alternateName>阿尔·戈尔</schema:alternateName>
+<schema:alternateName>앨 고어</schema:alternateName>
+<schema:sameAs>
+<rdf:Description rdf:about="http://d-nb.info/gnd/118900463"/>
+</schema:sameAs>
+<schema:sameAs>
+<rdf:Description rdf:about="http://isni.org/isni/0000000122833650"/>
+</schema:sameAs>
+<schema:sameAs>
+<rdf:Description rdf:about="http://www.wikidata.org/entity/Q19673"/>
+</schema:sameAs>
+<schema:sameAs>
+<rdf:Description rdf:about="http://id.loc.gov/authorities/names/n86130265"/>
+</schema:sameAs>
+<schema:sameAs>
+<rdf:Description rdf:about="http://data.bibsys.no/data/notrbib/authorityentry/x90711838"/>
+</schema:sameAs>
+<schema:sameAs>
+<rdf:Description rdf:about="http://libris.kb.se/resource/auth/313117"/>
+</schema:sameAs>
+<schema:sameAs>
+<rdf:Description rdf:about="http://data.bnf.fr/#foaf:Person"/>
+</schema:sameAs>
+<schema:sameAs>
+<rdf:Description rdf:about="http://www.idref.fr/031911188/id"/>
+</schema:sameAs>
+<schema:sameAs>
+<rdf:Description rdf:about="http://id.ndl.go.jp/auth/entity/00467362"/>
+</schema:sameAs>
+<schema:sameAs>
+<rdf:Description rdf:about="http://vocab.getty.edu/ulan/500251202-agent"/>
+</schema:sameAs>
+<rdf:value rdf:parseType="Literal">
+<ns1:source xmlns:ns1="http://viaf.org/viaf/terms#" xmlns="http://viaf.org/viaf/terms#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:void="http://rdfs.org/ns/void#" nsid="LNB:nvm;=Cb">LIH|LNB:_n__v__m_;=C_b_</ns1:source>
+</rdf:value>
+<rdf:value rdf:parseType="Literal">
+<ns1:source xmlns:ns1="http://viaf.org/viaf/terms#" xmlns="http://viaf.org/viaf/terms#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:void="http://rdfs.org/ns/void#" nsid="9810661949005606">PLWABN|9810661949005606</ns1:source>
+</rdf:value>
+<rdf:value rdf:parseType="Literal">
+<ns1:source xmlns:ns1="http://viaf.org/viaf/terms#" xmlns="http://viaf.org/viaf/terms#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:void="http://rdfs.org/ns/void#" nsid="987007261939705171">J9U|987007261939705171</ns1:source>
+</rdf:value>
+<rdf:value rdf:parseType="Literal">
+<ns1:source xmlns:ns1="http://viaf.org/viaf/terms#" xmlns="http://viaf.org/viaf/terms#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:void="http://rdfs.org/ns/void#" nsid="ncf11233245">CAOONL|ncf11233245</ns1:source>
+</rdf:value>
+<rdf:value rdf:parseType="Literal">
+<ns1:source xmlns:ns1="http://viaf.org/viaf/terms#" xmlns="http://viaf.org/viaf/terms#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:void="http://rdfs.org/ns/void#" nsid="UAE|Mill.a10001140">UAE|Mill_a10001140</ns1:source>
+</rdf:value>
+<rdf:value rdf:parseType="Literal">
+<ns1:source xmlns:ns1="http://viaf.org/viaf/terms#" xmlns="http://viaf.org/viaf/terms#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:void="http://rdfs.org/ns/void#" nsid="000221362">BLBNB|000221362</ns1:source>
+</rdf:value>
+<rdf:value rdf:parseType="Literal">
+<ns1:source xmlns:ns1="http://viaf.org/viaf/terms#" xmlns="http://viaf.org/viaf/terms#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:void="http://rdfs.org/ns/void#" nsid="55308387">SIMACOB|55308387</ns1:source>
+</rdf:value>
+<rdf:value rdf:parseType="Literal">
+<ns1:source xmlns:ns1="http://viaf.org/viaf/terms#" xmlns="http://viaf.org/viaf/terms#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:void="http://rdfs.org/ns/void#" nsid="a11144592">ERRR|a11144592</ns1:source>
+</rdf:value>
+<rdf:value rdf:parseType="Literal">
+<ns1:source xmlns:ns1="http://viaf.org/viaf/terms#" xmlns="http://viaf.org/viaf/terms#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:void="http://rdfs.org/ns/void#" nsid="981014191199106886">UIY|981014191199106886</ns1:source>
+</rdf:value>
+<schema:sameAs rdf:resource="http://dbpedia.org/resource/Al_Gore"/>
+<schema:gender rdf:resource="http://www.wikidata.org/entity/Q6581097"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/ISNI%7C0000000122833650#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/ISNI"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al Gore</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al Gore</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al Gore45th Vice President of the United States</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al GoreAmerikaans politicus</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al GorePhó Tổng thống Hoa Kỳ thứ 45 và người đoạt giải Nobel Hòa bình</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al GoreUS-amerikanischer Politiker, 45. Vizepräsident der USA</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al Goreamerický politik, 45. viceprezident USA</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al Goreamerikansk politikar</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al Goreamerikansk politiker</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al Goremaika-45 a Bise Presidente ti Estados Unidos iti Amerika</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al Gorepoliticien américain</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al Gorepolitico statunitense</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al Gorepolityk amerykański (Partia Demokratyczna)</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al Gorepolítico americano</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Al Gorepolítico estadounidense</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Albert Arnold Gore</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Albert Gore</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Albert Qor</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Albertus Arnoldus Gore</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Els Gors</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold1948-Jr</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold jr</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">GoreAl</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">GoreAlbert</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gors, Als1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Ǧūr, Āl1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Αλ Γκορ</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Ал Гор</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Аль Гор</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Альберт Гор</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Альбэрт Гор</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Гор, Ал</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Гор, Ал1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Гор, Альберт</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Гор, Альберт1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Эл Гор45-й вице-президент США, лауреат Нобелевской премии мира</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">אל גור</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">גור, אל1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">על גאר</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">آل جور</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">آل جور،1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">ال گور</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">ال گورسیاست‌مدار آمریکایی</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">ایل گور</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">جور، آل</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">جور، ألبرت،1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">غور، آل،1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">अल गोर</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">अल्बर्ट गोर</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">আল গোর</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">ਅਲ ਗੋਰ</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">ஆல் கோர்</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">അൽ ഗോർ</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">กอร์, อัล1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">อัล กอร์</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">ཨཱལ་གྷོར།</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">အယ်လ် ဂိုး</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">ალბერტ გორი</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">アル・ゴア</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">ゴア, アル</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">戈爾</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">阿尔·戈尔</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">앨고어</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/ICCU%7CMILV094371#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/ICCU"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold&lt;jr.&gt;</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/BNF%7C12303782#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/BNF"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">GoreAlbert1948-....</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/LIH%7CLNB:_n__v__m_;=C_b_#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/LIH"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore'asA.</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore'asAlas</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">GoreAl</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">GoreAlbert A.</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">GoreAlbert Arnold</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">ГорАльберт</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/NSK%7C000104334#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/NSK"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al</skos:prefLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/DBC%7C87097968356768#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/DBC"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/BIBSYS%7C90711838#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/BIBSYS"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/W2Z%7C90711838#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/W2Z"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/NTA%7C100033571#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/NTA"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al (Albert Arnold), 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Ǧūr, Āl,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+<schema:url>http://opc4.kb.nl/PPN?PPN=100033571</schema:url>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/SIMACOB%7C55308387#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/SIMACOB"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert,Jr.</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/LNB%7CLNC10-000137659#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/LNB"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gors, A.(Als),1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gors, Alans,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gors, Alberts Arnolds,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gors, Alberts,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gors, Als,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gors, Els,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Гор, А.(Альберт),1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Гор, Алберт,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Гор, Альберт,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/J9U%7C987007261939705171#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/J9U"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">جور، آل</skos:prefLabel>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">גור, אל, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/NKC%7Cjn20000602117#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/NKC"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/CAOONL%7Cncf11233245#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/CAOONL"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold,Jr.,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/LC%7Cn++86130265#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/LC"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold,Jr.,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Гор, Ал,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Гор, Альберт,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/SUDOC%7C031911188#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/SUDOC"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/RERO%7CA000073365#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/RERO"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/NII%7CDA01093696#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/NII"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/NYNYRILM%7C27706#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/NYNYRILM"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold (Al)</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/PLWABN%7C9810661949005606#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/PLWABN"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold Jr</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/NUKAT%7Cn++96637319#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/NUKAT"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al.</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/DNB%7C118900463#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/DNB"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert A.1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold jr.1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert J.jun.1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albertjunior1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/SZ%7C118900463#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/SZ"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert A.1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold jr.1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert Arnold1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert J.jun.1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albertjunior1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/KRNLK%7CKAC199610470#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/KRNLK"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert ArnoldJr.1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">ゴア, アル1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">고어, 알버트1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">고어, 앨버트1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/JPG%7C500251202#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/JPG"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert (American politician, born 1948)</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Albert Gore</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Гор, Ал</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Гор, Альберт</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/UIY%7C981014191199106886#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/UIY"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/NLA%7C000035959502#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/NLA"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/NDL%7C00467362#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/NDL"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">ゴア, アル</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/BNC%7C981058518377306706#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/BNC"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/UAE%7CMill_a10001140#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/UAE"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">جور، البيرت،1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">غور، آلبرت،1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/GRATEVE%7C69707#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/GRATEVE"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/ERRR%7Ca11144592#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/ERRR"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al.</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Гор, Альберт,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/BLBNB%7C000221362#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/BLBNB"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore Jr., Albert Arnold,1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/SELIBR%7C313117#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/SELIBR"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/BNCHL%7C10000000000000000857676#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/BNCHL"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/PTBNP%7C118560#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/PTBNP"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore,Al</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore,Albert</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/J9U%7C987007261939705171#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/J9U"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">جور، آل</skos:prefLabel>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">גור, אל, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/J9U%7C987007261939705171#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/J9U"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Al, 1948-....</skos:prefLabel>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">جور، آل</skos:prefLabel>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">גור, אל, 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">Gore, Albert,1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://viaf.org/viaf/sourceID/EGAXA%7Cvtls2667466#skos:Concept">
+<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+<skos:inScheme xmlns:skos="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://viaf.org/authorityScheme/EGAXA"/>
+<skos:prefLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">جور، آل، 1948-</skos:prefLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">آل جور،1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">جور، ألبرت،1948-</skos:altLabel>
+<skos:altLabel xmlns:skos="http://www.w3.org/2004/02/skos/core#">غور، آل،1948-</skos:altLabel>
+<foaf:focus xmlns:foaf="http://xmlns.com/foaf/0.1/" rdf:resource="http://viaf.org/viaf/98777888"/>
+</rdf:Description>
+</rdf:RDF>

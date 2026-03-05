@@ -82,7 +82,7 @@ impl ISNI {
             graph: FastGraph::new(),
             html: String::new(),
         };
-        let url = maybe_rewrite(&ret.get_key_url(&id));
+        let url = maybe_rewrite(&format!("https://isni.org/isni/{id}"));
         // Collapse all whitespace including newlines so regexes can match across lines
         ret.html = reqwest::get(&url)
             .await?
@@ -150,36 +150,74 @@ impl ISNI {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
     use wikimisc::wikibase::EntityTrait;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "0000000121251077";
 
+    async fn mock_isni() -> (MockServer, ISNI) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/isni_0000000121251077.html");
+
+        Mock::given(method("GET"))
+            .and(path("/isni/0000000121251077"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        // try_viaf stub (ISNI P213 is mapped in KEY2PROP)
+        let viaf_fixture =
+            include_str!("../test_data/fixtures/viaf_lookup_isni_0000000121251077.json");
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(viaf_fixture))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://isni.org", server.uri());
+        url_override::register("https://viaf.org", server.uri());
+
+        let isni = ISNI::new(TEST_ID).await.unwrap();
+        (server, isni)
+    }
+
+    fn cleanup() {
+        url_override::unregister("https://isni.org");
+        url_override::unregister("https://viaf.org");
+    }
+
     #[tokio::test]
     async fn test_new() {
-        assert!(ISNI::new(TEST_ID).await.is_ok());
+        let (_server, _isni) = mock_isni().await;
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let isni = ISNI::new(TEST_ID).await.unwrap();
+        let (_server, isni) = mock_isni().await;
         assert_eq!(isni.my_property(), P_ISNI);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let isni = ISNI::new(TEST_ID).await.unwrap();
+        let (_server, isni) = mock_isni().await;
         assert_eq!(isni.my_stated_in(), "Q423048");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_id() {
-        let isni = ISNI::new(TEST_ID).await.unwrap();
+        let (_server, isni) = mock_isni().await;
         assert_eq!(isni.my_id(), TEST_ID);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_run() {
-        let isni = ISNI::new(TEST_ID).await.unwrap();
+        let (_server, isni) = mock_isni().await;
         let meta_item = isni.run().await.unwrap();
         let props: Vec<String> = meta_item
             .item
@@ -188,21 +226,18 @@ mod tests {
             .map(|c| c.main_snak().property().to_string())
             .collect();
         assert!(props.contains(&"P213".to_string()));
-        // assert!(props.contains(&"P31".to_string()));
         assert!(props.contains(&"P214".to_string()));
-        // assert!(props.contains(&"P227".to_string()));
-        // assert!(props.contains(&"P244".to_string()));
-        // assert!(props.contains(&"P569".to_string()));
-        // assert!(props.contains(&"P570".to_string()));
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_try_viaf() {
-        let isni = ISNI::new(TEST_ID).await.unwrap();
+        let (_server, isni) = mock_isni().await;
         let mut mi = MetaItem::new();
         isni.try_viaf(&mut mi).await.unwrap();
         let ext_ids = mi.get_external_ids();
         assert_eq!(ext_ids.len(), 1); // VIAF
         assert_eq!(ext_ids[0], ExternalId::new(P_VIAF, "27063124"));
+        cleanup();
     }
 }

@@ -176,48 +176,91 @@ mod tests {
     use wikimisc::wikibase::{EntityTrait, LocaleString};
 
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "068364229";
 
+    async fn mock_nb() -> (MockServer, NB) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/nb_068364229.json");
+
+        Mock::given(method("GET"))
+            .and(path("/id/thes/p068364229"))
+            .respond_with(
+                ResponseTemplate::new(200)
+                    .set_body_string(fixture)
+                    .insert_header("Content-Type", "application/json"),
+            )
+            .mount(&server)
+            .await;
+
+        // try_viaf stub (NB P1006 is not mapped in KEY2PROP, so try_viaf
+        // returns early, but stub it anyway for safety)
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("{}"))
+            .mount(&server)
+            .await;
+
+        url_override::register("http://data.bibliotheken.nl", server.uri());
+        url_override::register("https://viaf.org", server.uri());
+
+        let nb = NB::new(TEST_ID).await.unwrap();
+        (server, nb)
+    }
+
+    fn cleanup() {
+        url_override::unregister("http://data.bibliotheken.nl");
+        url_override::unregister("https://viaf.org");
+    }
+
     #[tokio::test]
     async fn test_new() {
-        assert!(NB::new(TEST_ID).await.is_ok());
+        let (_server, _nb) = mock_nb().await;
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let nb = NB::new(TEST_ID).await.unwrap();
+        let (_server, nb) = mock_nb().await;
         assert_eq!(nb.my_property(), P_NB);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let nb = NB::new(TEST_ID).await.unwrap();
+        let (_server, nb) = mock_nb().await;
         assert_eq!(nb.my_stated_in(), "Q105488572");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_primary_language() {
-        let nb = NB::new(TEST_ID).await.unwrap();
+        let (_server, nb) = mock_nb().await;
         assert_eq!(nb.primary_language(), "nl");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_get_key_url() {
-        let nb = NB::new(TEST_ID).await.unwrap();
+        let (_server, nb) = mock_nb().await;
         assert_eq!(
             nb.get_key_url(TEST_ID),
             "http://data.bibliotheken.nl/id/thes/p068364229"
         );
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_run() {
-        let nb = NB::new(TEST_ID).await.unwrap();
+        let (_server, nb) = mock_nb().await;
         let meta_item = nb.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
             vec![LocaleString::new("nl", "Charles Robert Darwin")]
         );
+        cleanup();
     }
 }

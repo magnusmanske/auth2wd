@@ -149,12 +149,33 @@ impl NORAF {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
+
+    async fn mock_noraf(id: &str, fixture: &str) -> (MockServer, NORAF) {
+        let server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path(format!("/authority/rest/authorities/v2/{id}")))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://authority.bibsys.no", server.uri());
+
+        let noraf = NORAF::new(id).await.unwrap();
+        (server, noraf)
+    }
 
     #[tokio::test]
     async fn test_add_dates() {
-        let noraf = NORAF::new("123").await.unwrap();
+        // Use a minimal valid JSON fixture just for this unit test
+        let fixture = r#"{"marcdata":[],"identifiersMap":{}}"#;
+        let (_server, noraf) = mock_noraf("123", fixture).await;
         let mut ret = MetaItem::new();
         noraf.add_dates("1900-2000", &mut ret);
         assert_eq!(ret.item.claims().len(), 2);
+        url_override::unregister("https://authority.bibsys.no");
     }
 }

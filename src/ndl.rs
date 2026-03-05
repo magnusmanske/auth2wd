@@ -88,61 +88,101 @@ impl NDL {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
     use wikimisc::wikibase::EntityTrait;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     // Natsume Soseki - well-known Japanese author (1867-1916)
     const TEST_ID: &str = "00054222";
 
+    async fn mock_ndl() -> (MockServer, NDL) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/ndl_00054222.rdf");
+
+        Mock::given(method("GET"))
+            .and(path("/auth/ndlna/00054222.rdf"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        // try_viaf stub (NDL P349 is mapped in KEY2PROP)
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("{}"))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://id.ndl.go.jp", server.uri());
+        url_override::register("https://viaf.org", server.uri());
+
+        let ndl = NDL::new(TEST_ID).await.unwrap();
+        (server, ndl)
+    }
+
+    fn cleanup() {
+        url_override::unregister("https://id.ndl.go.jp");
+        url_override::unregister("https://viaf.org");
+    }
+
     #[tokio::test]
     async fn test_new() {
-        assert!(NDL::new(TEST_ID).await.is_ok());
+        let (_server, _ndl) = mock_ndl().await;
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let ndl = NDL::new(TEST_ID).await.unwrap();
+        let (_server, ndl) = mock_ndl().await;
         assert_eq!(ndl.my_property(), P_NDL);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let ndl = NDL::new(TEST_ID).await.unwrap();
+        let (_server, ndl) = mock_ndl().await;
         assert_eq!(ndl.my_stated_in(), "Q477675");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_primary_language() {
-        let ndl = NDL::new(TEST_ID).await.unwrap();
+        let (_server, ndl) = mock_ndl().await;
         assert_eq!(ndl.primary_language(), "ja");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_get_key_url() {
-        let ndl = NDL::new(TEST_ID).await.unwrap();
+        let (_server, ndl) = mock_ndl().await;
         assert_eq!(
             ndl.get_key_url(TEST_ID),
             "http://id.ndl.go.jp/auth/entity/00054222"
         );
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_id() {
-        let ndl = NDL::new(TEST_ID).await.unwrap();
+        let (_server, ndl) = mock_ndl().await;
         assert_eq!(ndl.my_id(), TEST_ID);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_transform_label() {
-        let ndl = NDL::new(TEST_ID).await.unwrap();
+        let (_server, ndl) = mock_ndl().await;
         assert_eq!(ndl.transform_label("Natsume, Soseki"), "Soseki Natsume");
         assert_eq!(ndl.transform_label("Natsume,Soseki"), "Natsume,Soseki");
         assert_eq!(ndl.transform_label("Soseki Natsume"), "Soseki Natsume");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_run() {
-        let ndl = NDL::new(TEST_ID).await.unwrap();
+        let (_server, ndl) = mock_ndl().await;
         let meta_item = ndl.run().await.unwrap();
         assert!(!meta_item.item.labels().is_empty());
+        cleanup();
     }
 }

@@ -155,12 +155,43 @@ impl GBIFtaxon {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path, query_param};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "5141342";
 
+    async fn mock_gbif() -> (MockServer, GBIFtaxon) {
+        let server = MockServer::start().await;
+        let species_fixture = include_str!("../test_data/fixtures/gbif_5141342.json");
+        let images_fixture = include_str!("../test_data/fixtures/gbif_5141342_images.json");
+
+        Mock::given(method("GET"))
+            .and(path("/v1/species/5141342"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(species_fixture))
+            .mount(&server)
+            .await;
+
+        Mock::given(method("GET"))
+            .and(path("/v1/occurrence/search"))
+            .and(query_param("taxon_key", "5141342"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(images_fixture))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://api.gbif.org", server.uri());
+
+        let gbif = GBIFtaxon::new(TEST_ID).await.unwrap();
+        (server, gbif)
+    }
+
+    fn cleanup() {
+        url_override::unregister("https://api.gbif.org");
+    }
+
     #[tokio::test]
     async fn test_all() {
-        let gbif = GBIFtaxon::new(TEST_ID).await.unwrap();
+        let (_server, gbif) = mock_gbif().await;
         assert_eq!(gbif.my_property(), P_GBIF_TAXON);
         assert_eq!(gbif.my_stated_in(), "Q1531570");
         assert_eq!(gbif.primary_language(), "en");
@@ -171,5 +202,6 @@ mod tests {
         );
         let new_item = gbif.run().await.unwrap();
         assert_eq!(new_item.item.claims().len(), 6);
+        cleanup();
     }
 }

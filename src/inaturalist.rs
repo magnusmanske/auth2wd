@@ -1,6 +1,7 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
+use crate::url_override::maybe_rewrite;
 use crate::utility::Utility;
 use crate::ExternalId;
 use anyhow::{anyhow, Result};
@@ -59,7 +60,7 @@ impl ExternalImporter for INaturalist {
 
 impl INaturalist {
     pub async fn new(id: &str) -> Result<Self> {
-        let url = format!("https://www.inaturalist.org/taxa/{id}");
+        let url = maybe_rewrite(&format!("https://www.inaturalist.org/taxa/{id}"));
         let text = Utility::get_url(&url).await?;
         let j = Self::parse_html(&text).ok_or(anyhow!("No JSON found"))?;
         Ok(Self {
@@ -208,55 +209,85 @@ impl INaturalist {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "627975";
 
+    async fn mock_inaturalist() -> (MockServer, INaturalist) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/inaturalist_627975.html");
+
+        Mock::given(method("GET"))
+            .and(path("/taxa/627975"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://www.inaturalist.org", server.uri());
+
+        let inaturalist = INaturalist::new(TEST_ID).await.unwrap();
+        (server, inaturalist)
+    }
+
+    fn cleanup() {
+        url_override::unregister("https://www.inaturalist.org");
+    }
+
     #[tokio::test]
     async fn test_new() {
-        assert!(INaturalist::new(TEST_ID).await.is_ok());
+        let (_server, _inaturalist) = mock_inaturalist().await;
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let inaturalist = INaturalist::new(TEST_ID).await.unwrap();
+        let (_server, inaturalist) = mock_inaturalist().await;
         assert_eq!(inaturalist.my_property(), P_INATURALIST_TAXON);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let inaturalist = INaturalist::new(TEST_ID).await.unwrap();
+        let (_server, inaturalist) = mock_inaturalist().await;
         assert_eq!(inaturalist.my_stated_in(), "Q16958215");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_primary_language() {
-        let inaturalist = INaturalist::new(TEST_ID).await.unwrap();
+        let (_server, inaturalist) = mock_inaturalist().await;
         assert_eq!(inaturalist.primary_language(), "en");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_get_key_url() {
-        let inaturalist = INaturalist::new(TEST_ID).await.unwrap();
+        let (_server, inaturalist) = mock_inaturalist().await;
         assert_eq!(
             inaturalist.get_key_url(TEST_ID),
             "https://www.inaturalist.org/taxa/627975"
         );
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_id() {
-        let inaturalist = INaturalist::new(TEST_ID).await.unwrap();
+        let (_server, inaturalist) = mock_inaturalist().await;
         assert_eq!(inaturalist.my_id(), TEST_ID);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_run_inaturalist() {
-        let inaturalist = INaturalist::new(TEST_ID).await.unwrap();
+        let (_server, inaturalist) = mock_inaturalist().await;
         let meta_item = inaturalist.run().await.unwrap();
         assert_eq!(
             meta_item.item.labels()[0],
             LocaleString::new("en", "Licea bryophila")
         );
         assert_eq!(meta_item.item.claims().len(), 8);
+        cleanup();
     }
 }

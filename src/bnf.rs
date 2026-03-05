@@ -138,23 +138,58 @@ mod tests {
     use wikimisc::wikibase::{EntityTrait, LocaleString};
 
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "11898689q";
     const TEST_ID2: &str = "15585136v";
 
+    async fn mock_bnf(id: &str, fixture: &str) -> (MockServer, BNF) {
+        let server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path(format!("/ark:/12148/cb{id}.rdfxml")))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        // try_viaf stub (BnF P268 is commented out in KEY2PROP so try_viaf
+        // returns early, but stub it anyway for safety)
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("{}"))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://data.bnf.fr", server.uri());
+        url_override::register("https://viaf.org", server.uri());
+
+        let bnf = BNF::new(id).await.unwrap();
+        (server, bnf)
+    }
+
+    fn cleanup() {
+        url_override::unregister("https://data.bnf.fr");
+        url_override::unregister("https://viaf.org");
+    }
+
     #[tokio::test]
     async fn test_run() {
-        let bnf = BNF::new(TEST_ID).await.unwrap();
+        let fixture = include_str!("../test_data/fixtures/bnf_11898689q.rdf");
+        let (_server, bnf) = mock_bnf(TEST_ID, fixture).await;
         let meta_item = bnf.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
             vec![LocaleString::new("fr", "Charles Darwin")]
         );
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_run_birth_death_place() {
-        let bnf = BNF::new(TEST_ID2).await.unwrap();
+        let fixture = include_str!("../test_data/fixtures/bnf_15585136v.rdf");
+        let (_server, bnf) = mock_bnf(TEST_ID2, fixture).await;
         let meta_item = bnf.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
@@ -169,30 +204,37 @@ mod tests {
             meta_item.prop_text[1],
             ExternalId::new(P_PLACE_OF_DEATH, "Grenoble (Isère)")
         );
-
-        // println!("{:?}", meta_item.prop_text);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_new() {
-        assert!(BNF::new(TEST_ID).await.is_ok());
+        let fixture = include_str!("../test_data/fixtures/bnf_11898689q.rdf");
+        let (_server, _bnf) = mock_bnf(TEST_ID, fixture).await;
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let bnf = BNF::new(TEST_ID).await.unwrap();
+        let fixture = include_str!("../test_data/fixtures/bnf_11898689q.rdf");
+        let (_server, bnf) = mock_bnf(TEST_ID, fixture).await;
         assert_eq!(bnf.my_property(), P_BNF);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let bnf = BNF::new(TEST_ID).await.unwrap();
+        let fixture = include_str!("../test_data/fixtures/bnf_11898689q.rdf");
+        let (_server, bnf) = mock_bnf(TEST_ID, fixture).await;
         assert_eq!(bnf.my_stated_in(), "Q19938912");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_id() {
-        let bnf = BNF::new(TEST_ID).await.unwrap();
+        let fixture = include_str!("../test_data/fixtures/bnf_11898689q.rdf");
+        let (_server, bnf) = mock_bnf(TEST_ID, fixture).await;
         assert_eq!(bnf.my_id(), TEST_ID);
+        cleanup();
     }
 }

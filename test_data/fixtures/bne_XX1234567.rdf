@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:ns2="https://datos.bne.es/def/"
+	xmlns:ns3="http://www.rdaregistry.info/Elements/a/" >
+  <rdf:Description rdf:about="https://datos.bne.es/resource/XX1234567">
+    <rdf:type rdf:resource="https://datos.bne.es/def/C1005" />
+    <rdfs:label>Coulon, Marcel</rdfs:label>
+    <ns2:OP5001 rdf:resource="https://datos.bne.es/resource/XX2380124" />
+    <ns2:OP5001 rdf:resource="https://datos.bne.es/resource/XX2380123" />
+    <ns2:OP5001 rdf:resource="https://datos.bne.es/resource/XX2380122" />
+    <ns2:OP5001 rdf:resource="https://datos.bne.es/resource/XX3099427" />
+    <ns3:P50116>Masculino</ns3:P50116>
+    <ns2:id>XX1234567</ns2:id>
+    <ns2:P5001>Coulon, Marcel</ns2:P5001>
+  </rdf:Description>
+</rdf:RDF>

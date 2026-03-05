@@ -149,50 +149,80 @@ impl WorldCat {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "E39PBJrcqvXdm3kkwGr7HVG8md";
 
+    async fn mock_worldcat() -> (MockServer, WorldCat) {
+        let server = MockServer::start().await;
+        let fixture =
+            include_str!("../test_data/fixtures/worldcat_E39PBJrcqvXdm3kkwGr7HVG8md.jsonld");
+
+        Mock::given(method("GET"))
+            .and(path("/worldcat/entity/E39PBJrcqvXdm3kkwGr7HVG8md.jsonld"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://id.oclc.org", server.uri());
+
+        let worldcat = WorldCat::new(TEST_ID).await.unwrap();
+        (server, worldcat)
+    }
+
+    fn cleanup() {
+        url_override::unregister("https://id.oclc.org");
+    }
+
     #[tokio::test]
     async fn test_new() {
-        assert!(WorldCat::new(TEST_ID).await.is_ok());
+        let (_server, _worldcat) = mock_worldcat().await;
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let worldcat = WorldCat::new(TEST_ID).await.unwrap();
+        let (_server, worldcat) = mock_worldcat().await;
         assert_eq!(worldcat.my_property(), P_WORLDCAT);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let worldcat = WorldCat::new(TEST_ID).await.unwrap();
+        let (_server, worldcat) = mock_worldcat().await;
         assert_eq!(worldcat.my_stated_in(), "Q112122720");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_primary_language() {
-        let worldcat = WorldCat::new(TEST_ID).await.unwrap();
+        let (_server, worldcat) = mock_worldcat().await;
         assert_eq!(worldcat.primary_language(), "en");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_get_key_url() {
-        let worldcat = WorldCat::new(TEST_ID).await.unwrap();
+        let (_server, worldcat) = mock_worldcat().await;
         assert_eq!(
             worldcat.get_key_url(TEST_ID),
             "https://id.oclc.org/worldcat/entity/E39PBJrcqvXdm3kkwGr7HVG8md"
         );
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_id() {
-        let worldcat = WorldCat::new(TEST_ID).await.unwrap();
+        let (_server, worldcat) = mock_worldcat().await;
         assert_eq!(worldcat.my_id(), TEST_ID);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_run() {
-        let worldcat = WorldCat::new(TEST_ID).await.unwrap();
+        let (_server, worldcat) = mock_worldcat().await;
         let meta_item = worldcat.run().await.unwrap();
         assert!(meta_item
             .item
@@ -203,5 +233,6 @@ mod tests {
             .aliases()
             .contains(&LocaleString::new("en", "Helen Elizabeth Clark")));
         assert_eq!(meta_item.item.claims().len(), 3);
+        cleanup();
     }
 }

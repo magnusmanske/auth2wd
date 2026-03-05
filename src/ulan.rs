@@ -62,7 +62,7 @@ impl ExternalImporter for ULAN {
 
 impl ULAN {
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = format!("https://vocab.getty.edu/ulan/{id}.rdf");
+        let rdf_url = maybe_rewrite(&format!("https://vocab.getty.edu/ulan/{id}.rdf"));
         let client = Utility::get_reqwest_client()?;
         let resp = client.get(&rdf_url).send().await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
@@ -150,9 +150,31 @@ mod tests {
 
     const TEST_ID: &str = "500228559";
 
+    async fn mock_ulan() -> (MockServer, ULAN) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/ulan_500228559.rdf");
+
+        Mock::given(method("GET"))
+            .and(path("/ulan/500228559.rdf"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://vocab.getty.edu", server.uri());
+
+        let ulan = ULAN::new(TEST_ID).await.unwrap();
+        (server, ulan)
+    }
+
+    fn cleanup() {
+        url_override::unregister("https://vocab.getty.edu");
+        url_override::unregister("https://viaf.org");
+    }
+
     #[tokio::test]
     async fn test_new() {
-        assert!(ULAN::new(TEST_ID).await.is_ok());
+        let (_server, _ulan) = mock_ulan().await;
+        cleanup();
     }
 
     #[tokio::test]

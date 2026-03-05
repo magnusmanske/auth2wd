@@ -100,39 +100,76 @@ mod tests {
     use wikimisc::wikibase::{EntityTrait, LocaleString};
 
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "026812304";
 
+    async fn mock_idref() -> (MockServer, IdRef) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/idref_026812304.rdf");
+
+        Mock::given(method("GET"))
+            .and(path("/026812304.rdf"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        // try_viaf stub (IdRef P269 is mapped via SUDOC key in KEY2PROP)
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("{}"))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://www.idref.fr", server.uri());
+        url_override::register("https://viaf.org", server.uri());
+
+        let idref = IdRef::new(TEST_ID).await.unwrap();
+        (server, idref)
+    }
+
+    fn cleanup() {
+        url_override::unregister("https://www.idref.fr");
+        url_override::unregister("https://viaf.org");
+    }
+
     #[tokio::test]
     async fn test_new() {
-        assert!(IdRef::new(TEST_ID).await.is_ok());
+        let (_server, _idref) = mock_idref().await;
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let idref = IdRef::new(TEST_ID).await.unwrap();
+        let (_server, idref) = mock_idref().await;
         assert_eq!(idref.my_property(), P_IDREF);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let idref = IdRef::new(TEST_ID).await.unwrap();
+        let (_server, idref) = mock_idref().await;
         assert_eq!(idref.my_stated_in(), "Q47757534");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_id() {
-        let idref = IdRef::new(TEST_ID).await.unwrap();
+        let (_server, idref) = mock_idref().await;
         assert_eq!(idref.my_id(), TEST_ID);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_run() {
-        let viaf = IdRef::new(TEST_ID).await.unwrap();
-        let meta_item = viaf.run().await.unwrap();
+        let (_server, idref) = mock_idref().await;
+        let meta_item = idref.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
             vec![LocaleString::new("fr", "Charles Darwin")]
         );
+        cleanup();
     }
 }

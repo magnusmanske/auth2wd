@@ -1,6 +1,7 @@
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
+use crate::url_override::maybe_rewrite;
 use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -53,7 +54,7 @@ impl ExternalImporter for LOC {
 
 impl LOC {
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = format!("https://id.loc.gov/authorities/names/{id}.rdf");
+        let rdf_url = maybe_rewrite(&format!("https://id.loc.gov/authorities/names/{id}.rdf"));
         let client = Utility::get_reqwest_client()?;
         let resp = client.get(&rdf_url).send().await?.text().await?;
         let mut graph: FastGraph = FastGraph::new();
@@ -68,11 +69,31 @@ impl LOC {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "n78095637";
 
+    async fn mock_loc() -> (MockServer, LOC) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/loc_n78095637.rdf");
+
+        Mock::given(method("GET"))
+            .and(path("/authorities/names/n78095637.rdf"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://id.loc.gov", server.uri());
+
+        let loc = LOC::new(TEST_ID).await.unwrap();
+        (server, loc)
+    }
+
     #[tokio::test]
     async fn test_new() {
-        assert!(LOC::new(TEST_ID).await.is_ok());
+        let (_server, _loc) = mock_loc().await;
+        url_override::unregister("https://id.loc.gov");
     }
 }

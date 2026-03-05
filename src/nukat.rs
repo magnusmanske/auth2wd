@@ -109,37 +109,79 @@ impl NUKAT {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
     use wikimisc::wikibase::EntityTrait;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "n96637319";
 
+    async fn mock_nukat() -> (MockServer, NUKAT) {
+        let server = MockServer::start().await;
+
+        // First POST: NUKAT source-ID lookup → returns VIAF cluster ID
+        let lookup_fixture = include_str!("../test_data/fixtures/viaf_lookup_nukat_n96637319.json");
+        // Second POST: fetch RDF for that VIAF cluster
+        let rdf_fixture = include_str!("../test_data/fixtures/viaf_98777888.rdf");
+
+        // wiremock matches requests in reverse-mount order, so mount the RDF
+        // responder first (it will be tried second) and the lookup responder
+        // last (it will be tried first).
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(rdf_fixture))
+            .mount(&server)
+            .await;
+
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(lookup_fixture))
+            .expect(1)
+            .mount(&server)
+            .await;
+
+        url_override::register("https://viaf.org", server.uri());
+
+        let nukat = NUKAT::new(TEST_ID).await.unwrap();
+        (server, nukat)
+    }
+
+    fn cleanup() {
+        url_override::unregister("https://viaf.org");
+    }
+
     #[tokio::test]
     async fn test_new() {
-        assert!(NUKAT::new(TEST_ID).await.is_ok());
+        let (_server, _nukat) = mock_nukat().await;
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let nukat = NUKAT::new(TEST_ID).await.unwrap();
+        let (_server, nukat) = mock_nukat().await;
         assert_eq!(nukat.my_property(), P_NUKAT);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let nukat = NUKAT::new(TEST_ID).await.unwrap();
+        let (_server, nukat) = mock_nukat().await;
         assert_eq!(nukat.my_stated_in(), "Q11789729");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_primary_language() {
-        let nukat = NUKAT::new(TEST_ID).await.unwrap();
+        let (_server, nukat) = mock_nukat().await;
         assert_eq!(nukat.primary_language(), "pl");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_id() {
-        let nukat = NUKAT::new(TEST_ID).await.unwrap();
+        let (_server, nukat) = mock_nukat().await;
         assert_eq!(nukat.my_id(), TEST_ID);
+        cleanup();
     }
 
     #[tokio::test]
@@ -151,8 +193,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_run() {
-        let nukat = NUKAT::new(TEST_ID).await.unwrap();
+        let (_server, nukat) = mock_nukat().await;
         let meta_item = nukat.run().await.unwrap();
         assert!(!meta_item.item.labels().is_empty());
+        cleanup();
     }
 }

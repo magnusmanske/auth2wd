@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:ns3="http://www.rdaregistry.info/Elements/a/"
+	xmlns:ns4="https://datos.bne.es/def/" >
+  <rdf:Description rdf:about="https://datos.bne.es/resource/XX990809">
+    <rdf:type rdf:resource="https://datos.bne.es/def/C1005" />
+    <rdfs:label>Darwin, Charles</rdfs:label>
+    <rdfs:seeAlso rdf:resource="http://es.wikipedia.org/wiki/Charles_Darwin" />
+    <owl:sameAs rdf:resource="http://d-nb.info/gnd/118523813" />
+    <owl:sameAs rdf:resource="http://dbpedia.org/resource/Charles_Darwin" />
+    <owl:sameAs rdf:resource="http://isni-url.oclc.nl/isni/0000000121251077" />
+    <owl:sameAs rdf:resource="http://libris.kb.se/resource/auth/231727" />
+    <owl:sameAs rdf:resource="http://www.idref.fr/026812304" />
+    <owl:sameAs rdf:resource="http://viaf.org/viaf/27063124" />
+    <owl:sameAs rdf:resource="http://data.bnf.fr/11898689" />
+    <owl:sameAs rdf:resource="http://id.loc.gov/authorities/names/n78095637" />
+    <ns3:P50101>Royal Geographical Society</ns3:P50101>
+    <ns3:P50101>Academia Prusiana de las Ciencias</ns3:P50101>
+    <ns3:P50101>Academia de las ciencias de Turín</ns3:P50101>
+    <ns3:P50101>Sociedad Zoológica de Londres</ns3:P50101>
+    <ns3:P50101>Academia de Ciencias de Baviera</ns3:P50101>
+    <ns3:P50101>Academia Nacional de los Li</ns3:P50101>
+    <ns3:P50101>Academia de Ciencias de Francia</ns3:P50101>
+    <ns3:P50101>Academia de Ciencias de Rusia</ns3:P50101>
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX4899816" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX3047403" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX5225459" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX3047407" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX2407452" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX2407468" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX2407469" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX4968454" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX2407453" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX3327059" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX2407470" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX3459183" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX3495541" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX4828012" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX3385429" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX4625000" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX4624998" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX1943167" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX2882453" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX5217414" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX5510713" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX3198145" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX1927967" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX3327063" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX5510711" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX5510714" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX4674831" />
+    <ns4:OP5001 rdf:resource="https://datos.bne.es/resource/XX2039885" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/bimo0000585353" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/a4516367" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/bimo0000764990" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/bimo0000764992" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/a4728217" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/a6884590" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/bimo0001772751" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/bimo0000765040" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/a4666514" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/a5676204" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/bimo0000765057" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/a5243891" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/bimo0001735253" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/a4393407" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/a4725289" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/bimo0000248242" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/a4636290" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/bimo0000022937" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/bimo0000189897" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/FF3350777" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/bimo0000161384" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/bimo0000397078" />
+    <ns4:OP5002 rdf:resource="https://datos.bne.es/resource/a4393067" />
+    <ns3:P50102>Inglés</ns3:P50102>
+    <ns3:P50102>Inglés de Inglaterra</ns3:P50102>
+    <ns3:P50100>Geología</ns3:P50100>
+    <ns3:P50100>Biología</ns3:P50100>
+    <ns3:P50104>Biólogos</ns3:P50104>
+    <ns3:P50104>Escritores</ns3:P50104>
+    <ns3:P50104>Exploradores</ns3:P50104>
+    <ns3:P50104>Entomólogos</ns3:P50104>
+    <ns3:P50104>Geólogos</ns3:P50104>
+    <ns3:P50104>Etólogo</ns3:P50104>
+    <ns3:P50116>Masculino</ns3:P50116>
+    <ns4:P5024>http://www.wikidata.org/entity/Q1035</ns4:P5024>
+    <ns4:P5024>https://data.cervantesvirtual.com/person/1867</ns4:P5024>
+    <ns4:P5024>http://viaf.org/viaf/27063124/</ns4:P5024>
+    <ns4:P5024>https://isni.org/isni/0000000121251077</ns4:P5024>
+    <ns4:id>XX990809</ns4:id>
+    <ns4:P1002>CDMARC names, 1993</ns4:P1002>
+    <ns4:P1002>El origen de las especies, 1984</ns4:P1002>
+    <ns4:P1003>(Darwin, Charles, 1809-1882)</ns4:P1003>
+    <ns4:P1003>port. (Charles Darwin)</ns4:P1003>
+    <ns4:P1100>#CDMARC names, 1993#(Darwin, Charles, 1809-1882)</ns4:P1100>
+    <ns4:P1100>#El origen de las especies, 1984#port. (Charles Darwin)</ns4:P1100>
+    <ns4:P5001>Darwin, Charles</ns4:P5001>
+    <ns4:P5002>1809-1882</ns4:P5002>
+    <ns4:P5010>1809</ns4:P5010>
+    <ns4:P5011>1882</ns4:P5011>
+    <ns4:P5012>Darwin, Charles Robert</ns4:P5012>
+    <ns4:P5012>Darwin, Charles R.</ns4:P5012>
+    <ns4:P5012>Darwin</ns4:P5012>
+  </rdf:Description>
+</rdf:RDF>

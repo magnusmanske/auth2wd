@@ -130,21 +130,45 @@ impl PubChemCid {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "22027196";
 
+    async fn mock_pubchem() -> (MockServer, PubChemCid) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/pubchem_22027196.json");
+
+        Mock::given(method("GET"))
+            .and(path("/rest/pug_view/data/compound/22027196/JSON/"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://pubchem.ncbi.nlm.nih.gov", server.uri());
+
+        let pubchem = PubChemCid::new(TEST_ID).await.unwrap();
+        (server, pubchem)
+    }
+
+    fn cleanup() {
+        url_override::unregister("https://pubchem.ncbi.nlm.nih.gov");
+    }
+
     #[tokio::test]
     async fn test_all() {
-        let gbif = PubChemCid::new(TEST_ID).await.unwrap();
-        assert_eq!(gbif.my_property(), P_PUBCHEM_CID);
-        assert_eq!(gbif.my_stated_in(), "Q278487");
-        assert_eq!(gbif.primary_language(), "en");
-        assert_eq!(gbif.my_id(), TEST_ID);
+        let (_server, pubchem) = mock_pubchem().await;
+        assert_eq!(pubchem.my_property(), P_PUBCHEM_CID);
+        assert_eq!(pubchem.my_stated_in(), "Q278487");
+        assert_eq!(pubchem.primary_language(), "en");
+        assert_eq!(pubchem.my_id(), TEST_ID);
         assert_eq!(
-            gbif.get_key_url(TEST_ID),
+            pubchem.get_key_url(TEST_ID),
             format!("https://pubchem.ncbi.nlm.nih.gov/compound/{TEST_ID}")
         );
-        let new_item = gbif.run().await.unwrap();
+        let new_item = pubchem.run().await.unwrap();
         assert_eq!(new_item.item.claims().len(), 7);
+        cleanup();
     }
 }

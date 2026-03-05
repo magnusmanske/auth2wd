@@ -141,6 +141,9 @@ impl ExternalId {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path, query_param};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     #[test]
     fn test_from_string() {
@@ -229,14 +232,63 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_item_for_external_id() {
-        // Test OK
+        let server = MockServer::start().await;
+
+        let single_result = r#"{"batchcomplete":"","query":{"searchinfo":{"totalhits":1},"search":[{"ns":0,"title":"Q13520818","pageid":15554972,"size":42000,"wordcount":0,"snippet":"","timestamp":"2024-01-01T00:00:00Z"}]}}"#;
+        let no_results =
+            r#"{"batchcomplete":"","query":{"searchinfo":{"totalhits":0},"search":[]}}"#;
+
+        // Match: exact ID search  haswbstatement:"P214=30701597"
+        Mock::given(method("GET"))
+            .and(path("/w/api.php"))
+            .and(query_param("srsearch", "haswbstatement:\"P214=30701597\""))
+            .respond_with(ResponseTemplate::new(200).set_body_string(single_result))
+            .mount(&server)
+            .await;
+
+        // Match: string + ID search  Magnus haswbstatement:"P214=30701597"
+        Mock::given(method("GET"))
+            .and(path("/w/api.php"))
+            .and(query_param(
+                "srsearch",
+                "Magnus haswbstatement:\"P214=30701597\"",
+            ))
+            .respond_with(ResponseTemplate::new(200).set_body_string(single_result))
+            .mount(&server)
+            .await;
+
+        // Match: nonsense string + ID search → no results
+        Mock::given(method("GET"))
+            .and(path("/w/api.php"))
+            .and(query_param(
+                "srsearch",
+                "ocshs87gvdsu6gsdi7vchkuchs haswbstatement:\"P214=30701597\"",
+            ))
+            .respond_with(ResponseTemplate::new(200).set_body_string(no_results))
+            .mount(&server)
+            .await;
+
+        // Match: bogus ID search → no results
+        Mock::given(method("GET"))
+            .and(path("/w/api.php"))
+            .and(query_param(
+                "srsearch",
+                "haswbstatement:\"P214=3070159777777\"",
+            ))
+            .respond_with(ResponseTemplate::new(200).set_body_string(no_results))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://www.wikidata.org", server.uri());
+
+        // Test OK — exact ID lookup
         let ext_id1 = ExternalId::new(214, "30701597");
         assert_eq!(
             ext_id1.get_item_for_external_id_value().await,
             Some("Q13520818".to_string())
         );
 
-        // Test OK
+        // Test OK — string + ID lookup
         assert_eq!(
             ext_id1
                 .get_item_for_string_external_id_value("Magnus")
@@ -256,6 +308,6 @@ mod tests {
         let ext_id2 = ExternalId::new(214, "3070159777777");
         assert_eq!(ext_id2.get_item_for_external_id_value().await, None);
 
-        // TODOO multiple items
+        url_override::unregister("https://www.wikidata.org");
     }
 }

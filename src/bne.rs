@@ -92,59 +92,70 @@ impl BNE {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use async_once_cell::OnceCell;
-    use std::sync::Arc;
+    use crate::url_override;
     use wikimisc::wikibase::{EntityTrait, LocaleString};
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "XX1234567";
 
-    lazy_static! {
-        static ref TEST_BNE: Arc<OnceCell<BNE>> = Arc::new(OnceCell::new());
+    async fn mock_bne() -> (MockServer, BNE) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/bne_XX1234567.rdf");
+
+        Mock::given(method("GET"))
+            .and(path("/resource/XX1234567.rdf"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        // try_viaf stub (BNE P950 is mapped in KEY2PROP)
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("{}"))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://datos.bne.es", server.uri());
+        url_override::register("https://viaf.org", server.uri());
+
+        let bne = BNE::new(TEST_ID).await.unwrap();
+        (server, bne)
     }
 
-    async fn get_test_bne() -> Result<BNE> {
-        // BNE sometimes has issues, so we retry until it works
-        // Also, we unse OnceCell to only load the test BNE once
-        let ret = TEST_BNE
-            .get_or_init(async {
-                loop {
-                    let bne = BNE::new(TEST_ID).await;
-                    match bne {
-                        Ok(gnd) => break gnd,
-                        Err(_) => {
-                            tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
-                        }
-                    }
-                }
-            })
-            .await;
-        Ok(ret.to_owned())
+    fn cleanup() {
+        url_override::unregister("https://datos.bne.es");
+        url_override::unregister("https://viaf.org");
     }
 
     #[tokio::test]
     async fn test_new() {
-        assert!(get_test_bne().await.is_ok());
+        let (_server, _bne) = mock_bne().await;
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let bne = get_test_bne().await.unwrap();
+        let (_server, bne) = mock_bne().await;
         assert_eq!(bne.my_property(), P_BNE);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let bne = get_test_bne().await.unwrap();
+        let (_server, bne) = mock_bne().await;
         assert_eq!(bne.my_stated_in(), "Q50358336");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_run() {
-        let bne = get_test_bne().await.unwrap();
+        let (_server, bne) = mock_bne().await;
         let meta_item = bne.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
             vec![LocaleString::new("es", "Marcel Coulon")]
         );
+        cleanup();
     }
 }

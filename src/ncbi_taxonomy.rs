@@ -175,13 +175,36 @@ impl NCBItaxonomy {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, query_param};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "1747344";
 
-    // Using all tests together to get around NCBI rate limiting
+    async fn mock_ncbi() -> (MockServer, NCBItaxonomy) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/ncbi_1747344.xml");
+
+        Mock::given(method("GET"))
+            .and(query_param("db", "taxonomy"))
+            .and(query_param("id", "1747344"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://eutils.ncbi.nlm.nih.gov", server.uri());
+
+        let ncbi_taxonomy = NCBItaxonomy::new(TEST_ID).await.unwrap();
+        (server, ncbi_taxonomy)
+    }
+
+    fn cleanup() {
+        url_override::unregister("https://eutils.ncbi.nlm.nih.gov");
+    }
+
     #[tokio::test]
     async fn test_all() {
-        let ncbi_taxonomy = NCBItaxonomy::new(TEST_ID).await.unwrap();
+        let (_server, ncbi_taxonomy) = mock_ncbi().await;
         assert_eq!(ncbi_taxonomy.my_property(), P_NCBI_TAXONOMY);
         assert_eq!(ncbi_taxonomy.my_stated_in(), "Q13711410");
         assert_eq!(ncbi_taxonomy.primary_language(), "en");
@@ -194,5 +217,6 @@ mod tests {
         );
         let new_item = ncbi_taxonomy.run().await.unwrap();
         assert_eq!(new_item.item.claims().len(), 5);
+        cleanup();
     }
 }

@@ -284,85 +284,100 @@ impl GND {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use async_once_cell::OnceCell;
-    use std::sync::Arc;
+    use crate::url_override;
     use wikimisc::wikibase::{EntityTrait, LocaleString};
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "132539691";
 
-    lazy_static! {
-        static ref TEST_GND: Arc<OnceCell<GND>> = Arc::new(OnceCell::new());
+    async fn mock_gnd() -> (MockServer, GND) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/gnd_132539691.rdf");
+
+        Mock::given(method("GET"))
+            .and(path("/gnd/132539691/about/lds.rdf"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        // try_viaf stub (called via add_the_usual → try_viaf during run())
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("{}"))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://d-nb.info", server.uri());
+        url_override::register("https://viaf.org", server.uri());
+
+        let gnd = GND::new(TEST_ID).await.unwrap();
+        (server, gnd)
     }
 
-    async fn get_test_gnd() -> Result<GND> {
-        // GND sometimes has issues, so we retry until it works
-        // Also, we unse OnceCell to only load the test GND once
-        let ret = TEST_GND
-            .get_or_init(async {
-                loop {
-                    let gnd = GND::new(TEST_ID).await;
-                    match gnd {
-                        Ok(gnd) => break gnd,
-                        Err(_) => {
-                            tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-                        }
-                    }
-                }
-            })
-            .await;
-        Ok(ret.to_owned())
+    fn cleanup() {
+        url_override::unregister("https://d-nb.info");
+        url_override::unregister("https://viaf.org");
     }
 
     #[tokio::test]
     async fn test_new() {
-        assert!(get_test_gnd().await.is_ok());
+        let (_server, _gnd) = mock_gnd().await;
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_property() {
-        let gnd = get_test_gnd().await.unwrap();
+        let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.my_property(), P_GND);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_stated_in() {
-        let gnd = get_test_gnd().await.unwrap();
+        let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.my_stated_in(), "Q36578");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_primary_language() {
-        let gnd = get_test_gnd().await.unwrap();
+        let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.primary_language(), "de");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_get_key_url() {
-        let gnd = get_test_gnd().await.unwrap();
+        let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.get_key_url(TEST_ID), "https://d-nb.info/gnd/132539691");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_my_id() {
-        let gnd = get_test_gnd().await.unwrap();
+        let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.my_id(), TEST_ID);
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_transform_label() {
-        let gnd = get_test_gnd().await.unwrap();
+        let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.transform_label("Manske, Magnus"), "Magnus Manske");
         assert_eq!(gnd.transform_label("Manske,Magnus"), "Manske,Magnus");
         assert_eq!(gnd.transform_label("Magnus Manske"), "Magnus Manske");
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_run() {
-        let gnd = get_test_gnd().await.unwrap();
+        let (_server, gnd) = mock_gnd().await;
         let meta_item = gnd.run().await.unwrap();
         assert_eq!(
             *meta_item.item.labels(),
             vec![LocaleString::new("de", "Magnus Manske")]
         );
+        cleanup();
     }
 }

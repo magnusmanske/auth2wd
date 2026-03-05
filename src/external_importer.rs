@@ -778,6 +778,32 @@ pub trait ExternalImporter: Send + Sync {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
+
+    /// Spin up a wiremock server with the VIAF fixture and return a VIAF
+    /// instance that was constructed against it.  The caller must call
+    /// `cleanup()` when done.
+    async fn mock_viaf_for_tests() -> (MockServer, crate::viaf::VIAF) {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/viaf_30701597.rdf");
+
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+
+        url_override::register("https://viaf.org", server.uri());
+
+        let viaf = crate::viaf::VIAF::new("30701597").await.unwrap();
+        (server, viaf)
+    }
+
+    fn cleanup() {
+        url_override::unregister("https://viaf.org");
+    }
 
     #[tokio::test]
     async fn test_do_not_use_external_url() {
@@ -800,7 +826,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_url2external_id() {
-        let t = crate::viaf::VIAF::new("312603351").await.unwrap(); // Any ID will do
+        let (_server, t) = mock_viaf_for_tests().await;
         assert_eq!(
             Some(ExternalId::new(214, "12345")),
             t.url2external_id("http://viaf.org/viaf/12345")
@@ -813,13 +839,15 @@ mod tests {
             Some(ExternalId::new(214, "12345")),
             t.url2external_id("https://viaff.org/viaf/12345")
         );
+        cleanup();
     }
 
     #[tokio::test]
     async fn test_lowercase_first_letter() {
-        let t = crate::viaf::VIAF::new("312603351").await.unwrap(); // Any ID will do
+        let (_server, t) = mock_viaf_for_tests().await;
         assert_eq!("foo", t.lowercase_first_letter("Foo"));
         assert_eq!("foo", t.lowercase_first_letter("foo"));
         assert_eq!("", t.lowercase_first_letter(""));
+        cleanup();
     }
 }
