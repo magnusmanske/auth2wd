@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Subject xmlns="http://vocab.getty.edu/ontology#" rdf:about="http://vocab.getty.edu/ulan/500228559">
+	<rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+	<rdf:type rdf:resource="http://vocab.getty.edu/ontology#PersonConcept"/>
+	<rdfs:label>Darwin, Charles</rdfs:label>
+	<rdfs:label>Charles Darwin</rdfs:label>
+	<rdfs:label>Darwin, Charles Robert</rdfs:label>
+	<rdfs:seeAlso rdf:resource="http://www.getty.edu/vow/ULANFullDisplay?find=&amp;role=&amp;nation=&amp;subjectid=500228559"/>
+	<created xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-06-15T23:57:17</created>
+	<issued xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-07-27T16:49:48</issued>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-06-15T23:57:17</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-03-07T13:46:05</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-12-20T11:47:01</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-10-08T16:50:51</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-10-08T16:51:52</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-05-02T13:03:44</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-10-08T16:47:30</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-10-28T13:30:44</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-07-27T16:37:00</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-07-27T16:49:48</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-04-26T12:37:24</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-01-21T13:13:39</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-10-08T16:47:49</modified>
+	<modified xmlns="http://purl.org/dc/terms/" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-10-08T16:49:42</modified>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5504169209"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506211882"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506514536"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762491"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762498"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5509205322"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762484"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5504169207"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5504169208"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762483"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5504602520"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5505137358"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5505137521"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5505137522"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5505629523"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506515501"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762482"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762485"/>
+	<changeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762486"/>
+	<broader xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/500299802"/>
+	<broaderInstantialExtended xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/500299802"/>
+	<broaderExtended xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/500299802"/>
+	<broaderPreferredExtended xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/500299802"/>
+	<parentString xmlns="http://vocab.getty.edu/ontology#">Non-Artists</parentString>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/scopeNote/124278"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5504169209"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506211882"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506514536"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762491"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762498"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5509205322"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762484"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5504169207"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5504169208"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762483"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5504602520"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5505137358"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5505137521"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5505137522"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5505629523"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506515501"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762482"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762485"/>
+	<note xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/rev/5506762486"/>
+	<parentStringAbbrev xmlns="http://vocab.getty.edu/ontology#">Non-Artists</parentStringAbbrev>
+	<displayOrder xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">4299</displayOrder>
+	<agentType xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/aat/300025799"/>
+	<agentType xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/aat/300025492"/>
+	<agentType xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/aat/300112034"/>
+	<exactMatch xmlns="http://www.w3.org/2004/02/skos/core#">
+		<rdf:Description rdf:about="http://vocab.getty.edu/ulan/500228559">
+			<exactMatch xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://id.loc.gov/authorities/names/n78095637"/>
+			<prefLabel xmlns="http://www.w3.org/2008/05/skos-xl#" rdf:resource="http://vocab.getty.edu/ulan/term/1500537520"/>
+			<prefLabel xmlns="http://www.w3.org/2004/02/skos/core#">Darwin, Charles</prefLabel>
+			<altLabel xmlns="http://www.w3.org/2008/05/skos-xl#" rdf:resource="http://vocab.getty.edu/ulan/term/1500618243"/>
+			<altLabel xmlns="http://www.w3.org/2008/05/skos-xl#" rdf:resource="http://vocab.getty.edu/ulan/term/1500816483"/>
+			<altLabel xmlns="http://www.w3.org/2004/02/skos/core#">Charles Darwin</altLabel>
+			<altLabel xmlns="http://www.w3.org/2004/02/skos/core#">Darwin, Charles Robert</altLabel>
+			<broaderInstantial xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/500299802"/>
+			<broaderPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/500299802"/>
+			<prefLabelGVP xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/term/1500537520"/>
+			<inScheme xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/"/>
+			<scopeNote xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/scopeNote/124278"/>
+			<contributor xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+			<contributor xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+			<contributor xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000256"/>
+			<source xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/source/2100153925"/>
+			<source xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/source/2100156593-subject-500228559"/>
+			<source xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/source/2100186163-subject-500228559"/>
+			<agentTypePreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/aat/300112034"/>
+			<agentTypeNonPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/aat/300025799"/>
+			<agentTypeNonPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/aat/300025492"/>
+			<related xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/500355025"/>
+			<related xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://vocab.getty.edu/ulan/500446177"/>
+			<identifier xmlns="http://purl.org/dc/elements/1.1/">500228559</identifier>
+			<ulan1512_parent_of xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/500446177"/>
+			<ulan1513_grandchild_of xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/500355025"/>
+			<mappingRelation xmlns="http://www.w3.org/2004/02/skos/core#">
+				<rdf:Description rdf:about="http://vocab.getty.edu/ulan/500228559">
+					<mappingRelation xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://id.loc.gov/authorities/names/n78095637"/>
+					<closeMatch xmlns="http://www.w3.org/2004/02/skos/core#">
+						<rdf:Description rdf:about="http://vocab.getty.edu/ulan/500228559">
+							<closeMatch xmlns="http://www.w3.org/2004/02/skos/core#" rdf:resource="http://id.loc.gov/authorities/names/n78095637"/>
+							<inDataset xmlns="http://rdfs.org/ns/void#" rdf:resource="http://vocab.getty.edu/dataset/ulan"/>
+							<license xmlns="http://purl.org/dc/terms/" rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+							<license xmlns="http://creativecommons.org/ns#" rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+							<wasGeneratedBy xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/rev/5504169209"/>
+							<focus xmlns="http://xmlns.com/foaf/0.1/" rdf:resource="http://vocab.getty.edu/ulan/500228559-agent"/>
+						</rdf:Description>
+					</closeMatch>
+				</rdf:Description>
+			</mappingRelation>
+		</rdf:Description>
+	</exactMatch>
+</Subject>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5504169209">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Create"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/">new:Darwin, Charles</description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-06-15T23:57:17</startedAtTime>
+	<type xmlns="http://purl.org/dc/elements/1.1/">created</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5506211882">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/">Darwin, Charles (500228559) 'grandparent of' Darwin, Erasmus (500355049);</description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-03-07T13:46:05</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">relation added</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5506514536">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/">Darwin, Charles (500228559) 'grandparent of' Darwin, Erasmus (500355025);</description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-12-20T11:47:01</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">relation added</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5506762491">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/">Darwin, Charles (500228559) 'grandparent of' Darwin, Erasmus (500355049);</description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-10-08T16:50:51</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">relation deleted</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5506762498">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/">Darwin, Charles (500228559) 'grandchild of' Darwin, Erasmus (500355025);</description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-10-08T16:51:52</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">relation added</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5509205322">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/">Darwin, Charles (500228559) 'parent of' Darwin, William Erasmus (500446177);</description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-05-02T13:03:44</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">relation added</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5506762484">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/">Language: English (70051)</description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-10-08T16:47:30</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">note created</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5504169207">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/">Darwin, Charles (1500537520);</description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-06-15T23:57:17</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">term added</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5504169208">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/">Charles Darwin (1500618243);</description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-06-15T23:57:17</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">term added</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5506762483">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/">Darwin, Charles Robert (1500816483);</description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-10-08T16:47:30</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">term added</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5504602520">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/"></description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-10-28T13:30:44</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">updated</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5505137358">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/"></description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-07-27T16:37:00</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">updated</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5505137521">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Publish"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/"></description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-07-27T16:49:48</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">issued</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5505137522">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/">Old Parent: temp.parent/ Avery Person (500204801)</description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-07-27T16:49:48</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">moved</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5505629523">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/">Old Parent: Persons, Artists (500000002)</description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-04-26T12:37:24</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">moved</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5506515501">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/"></description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-01-21T13:13:39</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">updated</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5506762482">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/"></description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-10-08T16:47:30</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">updated</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5506762485">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/"></description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-10-08T16:47:49</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">updated</type>
+</Activity>
+<Activity xmlns="http://www.w3.org/ns/prov#" rdf:about="http://vocab.getty.edu/ulan/rev/5506762486">
+	<rdf:type rdf:resource="http://www.w3.org/ns/prov#Modify"/>
+	<description xmlns="http://purl.org/dc/elements/1.1/"></description>
+	<startedAtTime xmlns="http://www.w3.org/ns/prov#" rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014-10-08T16:49:42</startedAtTime>
+	<used xmlns="http://www.w3.org/ns/prov#" rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<type xmlns="http://purl.org/dc/elements/1.1/">updated</type>
+</Activity>
+<DocumentPart xmlns="http://purl.org/ontology/bibo/" rdf:about="http://vocab.getty.edu/ulan/source/2100156593-subject-500228559">
+	<locator xmlns="http://purl.org/ontology/bibo/">LOC ID: n78095637</locator>
+	<isPartOf xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/source/2100156593"/>
+</DocumentPart>
+<DocumentPart xmlns="http://purl.org/ontology/bibo/" rdf:about="http://vocab.getty.edu/ulan/source/2100186163-subject-500228559">
+	<locator xmlns="http://purl.org/ontology/bibo/">LOC ID: n78095637</locator>
+	<isPartOf xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/source/2100186163"/>
+</DocumentPart>
+<ScopeNote xmlns="http://vocab.getty.edu/ontology#" rdf:about="http://vocab.getty.edu/ulan/scopeNote/124278">
+	<rdf:value xml:lang="en">Prominent English naturalist and geologist known for contributions to a unifying evolutionary theory, explaining the diversity of life; laid out in the 1859 book "On the Origin of Species."</rdf:value>
+	<contributor xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+	<source xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/source/2100181000"/>
+	<identifier xmlns="http://purl.org/dc/elements/1.1/">124278</identifier>
+	<language xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/aat/300388277"/>
+	<language xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/language/en"/>
+</ScopeNote>
+<Label xmlns="http://www.w3.org/2008/05/skos-xl#" rdf:about="http://vocab.getty.edu/ulan/term/1500537520">
+	<term xmlns="http://vocab.getty.edu/ontology#">Darwin, Charles</term>
+	<displayOrder xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</displayOrder>
+	<literalForm xmlns="http://www.w3.org/2008/05/skos-xl#">Darwin, Charles</literalForm>
+	<termFlag xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+	<termDisplay xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/term/display/Indexing"/>
+	<contributorPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+	<contributor xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+	<contributor xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+	<contributorNonPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+	<sourcePreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/source/2100042658"/>
+	<sourcePreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/source/2100156395"/>
+	<sourcePreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/source/2100181000"/>
+	<source xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/source/2100042658"/>
+	<source xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/source/2100156395"/>
+	<source xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/source/2100181000"/>
+	<identifier xmlns="http://purl.org/dc/elements/1.1/">1500537520</identifier>
+</Label>
+<Label xmlns="http://www.w3.org/2008/05/skos-xl#" rdf:about="http://vocab.getty.edu/ulan/term/1500618243">
+	<term xmlns="http://vocab.getty.edu/ontology#">Charles Darwin</term>
+	<displayOrder xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</displayOrder>
+	<literalForm xmlns="http://www.w3.org/2008/05/skos-xl#">Charles Darwin</literalForm>
+	<termFlag xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+	<termDisplay xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/term/display/Display"/>
+	<contributor xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+	<contributor xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+	<contributorNonPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+	<contributorNonPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+	<source xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/source/2100039894"/>
+	<sourceNonPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/source/2100039894"/>
+	<identifier xmlns="http://purl.org/dc/elements/1.1/">1500618243</identifier>
+</Label>
+<Label xmlns="http://www.w3.org/2008/05/skos-xl#" rdf:about="http://vocab.getty.edu/ulan/term/1500816483">
+	<term xmlns="http://vocab.getty.edu/ontology#">Darwin, Charles Robert</term>
+	<displayOrder xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">3</displayOrder>
+	<literalForm xmlns="http://www.w3.org/2008/05/skos-xl#">Darwin, Charles Robert</literalForm>
+	<termFlag xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/term/flag/Vernacular"/>
+	<contributor xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+	<contributorNonPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000013"/>
+	<source xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/source/2100156395"/>
+	<sourceNonPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/source/2100156395"/>
+	<identifier xmlns="http://purl.org/dc/elements/1.1/">1500816483</identifier>
+</Label>
+<rdf:Statement rdf:about="http://vocab.getty.edu/ulan/rel/500228559-agentType-300112034">
+	<rdf:subject rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#agentTypePreferred"/>
+	<rdf:object rdf:resource="http://vocab.getty.edu/aat/300112034"/>
+	<displayOrder xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</displayOrder>
+</rdf:Statement>
+<rdf:Statement rdf:about="http://vocab.getty.edu/ulan/rel/500228559-agentType-300025799">
+	<rdf:subject rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#agentTypeNonPreferred"/>
+	<rdf:object rdf:resource="http://vocab.getty.edu/aat/300025799"/>
+	<displayOrder xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</displayOrder>
+</rdf:Statement>
+<rdf:Statement rdf:about="http://vocab.getty.edu/ulan/rel/500228559-agentType-300025492">
+	<rdf:subject rdf:resource="http://vocab.getty.edu/ulan/500228559"/>
+	<rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#agentTypeNonPreferred"/>
+	<rdf:object rdf:resource="http://vocab.getty.edu/aat/300025492"/>
+	<displayOrder xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">3</displayOrder>
+</rdf:Statement>
+<Person xmlns="http://schema.org/" rdf:about="http://vocab.getty.edu/ulan/500228559-agent">
+	<biography xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/bio/4000365450"/>
+	<biographyPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/bio/4000365450"/>
+	<eventPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/ulan/event/176408"/>
+	<event xmlns="http://purl.org/vocab/bio/0.1/" rdf:resource="http://vocab.getty.edu/ulan/event/176408"/>
+	<nationalityPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/aat/300111159"/>
+	<nationality xmlns="http://schema.org/" rdf:resource="http://vocab.getty.edu/aat/300111178"/>
+	<nationality xmlns="http://schema.org/" rdf:resource="http://vocab.getty.edu/aat/300111159"/>
+	<nationalityNonPreferred xmlns="http://vocab.getty.edu/ontology#" rdf:resource="http://vocab.getty.edu/aat/300111178"/>
+	<inDataset xmlns="http://rdfs.org/ns/void#" rdf:resource="http://vocab.getty.edu/dataset/ulan"/>
+	<license xmlns="http://purl.org/dc/terms/" rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+	<license xmlns="http://creativecommons.org/ns#" rdf:resource="http://opendatacommons.org/licenses/by/1.0/"/>
+</Person>
+<Biography xmlns="http://vocab.getty.edu/ontology#" rdf:about="http://vocab.getty.edu/ulan/bio/4000365450">
+	<estStart xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1809</estStart>
+	<estEnd xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1882</estEnd>
+	<contributor xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/ulan/contrib/2500000008"/>
+	<description xmlns="http://schema.org/">English naturalist, 1809-1882</description>
+	<gender xmlns="http://schema.org/" rdf:resource="http://vocab.getty.edu/aat/300189559"/>
+</Biography>
+<Event xmlns="http://purl.org/vocab/bio/0.1/" rdf:about="http://vocab.getty.edu/ulan/event/176408">
+	<rdf:type rdf:resource="http://schema.org/Event"/>
+	<rdfs:comment>on the HMS Beagle, 1831-1836</rdfs:comment>
+	<displayOrder xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</displayOrder>
+	<estStart xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1831</estStart>
+	<estEnd xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1836</estEnd>
+	<type xmlns="http://purl.org/dc/terms/" rdf:resource="http://vocab.getty.edu/aat/300069799"/>
+</Event>
+<rdf:Statement rdf:about="http://vocab.getty.edu/ulan/500228559-nationality-300111178">
+	<rdf:subject rdf:resource="http://vocab.getty.edu/ulan/500228559-agent"/>
+	<rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#nationalityNonPreferred"/>
+	<rdf:object rdf:resource="http://vocab.getty.edu/aat/300111178"/>
+	<displayOrder xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">2</displayOrder>
+</rdf:Statement>
+<rdf:Statement rdf:about="http://vocab.getty.edu/ulan/500228559-nationality-300111159">
+	<rdf:subject rdf:resource="http://vocab.getty.edu/ulan/500228559-agent"/>
+	<rdf:predicate rdf:resource="http://vocab.getty.edu/ontology#nationalityPreferred"/>
+	<rdf:object rdf:resource="http://vocab.getty.edu/aat/300111159"/>
+	<displayOrder xmlns="http://vocab.getty.edu/ontology#" rdf:datatype="http://www.w3.org/2001/XMLSchema#positiveInteger">1</displayOrder>
+</rdf:Statement>
+
+</rdf:RDF>

@@ -1,13 +1,16 @@
-use crate::external_id::ExternalId;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
+use crate::url_override::maybe_rewrite;
 use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
+use serde_json::json;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
+
+use crate::external_id::ExternalId;
 
 #[derive(Debug)]
 pub struct ULAN {
@@ -50,6 +53,7 @@ impl ExternalImporter for ULAN {
         self.add_p31(&mut ret)?;
         self.add_children(&mut ret).await?;
         self.add_mentors(&mut ret).await?;
+        self.viaf_id_from_ulan(&mut ret).await?;
         self.try_rescue_prop_text(&mut ret).await?;
         ret.cleanup();
         Ok(ret)
@@ -104,16 +108,151 @@ impl ULAN {
             let _ = ret.add_prop_text(ExternalId::new(property, url));
         }
     }
+
+    /// Queries VIAF for the ULAN ID (using the "JPG" source key) and, if a
+    /// VIAF ID is returned, adds a P214 (VIAF) claim to the item.
+    async fn viaf_id_from_ulan(&self, ret: &mut MetaItem) -> Result<()> {
+        let record_id = format!("JPG|{}", self.id);
+        let url = maybe_rewrite("https://viaf.org/api/cluster-record");
+        let payload = json!({
+            "reqValues": {
+                "recordId": record_id,
+                "isSourceId": true
+            },
+            "meta": {
+                "pageIndex": 0,
+                "pageSize": 1
+            }
+        });
+        let client = Utility::get_reqwest_client()?;
+        let response: serde_json::Value = client
+            .post(&url)
+            .json(&payload)
+            .send()
+            .await?
+            .json()
+            .await?;
+        if let Some(viaf_id) = response["queryResult"]["viafID"].as_i64() {
+            let viaf_id = viaf_id.to_string();
+            ret.add_claim(self.new_statement_string(P_VIAF, &viaf_id));
+        }
+        Ok(())
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::url_override;
+    use wikimisc::wikibase::{EntityTrait, Statement, Value};
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     const TEST_ID: &str = "500228559";
 
     #[tokio::test]
     async fn test_new() {
         assert!(ULAN::new(TEST_ID).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_viaf_id_from_ulan() {
+        let ulan_fixture = include_str!("../test_data/fixtures/ulan_500228559.rdf");
+
+        // ── Case 1: VIAF returns a valid viafID ────────────────────────────
+        {
+            let server = MockServer::start().await;
+
+            Mock::given(method("GET"))
+                .and(path("/ulan/500228559.rdf"))
+                .respond_with(ResponseTemplate::new(200).set_body_string(ulan_fixture))
+                .mount(&server)
+                .await;
+
+            let viaf_fixture = include_str!("../test_data/fixtures/viaf_lookup_jpg_500228559.json");
+            Mock::given(method("POST"))
+                .and(path("/api/cluster-record"))
+                .respond_with(ResponseTemplate::new(200).set_body_string(viaf_fixture))
+                .mount(&server)
+                .await;
+
+            url_override::clear();
+            url_override::register("https://vocab.getty.edu", server.uri());
+            url_override::register("https://viaf.org", server.uri());
+
+            let ulan = ULAN::new(TEST_ID).await.unwrap();
+
+            let mut meta_item = MetaItem::new();
+            let result = ulan.viaf_id_from_ulan(&mut meta_item).await;
+            assert!(
+                result.is_ok(),
+                "viaf_id_from_ulan failed: {:?}",
+                result.err()
+            );
+
+            // Check that a P214 (VIAF) claim was added with the expected VIAF ID
+            let viaf_claims: Vec<&Statement> = meta_item
+                .item
+                .claims()
+                .iter()
+                .filter(|c| c.main_snak().property() == format!("P{P_VIAF}"))
+                .collect();
+            assert_eq!(viaf_claims.len(), 1, "expected exactly one VIAF claim");
+
+            let snak = viaf_claims[0].main_snak();
+            if let Some(dv) = snak.data_value() {
+                match dv.value() {
+                    Value::StringValue(s) => {
+                        assert_eq!(s, "27063124");
+                    }
+                    other => panic!("expected StringValue, got {:?}", other),
+                }
+            } else {
+                panic!("expected data value on VIAF snak");
+            }
+
+            url_override::clear();
+        }
+
+        // ── Case 2: VIAF returns no viafID ─────────────────────────────────
+        {
+            let server = MockServer::start().await;
+
+            Mock::given(method("GET"))
+                .and(path("/ulan/500228559.rdf"))
+                .respond_with(ResponseTemplate::new(200).set_body_string(ulan_fixture))
+                .mount(&server)
+                .await;
+
+            Mock::given(method("POST"))
+                .and(path("/api/cluster-record"))
+                .respond_with(ResponseTemplate::new(200).set_body_string("{}"))
+                .mount(&server)
+                .await;
+
+            url_override::clear();
+            url_override::register("https://vocab.getty.edu", server.uri());
+            url_override::register("https://viaf.org", server.uri());
+
+            let ulan = ULAN::new(TEST_ID).await.unwrap();
+
+            let mut meta_item = MetaItem::new();
+            let result = ulan.viaf_id_from_ulan(&mut meta_item).await;
+            assert!(result.is_ok());
+
+            // No VIAF claim should have been added
+            let viaf_claims: Vec<&Statement> = meta_item
+                .item
+                .claims()
+                .iter()
+                .filter(|c| c.main_snak().property() == format!("P{P_VIAF}"))
+                .collect();
+            assert!(
+                viaf_claims.is_empty(),
+                "expected no VIAF claim when VIAF returns no ID"
+            );
+
+            url_override::clear();
+        }
     }
 }
