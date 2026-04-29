@@ -68,7 +68,7 @@ lazy_static! {
         ret.insert(String::from("SUDOC"), 269);
         // ret.insert(String::from("SZ"), XXXX);
         ret.insert(String::from("SRP"), 6934);
-        // ret.insert(String::from("JPG"), XXXX);
+        ret.insert(String::from("JPG"), P_ULAN);
         // ret.insert(String::from("UAE"), XXXX);
         ret.insert(String::from("BAV"), 8034);
         // ret.insert(String::from("WKP"), XXXX); // Maybe not?

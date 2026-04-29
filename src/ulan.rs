@@ -5,7 +5,6 @@ use crate::url_override::maybe_rewrite;
 use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
-use serde_json::json;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
@@ -53,7 +52,6 @@ impl ExternalImporter for ULAN {
         self.add_p31(&mut ret)?;
         self.add_children(&mut ret).await?;
         self.add_mentors(&mut ret).await?;
-        self.viaf_id_from_ulan(&mut ret).await?;
         self.try_rescue_prop_text(&mut ret).await?;
         ret.cleanup();
         Ok(ret)
@@ -109,35 +107,6 @@ impl ULAN {
         }
     }
 
-    /// Queries VIAF for the ULAN ID (using the "JPG" source key) and, if a
-    /// VIAF ID is returned, adds a P214 (VIAF) claim to the item.
-    async fn viaf_id_from_ulan(&self, ret: &mut MetaItem) -> Result<()> {
-        let record_id = format!("JPG|{}", self.id);
-        let url = maybe_rewrite("https://viaf.org/api/cluster-record");
-        let payload = json!({
-            "reqValues": {
-                "recordId": record_id,
-                "isSourceId": true
-            },
-            "meta": {
-                "pageIndex": 0,
-                "pageSize": 1
-            }
-        });
-        let client = Utility::get_reqwest_client()?;
-        let response: serde_json::Value = client
-            .post(&url)
-            .json(&payload)
-            .send()
-            .await?
-            .json()
-            .await?;
-        if let Some(viaf_id) = response["queryResult"]["viafID"].as_i64() {
-            let viaf_id = viaf_id.to_string();
-            ret.add_claim(self.new_statement_string(P_VIAF, &viaf_id));
-        }
-        Ok(())
-    }
 }
 
 #[cfg(test)]
@@ -179,6 +148,10 @@ mod tests {
         cleanup();
     }
 
+    /// Verifies that VIAF inference for ULAN flows through the shared
+    /// `try_viaf` machinery in `ExternalImporter` (via the JPG → P_ULAN entry
+    /// in VIAF's KEY2PROP map). The fixture mocks the VIAF cluster-record
+    /// response that the lookup would receive for `JPG|500228559`.
     #[tokio::test]
     #[serial]
     async fn test_viaf_id_from_ulan() {
@@ -207,14 +180,8 @@ mod tests {
             let ulan = ULAN::new(TEST_ID).await.unwrap();
 
             let mut meta_item = MetaItem::new();
-            let result = ulan.viaf_id_from_ulan(&mut meta_item).await;
-            assert!(
-                result.is_ok(),
-                "viaf_id_from_ulan failed: {:?}",
-                result.err()
-            );
+            ulan.try_viaf(&mut meta_item).await.unwrap();
 
-            // Check that a P214 (VIAF) claim was added with the expected VIAF ID
             let viaf_claims: Vec<&Statement> = meta_item
                 .item
                 .claims()
@@ -235,8 +202,7 @@ mod tests {
                 panic!("expected data value on VIAF snak");
             }
 
-            url_override::unregister("https://vocab.getty.edu");
-            url_override::unregister("https://viaf.org");
+            cleanup();
         }
 
         // ── Case 2: VIAF returns no viafID ─────────────────────────────────
@@ -261,10 +227,8 @@ mod tests {
             let ulan = ULAN::new(TEST_ID).await.unwrap();
 
             let mut meta_item = MetaItem::new();
-            let result = ulan.viaf_id_from_ulan(&mut meta_item).await;
-            assert!(result.is_ok());
+            ulan.try_viaf(&mut meta_item).await.unwrap();
 
-            // No VIAF claim should have been added
             let viaf_claims: Vec<&Statement> = meta_item
                 .item
                 .claims()
@@ -276,8 +240,7 @@ mod tests {
                 "expected no VIAF claim when VIAF returns no ID"
             );
 
-            url_override::unregister("https://vocab.getty.edu");
-            url_override::unregister("https://viaf.org");
+            cleanup();
         }
     }
 }
