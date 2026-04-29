@@ -13,6 +13,13 @@ lazy_static! {
     static ref RE_FROM_STRING: Regex = Regex::new(r#"^[Pp](\d+):(.+)$"#).expect("Regexp error");
     static ref EXTERNAL_IDS_OK_CACHE: Arc<Mutex<HashMap<ExternalId, bool>>> =
         Arc::new(Mutex::new(HashMap::new()));
+    /// In-process cache for `search_wikidata_single_item`, keyed by raw
+    /// `srsearch` query string. Both hits (`Some(QID)`) and misses (`None`)
+    /// are cached so the same Wikidata search isn't repeated within one run.
+    /// Tests that exercise multiple mock responses for the same query can
+    /// call [`ExternalId::clear_wikidata_search_cache`] between cases.
+    static ref WIKIDATA_SEARCH_CACHE: Mutex<HashMap<String, Option<String>>> =
+        Mutex::new(HashMap::new());
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Hash)]
@@ -81,14 +88,35 @@ impl ExternalId {
     }
 
     pub async fn search_wikidata_single_item(query: &str) -> Option<String> {
+        if let Some(cached) = WIKIDATA_SEARCH_CACHE.lock().await.get(query) {
+            return cached.clone();
+        }
         // TODO urlencode query?
         let url = format!("https://www.wikidata.org/w/api.php?action=query&list=search&srnamespace=0&format=json&srsearch={}",&query);
+        // The early `?` exits do not cache: a network/parse failure is treated
+        // as transient so a later call can retry. Only well-formed responses
+        // (a known totalhits value) populate the cache.
         let text = Utility::get_url(&url).await.ok()?;
         let j: serde_json::Value = serde_json::from_str(&text).ok()?;
-        if j["query"]["searchinfo"]["totalhits"].as_i64()? == 1 {
-            return Some(j["query"]["search"][0]["title"].as_str()?.to_string());
-        }
-        None
+        let totalhits = j["query"]["searchinfo"]["totalhits"].as_i64()?;
+        let result = if totalhits == 1 {
+            j["query"]["search"][0]["title"]
+                .as_str()
+                .map(|s| s.to_string())
+        } else {
+            None
+        };
+        WIKIDATA_SEARCH_CACHE
+            .lock()
+            .await
+            .insert(query.to_string(), result.clone());
+        result
+    }
+
+    /// Clears the in-process Wikidata search cache. Intended for tests that
+    /// exercise multiple distinct mock responses for the same query string.
+    pub async fn clear_wikidata_search_cache() {
+        WIKIDATA_SEARCH_CACHE.lock().await.clear();
     }
 
     pub async fn get_item_for_external_id_value(&self) -> Option<String> {
@@ -234,6 +262,7 @@ mod tests {
     #[tokio::test]
     #[serial]
     async fn test_get_item_for_external_id() {
+        ExternalId::clear_wikidata_search_cache().await;
         let server = MockServer::start().await;
 
         let single_result = r#"{"batchcomplete":"","query":{"searchinfo":{"totalhits":1},"search":[{"ns":0,"title":"Q13520818","pageid":15554972,"size":42000,"wordcount":0,"snippet":"","timestamp":"2024-01-01T00:00:00Z"}]}}"#;
@@ -311,5 +340,57 @@ mod tests {
         assert_eq!(ext_id2.get_item_for_external_id_value().await, None);
 
         url_override::unregister("https://www.wikidata.org");
+        ExternalId::clear_wikidata_search_cache().await;
+    }
+
+    /// Once a query has been resolved, repeating it does not hit the network.
+    /// Verified by tearing the mock server down between the two calls — the
+    /// second call must still return the same value.
+    #[tokio::test]
+    #[serial]
+    async fn test_search_wikidata_single_item_caches_results() {
+        ExternalId::clear_wikidata_search_cache().await;
+
+        // ── First call: live mock returns a single hit ─────────────────────
+        {
+            let server = MockServer::start().await;
+            let single_result = r#"{"batchcomplete":"","query":{"searchinfo":{"totalhits":1},"search":[{"ns":0,"title":"Q42","pageid":1,"size":0,"wordcount":0,"snippet":"","timestamp":"2026-01-01T00:00:00Z"}]}}"#;
+            Mock::given(method("GET"))
+                .and(path("/w/api.php"))
+                .and(query_param(
+                    "srsearch",
+                    "haswbstatement:\"P227=cache-test-id\"",
+                ))
+                .respond_with(ResponseTemplate::new(200).set_body_string(single_result))
+                .mount(&server)
+                .await;
+            url_override::register("https://www.wikidata.org", server.uri());
+
+            let ext_id = ExternalId::new(227, "cache-test-id");
+            assert_eq!(
+                ext_id.get_item_for_external_id_value().await,
+                Some("Q42".to_string())
+            );
+
+            url_override::unregister("https://www.wikidata.org");
+        }
+
+        // ── Second call: a fresh mock with no stub. A cache miss would 404
+        //    and `search_wikidata_single_item` would return `None`. The
+        //    cached `Some("Q42")` must win. ─────────────────────────────────
+        {
+            let server = MockServer::start().await;
+            url_override::register("https://www.wikidata.org", server.uri());
+
+            let ext_id = ExternalId::new(227, "cache-test-id");
+            assert_eq!(
+                ext_id.get_item_for_external_id_value().await,
+                Some("Q42".to_string())
+            );
+
+            url_override::unregister("https://www.wikidata.org");
+        }
+
+        ExternalId::clear_wikidata_search_cache().await;
     }
 }
