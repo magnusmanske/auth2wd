@@ -1,13 +1,10 @@
 use crate::external_id::*;
 use crate::meta_item::*;
 use crate::properties::*;
-use crate::url_override::maybe_rewrite;
-use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
 use chrono::prelude::*;
 use regex::Regex;
-use serde_json::json;
 use sophia::api::ns;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
@@ -750,25 +747,9 @@ pub trait ExternalImporter: Send + Sync {
     }
 
     async fn try_viaf(&self, ret: &mut MetaItem) -> Result<()> {
-        let id = self.my_id();
-        let prop_numeric = self.my_property();
-        let key = match crate::viaf::VIAF::prop2key(prop_numeric) {
-            Some(key) => key,
-            None => return Ok(()), // No VIAF key for property found
-        };
-        let record_id = format!("{key}|{id}");
-        let url = maybe_rewrite("https://viaf.org/api/cluster-record");
-        let payload = json!({"reqValues":{"recordId":record_id,"isSourceId":true},"meta":{"pageIndex":0,"pageSize":1}});
-        let client = Utility::get_reqwest_client()?;
-        let response: serde_json::Value = client
-            .post(&url)
-            .json(&payload)
-            .send()
-            .await?
-            .json()
-            .await?;
-        if let Some(viaf_id) = response["queryResult"]["viafID"].as_i64() {
-            let viaf_id = viaf_id.to_string();
+        if let Some(viaf_id) =
+            crate::viaf::VIAF::infer_viaf_id_for(self.my_property(), &self.my_id()).await
+        {
             ret.add_claim(self.new_statement_string(P_VIAF, &viaf_id));
         }
         Ok(())

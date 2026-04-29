@@ -12,8 +12,17 @@ use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
 use std::collections::HashMap;
+use tokio::sync::Mutex as AsyncMutex;
 
 lazy_static! {
+    /// In-process cache for VIAF source-ID lookups, keyed by `(property, id)`.
+    /// Both successful matches (`Some(viaf_id)`) and definite "no match" results
+    /// (`None`) are cached so that the same `(property, id)` is never queried
+    /// twice in one process. Tests that exercise multiple mock responses for
+    /// the same key can call [`VIAF::clear_lookup_cache`] between cases.
+    static ref VIAF_LOOKUP_CACHE: AsyncMutex<HashMap<(usize, String), Option<String>>> =
+        AsyncMutex::new(HashMap::new());
+
     static ref KEY2PROP: HashMap<String, usize> = {
         let mut ret = HashMap::new();
         ret.insert(String::from("DNB"), 227);
@@ -145,6 +154,62 @@ impl VIAF {
             .map(|(k, _)| k.clone())
     }
 
+    /// Queries VIAF's `cluster-record` endpoint for the cluster matching the
+    /// given `(property, id)` source identifier and returns the VIAF ID if
+    /// one is found.
+    ///
+    /// VIAF's `cluster-record` endpoint resolves a source ID to at most one
+    /// cluster, so a successful response is by construction a single,
+    /// unambiguous match — no manual deduplication is required.
+    ///
+    /// Returns `None` when:
+    /// - the property has no known VIAF source key (see `KEY2PROP`),
+    /// - VIAF has no cluster for this source ID,
+    /// - the request fails for any reason. Lookup failures are intentionally
+    ///   swallowed so that an unreachable VIAF cannot cascade into a parser
+    ///   failure for the underlying source importer.
+    ///
+    /// Results are cached in-process; see [`Self::clear_lookup_cache`].
+    pub async fn infer_viaf_id_for(property: usize, id: &str) -> Option<String> {
+        let key = Self::prop2key(property)?;
+        let cache_key = (property, id.to_string());
+        if let Some(cached) = VIAF_LOOKUP_CACHE.lock().await.get(&cache_key) {
+            return cached.clone();
+        }
+        let result = Self::query_cluster_record(&key, id).await;
+        VIAF_LOOKUP_CACHE
+            .lock()
+            .await
+            .insert(cache_key, result.clone());
+        result
+    }
+
+    async fn query_cluster_record(source_key: &str, id: &str) -> Option<String> {
+        let url = maybe_rewrite("https://viaf.org/api/cluster-record");
+        let payload = json!({
+            "reqValues": {
+                "recordId": format!("{source_key}|{id}"),
+                "isSourceId": true,
+            },
+            "meta": { "pageIndex": 0, "pageSize": 1 },
+        });
+        let client = Utility::get_reqwest_client().ok()?;
+        let response = client.post(&url).json(&payload).send().await.ok()?;
+        if !response.status().is_success() {
+            return None;
+        }
+        let json: serde_json::Value = response.json().await.ok()?;
+        json["queryResult"]["viafID"]
+            .as_i64()
+            .map(|v| v.to_string())
+    }
+
+    /// Clears the in-process VIAF lookup cache. Intended for tests that
+    /// exercise multiple distinct mock responses for the same `(property, id)`.
+    pub async fn clear_lookup_cache() {
+        VIAF_LOOKUP_CACHE.lock().await.clear();
+    }
+
     fn external_ids(&self, ret: &mut MetaItem) -> Result<()> {
         lazy_static! {
             static ref RE_EXT_ID: Regex =
@@ -261,5 +326,86 @@ mod tests {
             vec![LocaleString::new("en", "Magnus Manske")]
         );
         url_override::unregister("https://viaf.org");
+    }
+
+    /// Returns `None` for a property that has no entry in `KEY2PROP`,
+    /// without making any HTTP call.
+    #[tokio::test]
+    #[serial]
+    async fn test_infer_viaf_id_for_unmapped_property() {
+        VIAF::clear_lookup_cache().await;
+        // P_INATURALIST_TAXON is supported by the importer set but is not in
+        // KEY2PROP — VIAF doesn't index iNaturalist taxa.
+        assert!(VIAF::prop2key(P_INATURALIST_TAXON).is_none());
+        assert_eq!(
+            None,
+            VIAF::infer_viaf_id_for(P_INATURALIST_TAXON, "12345").await
+        );
+    }
+
+    /// End-to-end of the inference function against a mocked VIAF endpoint:
+    /// a successful response yields `Some(viaf_id)`, an empty body yields
+    /// `None`, and the result is cached so a second call does not re-hit
+    /// the (now-removed) mock.
+    #[tokio::test]
+    #[serial]
+    async fn test_infer_viaf_id_for_caches_results() {
+        VIAF::clear_lookup_cache().await;
+
+        // ── Hit ─────────────────────────────────────────────────────────────
+        {
+            let server = MockServer::start().await;
+            let fixture =
+                include_str!("../test_data/fixtures/viaf_lookup_jpg_500228559.json");
+            Mock::given(method("POST"))
+                .and(path("/api/cluster-record"))
+                .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+                .mount(&server)
+                .await;
+            url_override::register("https://viaf.org", server.uri());
+
+            let result = VIAF::infer_viaf_id_for(P_ULAN, "500228559").await;
+            assert_eq!(result, Some("27063124".to_string()));
+
+            url_override::unregister("https://viaf.org");
+        }
+
+        // ── Cached: a fresh server returns nothing, but the cached value
+        //    from the previous call must still be returned. ─────────────────
+        {
+            let server = MockServer::start().await;
+            // Deliberately register no mock — any HTTP call would 404.
+            url_override::register("https://viaf.org", server.uri());
+
+            let result = VIAF::infer_viaf_id_for(P_ULAN, "500228559").await;
+            assert_eq!(result, Some("27063124".to_string()));
+
+            url_override::unregister("https://viaf.org");
+        }
+
+        VIAF::clear_lookup_cache().await;
+    }
+
+    /// An empty `queryResult` (i.e. no `viafID` field) yields `None` and is
+    /// cached as such — a subsequent call does not re-query VIAF.
+    #[tokio::test]
+    #[serial]
+    async fn test_infer_viaf_id_for_no_match() {
+        VIAF::clear_lookup_cache().await;
+
+        let server = MockServer::start().await;
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("{}"))
+            .mount(&server)
+            .await;
+        url_override::register("https://viaf.org", server.uri());
+
+        // Use a clearly-unique id to keep this test independent of others.
+        let result = VIAF::infer_viaf_id_for(P_GND, "test-no-match").await;
+        assert_eq!(result, None);
+
+        url_override::unregister("https://viaf.org");
+        VIAF::clear_lookup_cache().await;
     }
 }

@@ -157,6 +157,11 @@ mod tests {
     async fn test_viaf_id_from_ulan() {
         let ulan_fixture = include_str!("../test_data/fixtures/ulan_500228559.rdf");
 
+        // The two cases below exercise different mock responses for the
+        // same `(P_ULAN, "500228559")` key, so the in-process VIAF lookup
+        // cache must be cleared between them.
+        crate::viaf::VIAF::clear_lookup_cache().await;
+
         // ── Case 1: VIAF returns a valid viafID ────────────────────────────
         {
             let server = MockServer::start().await;
@@ -204,6 +209,8 @@ mod tests {
 
             cleanup();
         }
+
+        crate::viaf::VIAF::clear_lookup_cache().await;
 
         // ── Case 2: VIAF returns no viafID ─────────────────────────────────
         {

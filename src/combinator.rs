@@ -1,7 +1,9 @@
 use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
+use crate::properties::P_VIAF;
 use crate::supported_property::SUPPORTED_PROPERTIES;
+use crate::viaf::VIAF;
 use anyhow::{anyhow, Result};
 use futures::future::join_all;
 use std::collections::HashMap;
@@ -72,9 +74,47 @@ impl Combinator {
         parsers
     }
 
+    /// For each external ID in `ids` whose property is mapped to a VIAF source
+    /// key, query VIAF in parallel and return any inferred VIAF IDs as new
+    /// `ExternalId`s (property = `P_VIAF`). Failures and "no match" responses
+    /// are silently skipped — VIAF is treated as a best-effort enrichment.
+    /// `VIAF::infer_viaf_id_for` caches results, so calling this every loop
+    /// iteration does not refetch already-resolved IDs.
+    async fn discover_viaf_ids(ids: &[ExternalId]) -> Vec<ExternalId> {
+        let mut futures = Vec::new();
+        for ext_id in ids {
+            if ext_id.property() == P_VIAF {
+                continue;
+            }
+            if VIAF::prop2key(ext_id.property()).is_none() {
+                continue;
+            }
+            let prop = ext_id.property();
+            let id = ext_id.id().to_string();
+            futures.push(async move { VIAF::infer_viaf_id_for(prop, &id).await });
+        }
+        join_all(futures)
+            .await
+            .into_iter()
+            .flatten()
+            .map(|v| ExternalId::new(P_VIAF, &v))
+            .collect()
+    }
+
     pub async fn import(&mut self, mut ids: Vec<ExternalId>) -> Result<()> {
         let mut ids_used: HashSet<ExternalId> = HashSet::new();
         while !ids.is_empty() {
+            ids.sort();
+            ids.dedup();
+            // Eager VIAF discovery: for every queued source ID with a VIAF
+            // mapping, look up VIAF in parallel and queue the result so the
+            // VIAF parser runs alongside the source parser instead of waiting
+            // for the source parser's `try_viaf` to surface a P214 claim.
+            for vid in Self::discover_viaf_ids(&ids).await {
+                if !ids_used.contains(&vid) && !ids.contains(&vid) {
+                    ids.push(vid);
+                }
+            }
             ids.sort();
             ids.dedup();
             let parsers = self.import_get_parsers(&ids, &mut ids_used).await;
@@ -145,10 +185,53 @@ impl Combinator {
 
 #[cfg(test)]
 mod tests {
+    use crate::properties::{P_GND, P_INATURALIST_TAXON, P_ULAN};
+    use crate::url_override;
     use serde_json::Value;
+    use serial_test::serial;
     use wikimisc::wikibase::{EntityTrait, ItemEntity};
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     use super::*;
+
+    /// Properties without a VIAF source-key mapping (and P_VIAF itself) are
+    /// skipped; properties with a mapping are queried in parallel; the
+    /// resulting VIAF IDs are returned as `P_VIAF` external IDs.
+    #[tokio::test]
+    #[serial]
+    async fn test_discover_viaf_ids() {
+        VIAF::clear_lookup_cache().await;
+
+        let server = MockServer::start().await;
+        // Stub: any cluster-record POST returns the JPG fixture (viafID 27063124).
+        let fixture = include_str!("../test_data/fixtures/viaf_lookup_jpg_500228559.json");
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+        url_override::register("https://viaf.org", server.uri());
+
+        let inputs = vec![
+            ExternalId::new(P_ULAN, "500228559"),       // mapped via JPG
+            ExternalId::new(P_GND, "discover-test-id"), // mapped via DNB
+            ExternalId::new(P_INATURALIST_TAXON, "1"),  // unmapped → skipped
+            ExternalId::new(P_VIAF, "27063124"),        // VIAF → skipped
+        ];
+        let discovered = Combinator::discover_viaf_ids(&inputs).await;
+
+        // Only the two mapped inputs trigger lookups; both resolve to the
+        // same fixture VIAF ID, and the dedup happens later in `import`.
+        assert_eq!(discovered.len(), 2);
+        for ext_id in &discovered {
+            assert_eq!(ext_id.property(), P_VIAF);
+            assert_eq!(ext_id.id(), "27063124");
+        }
+
+        url_override::unregister("https://viaf.org");
+        VIAF::clear_lookup_cache().await;
+    }
 
     #[test]
     fn test_combine() {
