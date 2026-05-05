@@ -129,8 +129,7 @@ impl VIAF {
         let url = maybe_rewrite("https://viaf.org/api/cluster-record");
         let client = Utility::get_reqwest_client()?;
         let payload = json!({"reqValues":{"recordId":id,"isSourceId":false,"acceptFiletype":"rdf+xml"},"meta":{"pageIndex":0,"pageSize":1}});
-        let response = client
-            .post(&url)
+        let response = Self::cluster_record_request(&client, &url)
             .json(&payload)
             .send()
             .await?
@@ -142,6 +141,21 @@ impl VIAF {
             id: String::from(id),
             graph,
         })
+    }
+
+    /// VIAF's `/api/cluster-record` endpoint sits behind a Cloudflare bot
+    /// wall that 403s any request lacking the header set its own SPA sends.
+    /// `Content-Type` alone (what reqwest's `.json()` adds) is not enough —
+    /// `Accept`, `Origin`, and `Referer` are also required.
+    fn cluster_record_request(
+        client: &reqwest::Client,
+        url: &str,
+    ) -> reqwest::RequestBuilder {
+        client
+            .post(url)
+            .header(reqwest::header::ACCEPT, "application/json")
+            .header(reqwest::header::ORIGIN, "https://viaf.org")
+            .header(reqwest::header::REFERER, "https://viaf.org/")
     }
 
     /// Returns the VIAF source key for a Wikidata property ID, if one is mapped.
@@ -192,7 +206,11 @@ impl VIAF {
             "meta": { "pageIndex": 0, "pageSize": 1 },
         });
         let client = Utility::get_reqwest_client().ok()?;
-        let response = client.post(&url).json(&payload).send().await.ok()?;
+        let response = Self::cluster_record_request(&client, &url)
+            .json(&payload)
+            .send()
+            .await
+            .ok()?;
         if !response.status().is_success() {
             return None;
         }
