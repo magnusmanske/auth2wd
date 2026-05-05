@@ -57,12 +57,27 @@ impl LOC {
         let rdf_url = maybe_rewrite(&format!("https://id.loc.gov/authorities/names/{id}.rdf"));
         let client = Utility::get_reqwest_client()?;
         let resp = client.get(&rdf_url).send().await?.text().await?;
+        let resp = Self::sanitize_rdf(&resp);
         let mut graph: FastGraph = FastGraph::new();
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {
             id: id.to_string(),
             graph,
         })
+    }
+
+    /// Patch up two strict-parser violations occasionally found in real LOC
+    /// payloads (both seen on n80115701):
+    /// - protocol-relative URIs like `rdf:resource="//www.loc.gov/..."` get
+    ///   `http:` prepended (sophia: "No scheme found in an absolute IRI").
+    /// - the bare `lclang="..."` attribute (LOC's own non-standard
+    ///   language tag, only on language-of-cataloging blocks we don't read)
+    ///   is rewritten to `xml:lang="..."`, which sophia accepts (sophia:
+    ///   "XML namespaces are required in RDF/XML").
+    fn sanitize_rdf(s: &str) -> String {
+        s.replace("rdf:resource=\"//", "rdf:resource=\"http://")
+            .replace("rdf:about=\"//", "rdf:about=\"http://")
+            .replace(" lclang=\"", " xml:lang=\"")
     }
 }
 
@@ -98,6 +113,37 @@ mod tests {
     #[serial]
     async fn test_new() {
         let (_server, _loc) = mock_loc().await;
+        url_override::unregister("https://id.loc.gov");
+    }
+
+    #[test]
+    fn test_sanitize_rdf_fixes_loc_quirks() {
+        let input = r#"<rdf:type rdf:resource="//www.loc.gov/x"/><x rdf:about="//y"/><l lclang="en">English</l>"#;
+        let out = LOC::sanitize_rdf(input);
+        assert!(out.contains(r#"rdf:resource="http://www.loc.gov/x""#));
+        assert!(out.contains(r#"rdf:about="http://y""#));
+        assert!(out.contains(r#"xml:lang="en""#));
+        assert!(!out.contains("lclang"));
+    }
+
+    /// Real LOC payloads occasionally contain RDF/XML the strict parser
+    /// rejects: protocol-relative `rdf:resource="//..."` and bare `lclang="..."`
+    /// attributes. `LOC::new` must sanitize both so parsing succeeds —
+    /// regression test for Q139674000 (`n80115701`), whose RDF has both.
+    #[tokio::test]
+    #[serial]
+    async fn test_new_handles_malformed_rdf() {
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/loc_n80115701.rdf");
+        Mock::given(method("GET"))
+            .and(path("/authorities/names/n80115701.rdf"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+        url_override::register("https://id.loc.gov", server.uri());
+
+        let _loc = LOC::new("n80115701").await.unwrap();
+
         url_override::unregister("https://id.loc.gov");
     }
 
