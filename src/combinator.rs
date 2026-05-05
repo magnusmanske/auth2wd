@@ -80,7 +80,12 @@ impl Combinator {
     /// are silently skipped — VIAF is treated as a best-effort enrichment.
     /// `VIAF::infer_viaf_id_for` caches results, so calling this every loop
     /// iteration does not refetch already-resolved IDs.
-    async fn discover_viaf_ids(ids: &[ExternalId]) -> Vec<ExternalId> {
+    ///
+    /// This is also called by the `extend` endpoint on the full set of base-item
+    /// external IDs (before the parser filter) so that VIAF IDs are seeded into
+    /// the Combinator cycle even when the source parser (e.g. LOC for P244) is
+    /// unavailable.
+    pub async fn discover_viaf_ids(ids: &[ExternalId]) -> Vec<ExternalId> {
         let mut futures = Vec::new();
         for ext_id in ids {
             if ext_id.property() == P_VIAF {
@@ -228,6 +233,40 @@ mod tests {
             assert_eq!(ext_id.property(), P_VIAF);
             assert_eq!(ext_id.id(), "27063124");
         }
+
+        url_override::unregister("https://viaf.org");
+        VIAF::clear_lookup_cache().await;
+    }
+
+    /// A P244 (LOC) ext_id is mapped via "LC" in KEY2PROP, so
+    /// `discover_viaf_ids` must return the corresponding VIAF ID.
+    /// This mirrors the path taken by the `extend` endpoint when the base
+    /// item contains a P244 value but no P214.
+    #[tokio::test]
+    #[serial]
+    async fn test_discover_viaf_ids_for_p244() {
+        use crate::properties::P_LOC;
+
+        VIAF::clear_lookup_cache().await;
+
+        let server = MockServer::start().await;
+        let fixture = include_str!("../test_data/fixtures/viaf_lookup_lc_n78095637.json");
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(fixture))
+            .mount(&server)
+            .await;
+        url_override::register("https://viaf.org", server.uri());
+
+        let inputs = vec![
+            ExternalId::new(P_LOC, "n78095637"),
+            ExternalId::new(P_VIAF, "30701597"), // already a VIAF ID → skipped
+        ];
+        let discovered = Combinator::discover_viaf_ids(&inputs).await;
+
+        assert_eq!(discovered.len(), 1);
+        assert_eq!(discovered[0].property(), P_VIAF);
+        assert_eq!(discovered[0].id(), "30701597");
 
         url_override::unregister("https://viaf.org");
         VIAF::clear_lookup_cache().await;

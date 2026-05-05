@@ -117,12 +117,19 @@ async fn extend(Path(item): Path<String>) -> Json<serde_json::Value> {
         Ok(base_item) => base_item,
         Err(e) => return Json(json!({"status":e.to_string()})),
     };
-    let ext_ids: Vec<ExternalId> = base_item
-        .get_external_ids()
+    let all_ext_ids = base_item.get_external_ids();
+    let mut ext_ids: Vec<ExternalId> = all_ext_ids
         .iter()
         .filter(|ext_id| Combinator::has_parser_for_ext_id(ext_id))
         .cloned()
         .collect();
+    // If the item has a P244 (LOC) value, look it up on VIAF and seed the
+    // VIAF ID into the Combinator cycle directly, before parsers run.
+    for viaf_id in Combinator::discover_viaf_ids(&all_ext_ids).await {
+        if !ext_ids.contains(&viaf_id) {
+            ext_ids.push(viaf_id);
+        }
+    }
     let mut combinator = Combinator::new();
     if let Err(e) = combinator.import(ext_ids).await {
         return Json(json!({"status":e.to_string()}));
@@ -268,11 +275,19 @@ fn get_extid_from_argv(argv: &[String]) -> Result<ExternalId, Box<dyn std::error
 
 async fn get_extend(item: &str) -> Result<MergeDiff, Box<dyn std::error::Error>> {
     let mut base_item = MetaItem::from_entity(item).await?;
-    let ext_ids: Vec<ExternalId> = base_item
-        .get_external_ids()
-        .into_iter()
-        .filter(Combinator::has_parser_for_ext_id)
+    let all_ext_ids = base_item.get_external_ids();
+    let mut ext_ids: Vec<ExternalId> = all_ext_ids
+        .iter()
+        .filter(|ext_id| Combinator::has_parser_for_ext_id(ext_id))
+        .cloned()
         .collect();
+    // If the item has a P244 (LOC) value, look it up on VIAF and seed the
+    // VIAF ID into the Combinator cycle directly, before parsers run.
+    for viaf_id in Combinator::discover_viaf_ids(&all_ext_ids).await {
+        if !ext_ids.contains(&viaf_id) {
+            ext_ids.push(viaf_id);
+        }
+    }
     let mut combinator = Combinator::new();
     combinator.import(ext_ids).await?;
     let (mut other, _merge_diff) = match combinator.combine() {
