@@ -170,6 +170,48 @@ lazy_static! {
     .collect();
 }
 
+const SAME_AS_IRIS: &[&str] = &[
+    "http://www.w3.org/2002/07/owl#sameAs",
+    "http://www.w3.org/2004/02/skos/core#exactMatch",
+    "https://id.kb.se/vocab/sameAs",
+    "http://schema.org/sameAs",
+    "http://www.loc.gov/mads/rdf/v1#identifiesRWO",
+];
+
+const LABEL_ALIAS_IRIS: &[&str] = &[
+    "http://schema.org/name",
+    "https://schema.org/name",
+    "http://xmlns.com/foaf/0.1/name",
+    "https://xmlns.com/foaf/0.1/name",
+    "http://datos.bne.es/def/P5012",
+    "https://datos.bne.es/def/P5012",
+    "http://d-nb.info/standards/elementset/gnd#preferredNameForThePerson",
+    "https://d-nb.info/standards/elementset/gnd#preferredNameForThePerson",
+    "http://d-nb.info/standards/elementset/gnd#variantNameForThePerson",
+    "https://d-nb.info/standards/elementset/gnd#variantNameForThePerson",
+    "http://schema.org/alternateName",
+    "https://schema.org/alternateName",
+    "http://www.w3.org/2000/01/rdf-schema#label",
+    "https://www.w3.org/2000/01/rdf-schema#label",
+];
+
+const DESCRIPTION_IRIS: &[&str] = &[
+    "http://www.w3.org/2004/02/skos/core#prefLabel",
+    "https://www.w3.org/2004/02/skos/core#prefLabel",
+    "http://datos.bne.es/def/P3067",
+    "https://datos.bne.es/def/P3067",
+    "http://rdaregistry.info/Elements/a/#P50113",
+    "https://rdaregistry.info/Elements/a/#P50113",
+    "http://rdvocab.info/ElementsGr2/biographicalInformation",
+    "https://rdvocab.info/ElementsGr2/biographicalInformation",
+    "http://www.w3.org/2004/02/skos/core#altLabel",
+    "https://www.w3.org/2004/02/skos/core#altLabel",
+    "http://id.kb.se/vocab/description",
+    "https://id.kb.se/vocab/description",
+    "http://www.loc.gov/mads/rdf/v1#authoritativeLabel",
+    "https://www.loc.gov/mads/rdf/v1#authoritativeLabel",
+];
+
 #[async_trait]
 pub trait ExternalImporter: Send + Sync {
     // These methods need to be implemented by the importer
@@ -448,15 +490,7 @@ pub trait ExternalImporter: Send + Sync {
     }
 
     async fn add_same_as(&self, ret: &mut MetaItem) -> Result<()> {
-        let iris = [
-            "http://www.w3.org/2002/07/owl#sameAs",
-            "http://www.w3.org/2002/07/owl#sameAs",
-            "http://www.w3.org/2004/02/skos/core#exactMatch",
-            "https://id.kb.se/vocab/sameAs",
-            "http://schema.org/sameAs",
-            "http://www.loc.gov/mads/rdf/v1#identifiesRWO",
-        ];
-        for iri in iris {
+        for iri in SAME_AS_IRIS {
             for url in self.triples_iris(iri)? {
                 if ExternalId::do_not_use_external_url(&url) {
                     continue;
@@ -543,23 +577,7 @@ pub trait ExternalImporter: Send + Sync {
     fn add_label_aliases(&self, ret: &mut MetaItem) -> Result<()> {
         let language = self.primary_language();
 
-        let urls = [
-            "http://schema.org/name",
-            "https://schema.org/name",
-            "http://xmlns.com/foaf/0.1/name",
-            "https://xmlns.com/foaf/0.1/name",
-            "http://datos.bne.es/def/P5012",
-            "https://datos.bne.es/def/P5012",
-            "http://d-nb.info/standards/elementset/gnd#preferredNameForThePerson",
-            "https://d-nb.info/standards/elementset/gnd#preferredNameForThePerson",
-            "http://d-nb.info/standards/elementset/gnd#variantNameForThePerson",
-            "https://d-nb.info/standards/elementset/gnd#variantNameForThePerson",
-            "http://schema.org/alternateName",
-            "https://schema.org/alternateName",
-            "http://www.w3.org/2000/01/rdf-schema#label",
-            "https://www.w3.org/2000/01/rdf-schema#label",
-        ];
-        for url in urls {
+        for url in LABEL_ALIAS_IRIS {
             for s in self.triples_literals(url)? {
                 let s = self.transform_label(&s);
                 let s = self.limit_string_length(&s);
@@ -635,23 +653,7 @@ pub trait ExternalImporter: Send + Sync {
 
     fn add_description(&self, ret: &mut MetaItem) -> Result<()> {
         let language = self.primary_language();
-        let iris = [
-            "http://www.w3.org/2004/02/skos/core#prefLabel",
-            "https://www.w3.org/2004/02/skos/core#prefLabel",
-            "http://datos.bne.es/def/P3067",
-            "https://datos.bne.es/def/P3067",
-            "http://rdaregistry.info/Elements/a/#P50113",
-            "https://rdaregistry.info/Elements/a/#P50113",
-            "http://rdvocab.info/ElementsGr2/biographicalInformation",
-            "https://rdvocab.info/ElementsGr2/biographicalInformation",
-            "http://www.w3.org/2004/02/skos/core#altLabel",
-            "https://www.w3.org/2004/02/skos/core#altLabel",
-            "http://id.kb.se/vocab/description",
-            "https://id.kb.se/vocab/description",
-            "http://www.loc.gov/mads/rdf/v1#authoritativeLabel",
-            "https://www.loc.gov/mads/rdf/v1#authoritativeLabel",
-        ];
-        for iri in iris {
+        for iri in DESCRIPTION_IRIS {
             for s in self.triples_literals(iri)? {
                 if ret.item.description_in_locale(&language).is_none() {
                     let mut s = self.limit_string_length(&s);

@@ -55,6 +55,28 @@ impl Combinator {
             .any(|sp| sp.property() == id.property())
     }
 
+    /// Builds a ready-to-use `Combinator` seeded from a `MetaItem`.
+    ///
+    /// Collects every external ID in `item` that has a registered parser,
+    /// discovers VIAF IDs for any VIAF-mapped properties (e.g. P244 → LC),
+    /// then runs `import` so all results are available for combining.
+    pub async fn import_from_item(item: &MetaItem) -> Result<Self> {
+        let all_ext_ids = item.get_external_ids();
+        let mut ext_ids: Vec<ExternalId> = all_ext_ids
+            .iter()
+            .filter(|id| Self::has_parser_for_ext_id(id))
+            .cloned()
+            .collect();
+        for viaf_id in Self::discover_viaf_ids(&all_ext_ids).await {
+            if !ext_ids.contains(&viaf_id) {
+                ext_ids.push(viaf_id);
+            }
+        }
+        let mut combinator = Self::new();
+        combinator.import(ext_ids).await?;
+        Ok(combinator)
+    }
+
     async fn import_get_parsers(
         &self,
         ids: &[ExternalId],

@@ -23,66 +23,64 @@ lazy_static! {
     static ref VIAF_LOOKUP_CACHE: AsyncMutex<HashMap<(usize, String), Option<String>>> =
         AsyncMutex::new(HashMap::new());
 
-    static ref KEY2PROP: HashMap<String, usize> = {
-        let mut ret = HashMap::new();
-        ret.insert(String::from("DNB"), 227);
-        ret.insert(String::from("PLWABN"), 7293);
-        ret.insert(String::from("BIBSYS"), 1015);
-        ret.insert(String::from("ICCU"), 396);
-        ret.insert(String::from("DBC"), 3846);
-        ret.insert(String::from("FAST"), 2163);
-        ret.insert(String::from("VLACC"), 7024);
-        ret.insert(String::from("ISNI"), 213);
-        ret.insert(String::from("DE633"), 5504);
-        ret.insert(String::from("LNL"), 7026);
-        ret.insert(String::from("CAOONL"), 8179);
-        ret.insert(String::from("EGAXA"), 1309);
-        ret.insert(String::from("LC"), 244);
-        // ret.insert(String::from("NII"), XXXX);
-        ret.insert(String::from("SIMACOB"), 1280);
-        ret.insert(String::from("NUKAT"), 1207);
-        ret.insert(String::from("CYT"), 1048);
-        ret.insert(String::from("NDL"), 349);
-        // ret.insert(String::from("NLB"), XXXX);
-        // ret.insert(String::from("B2Q"), XXXX);
-        ret.insert(String::from("ARBABN"), 3788);
-        // ret.insert(String::from("NLA"), XXXX);
-        ret.insert(String::from("BLBNB"), 4619);
-        ret.insert(String::from("BNC"), 9984);
-        ret.insert(String::from("BNCHL"), 7369);
-        ret.insert(String::from("ERRR"), 6394);
-        // ret.insert(String::from("BNF"), 268); // Deactivated for now; eg Q136170149 / 6471159248261404870006 gives truncated ID
-        ret.insert(String::from("GRATEVE"), 3348);
-        ret.insert(String::from("N6I"), 10227);
-        ret.insert(String::from("NLI"), 949);
-        ret.insert(String::from("KRNLK"), 5034);
-        ret.insert(String::from("LNB"), 1368);
-        // ret.insert(String::from("LIH"), 7699); // Something is wrong there
-        ret.insert(String::from("BNL"), 7028);
-        ret.insert(String::from("MRBNR"), 7058);
-        ret.insert(String::from("W2Z"), 1015);
-        ret.insert(String::from("PTBNP"), 1005);
-        ret.insert(String::from("NLR"), 7029);
-        // ret.insert(String::from("BNE"), XXXX);
-        ret.insert(String::from("SELIBR"), 906);
-        ret.insert(String::from("NKC"), 691);
-        // ret.insert(String::from("NTA"), XXXX);
-        // ret.insert(String::from("NSZL"), XXXX);
-        ret.insert(String::from("NSK"), 1375);
-        ret.insert(String::from("UIY"), 7039);
-        // ret.insert(String::from("PERSEUS"), XXXX);
-        ret.insert(String::from("RERO"), 3065);
-        ret.insert(String::from("NYNYRILM"), 9171);
-        ret.insert(String::from("SKMASNL"), 7700);
-        ret.insert(String::from("SUDOC"), 269);
-        // ret.insert(String::from("SZ"), XXXX);
-        ret.insert(String::from("SRP"), 6934);
-        ret.insert(String::from("JPG"), P_ULAN);
-        // ret.insert(String::from("UAE"), XXXX);
-        ret.insert(String::from("BAV"), 8034);
-        // ret.insert(String::from("WKP"), XXXX); // Maybe not?
-        ret
-    };
+    static ref KEY2PROP: HashMap<&'static str, usize> = HashMap::from([
+        ("DNB",     227),
+        ("PLWABN",  7293),
+        ("BIBSYS",  1015),
+        ("ICCU",    396),
+        ("DBC",     3846),
+        ("FAST",    2163),
+        ("VLACC",   7024),
+        ("ISNI",    213),
+        ("DE633",   5504),
+        ("LNL",     7026),
+        ("CAOONL",  8179),
+        ("EGAXA",   1309),
+        ("LC",      244),
+        // ("NII",  XXXX),
+        ("SIMACOB", 1280),
+        ("NUKAT",   1207),
+        ("CYT",     1048),
+        ("NDL",     349),
+        // ("NLB",  XXXX),
+        // ("B2Q",  XXXX),
+        ("ARBABN",  3788),
+        // ("NLA",  XXXX),
+        ("BLBNB",   4619),
+        ("BNC",     9984),
+        ("BNCHL",   7369),
+        ("ERRR",    6394),
+        // ("BNF",  268), // Deactivated; eg Q136170149 gives truncated ID
+        ("GRATEVE", 3348),
+        ("N6I",     10227),
+        ("NLI",     949),
+        ("KRNLK",   5034),
+        ("LNB",     1368),
+        // ("LIH",  7699), // Something is wrong there
+        ("BNL",     7028),
+        ("MRBNR",   7058),
+        ("W2Z",     1015),
+        ("PTBNP",   1005),
+        ("NLR",     7029),
+        // ("BNE",  XXXX),
+        ("SELIBR",  906),
+        ("NKC",     691),
+        // ("NTA",  XXXX),
+        // ("NSZL", XXXX),
+        ("NSK",     1375),
+        ("UIY",     7039),
+        // ("PERSEUS", XXXX),
+        ("RERO",    3065),
+        ("NYNYRILM",9171),
+        ("SKMASNL", 7700),
+        ("SUDOC",   269),
+        // ("SZ",   XXXX),
+        ("SRP",     6934),
+        ("JPG",     P_ULAN),
+        // ("UAE",  XXXX),
+        ("BAV",     8034),
+        // ("WKP",  XXXX), // Maybe not?
+    ]);
 }
 
 #[derive(Clone, Debug)]
@@ -146,12 +144,12 @@ impl VIAF {
         })
     }
 
-    // Takes a numeric Wikidata property ID and returns the corresponding VIAF key, if available
-    pub fn prop2key(property: usize) -> Option<String> {
+    /// Returns the VIAF source key for a Wikidata property ID, if one is mapped.
+    pub fn prop2key(property: usize) -> Option<&'static str> {
         KEY2PROP
             .iter()
             .find(|&(_, v)| *v == property)
-            .map(|(k, _)| k.clone())
+            .map(|(k, _)| *k)
     }
 
     /// Queries VIAF's `cluster-record` endpoint for the cluster matching the
@@ -176,7 +174,7 @@ impl VIAF {
         if let Some(cached) = VIAF_LOOKUP_CACHE.lock().await.get(&cache_key) {
             return cached.clone();
         }
-        let result = Self::query_cluster_record(&key, id).await;
+        let result = Self::query_cluster_record(key, id).await;
         VIAF_LOOKUP_CACHE
             .lock()
             .await
