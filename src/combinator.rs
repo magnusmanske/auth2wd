@@ -212,11 +212,14 @@ impl Combinator {
 
 #[cfg(test)]
 mod tests {
-    use crate::properties::{P_GND, P_INATURALIST_TAXON, P_ULAN};
+    use crate::properties::{P_GND, P_INATURALIST_TAXON, P_LOC, P_ULAN, P_VIAF};
     use crate::url_override;
     use serde_json::Value;
     use serial_test::serial;
-    use wikimisc::wikibase::{EntityTrait, ItemEntity};
+    use wikimisc::wikibase::{
+        DataValue, DataValueType, EntityTrait, ItemEntity, Snak, SnakDataType, SnakType,
+        Statement, StatementRank, Value as WbValue,
+    };
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -291,6 +294,153 @@ mod tests {
         assert_eq!(discovered[0].id(), "30701597");
 
         url_override::unregister("https://viaf.org");
+        VIAF::clear_lookup_cache().await;
+    }
+
+    // ── has_parser_for_ext_id ────────────────────────────────────────────────
+
+    #[test]
+    fn test_has_parser_for_ext_id_supported() {
+        assert!(Combinator::has_parser_for_ext_id(&ExternalId::new(P_VIAF, "123")));
+        assert!(Combinator::has_parser_for_ext_id(&ExternalId::new(P_LOC, "n123")));
+        assert!(Combinator::has_parser_for_ext_id(&ExternalId::new(P_GND, "456")));
+    }
+
+    #[test]
+    fn test_has_parser_for_ext_id_unsupported() {
+        // Property 99999 is not in SUPPORTED_PROPERTIES
+        assert!(!Combinator::has_parser_for_ext_id(&ExternalId::new(99999, "x")));
+    }
+
+    // ── combine_on_base_item ─────────────────────────────────────────────────
+
+    #[test]
+    fn test_combine_on_base_item_empty_returns_none() {
+        let mut combinator = Combinator::new();
+        let mut base = MetaItem::new_from_item(ItemEntity::new_empty());
+        assert!(combinator.combine_on_base_item(&mut base).is_none());
+    }
+
+    #[test]
+    fn test_combine_on_base_item_merges_into_base() {
+        let mut combinator = Combinator::new();
+        let s1 = include_str!("../test_data/item1.json");
+        let j1: Value = serde_json::from_str(s1).unwrap();
+        let i1 = ItemEntity::new_from_json(&j1).unwrap();
+        let claim_count = i1.claims().len();
+        combinator
+            .items
+            .insert("imported".to_string(), MetaItem::new_from_item(i1));
+
+        let mut base = MetaItem::new_from_item(ItemEntity::new_empty());
+        let diff = combinator.combine_on_base_item(&mut base);
+
+        assert!(diff.is_some());
+        assert_eq!(
+            base.item.claims().len(),
+            claim_count,
+            "all imported claims should be merged into the base item"
+        );
+    }
+
+    // ── import_from_item ─────────────────────────────────────────────────────
+
+    /// A MetaItem with no external-ID claims yields an empty Combinator.
+    #[tokio::test]
+    #[serial]
+    async fn test_import_from_item_no_external_ids() {
+        let base = MetaItem::new_from_item(ItemEntity::new_empty());
+        let combinator = Combinator::import_from_item(&base).await.unwrap();
+        assert!(combinator.items.is_empty());
+    }
+
+    /// A MetaItem that only has an item-type claim (not an ExternalId snak)
+    /// should produce an empty Combinator — non-externalid snaks are invisible
+    /// to `get_external_ids`.
+    #[tokio::test]
+    #[serial]
+    async fn test_import_from_item_item_snak_ignored() {
+        let mut item = ItemEntity::new_empty();
+        item.set_id("Q0".to_string());
+        item.add_claim(Statement::new(
+            "statement",
+            StatementRank::Normal,
+            Snak::new(
+                SnakDataType::WikibaseItem,
+                "P31",
+                SnakType::Value,
+                Some(DataValue::new(
+                    DataValueType::EntityId,
+                    WbValue::Entity(wikimisc::wikibase::EntityValue::new(
+                        wikimisc::wikibase::EntityType::Item,
+                        "Q5",
+                    )),
+                )),
+            ),
+            vec![],
+            vec![],
+        ));
+        let base = MetaItem::new_from_item(item);
+        let combinator = Combinator::import_from_item(&base).await.unwrap();
+        assert!(combinator.items.is_empty());
+    }
+
+    /// When the base MetaItem has a P244 (LOC) claim, `import_from_item`
+    /// should run the LOC parser and store the result keyed by "P244:<id>".
+    #[tokio::test]
+    #[serial]
+    async fn test_import_from_item_with_p244_imports_loc() {
+        VIAF::clear_lookup_cache().await;
+
+        // VIAF returns empty JSON so discover_viaf_ids finds no VIAF ID and
+        // the VIAF parser silently fails — this keeps the test focused on LOC.
+        let viaf_server = MockServer::start().await;
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("{}"))
+            .mount(&viaf_server)
+            .await;
+        url_override::register("https://viaf.org", viaf_server.uri());
+
+        let loc_server = MockServer::start().await;
+        let loc_fixture = include_str!("../test_data/fixtures/loc_n78095637.rdf");
+        Mock::given(method("GET"))
+            .and(path("/authorities/names/n78095637.rdf"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(loc_fixture))
+            .mount(&loc_server)
+            .await;
+        url_override::register("https://id.loc.gov", loc_server.uri());
+
+        // Build a MetaItem that carries a single P244 external-ID claim.
+        let mut item = ItemEntity::new_empty();
+        item.set_id("Q0".to_string());
+        item.add_claim(Statement::new(
+            "statement",
+            StatementRank::Normal,
+            Snak::new(
+                SnakDataType::ExternalId,
+                "P244",
+                SnakType::Value,
+                Some(DataValue::new(
+                    DataValueType::StringType,
+                    WbValue::StringValue("n78095637".to_string()),
+                )),
+            ),
+            vec![],
+            vec![],
+        ));
+        let base = MetaItem::new_from_item(item);
+
+        let combinator = Combinator::import_from_item(&base).await.unwrap();
+
+        assert!(
+            combinator.items.contains_key("P244:n78095637"),
+            "expected LOC item keyed by P244:n78095637, got: {:?}",
+            combinator.items.keys().collect::<Vec<_>>()
+        );
+
+        url_override::unregister("https://viaf.org");
+        url_override::unregister("https://id.loc.gov");
         VIAF::clear_lookup_cache().await;
     }
 

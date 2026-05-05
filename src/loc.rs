@@ -70,7 +70,9 @@ impl LOC {
 mod tests {
     use super::*;
     use crate::url_override;
+    use crate::viaf::VIAF;
     use serial_test::serial;
+    use wikimisc::wikibase::EntityTrait;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -97,5 +99,61 @@ mod tests {
     async fn test_new() {
         let (_server, _loc) = mock_loc().await;
         url_override::unregister("https://id.loc.gov");
+    }
+
+    /// `run()` must always produce a P244 claim (from `add_own_id`) and an
+    /// English description derived from the MADS authoritative label in the
+    /// fixture ("Darwin, Charles, 1809-1882").
+    #[tokio::test]
+    #[serial]
+    async fn test_run() {
+        VIAF::clear_lookup_cache().await;
+
+        // VIAF stub: empty JSON → try_viaf finds no VIAF ID (swallowed silently).
+        let viaf_server = MockServer::start().await;
+        Mock::given(method("POST"))
+            .and(path("/api/cluster-record"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("{}"))
+            .mount(&viaf_server)
+            .await;
+        url_override::register("https://viaf.org", viaf_server.uri());
+
+        let (_loc_server, loc) = mock_loc().await;
+        let meta = loc.run().await.unwrap();
+
+        // add_own_id always adds the parser's external ID as the first claim.
+        let has_p244 = meta.item.claims().iter().any(|c| {
+            c.property() == "P244"
+                && c.main_snak()
+                    .data_value()
+                    .as_ref()
+                    .and_then(|dv| match dv.value() {
+                        wikimisc::wikibase::Value::StringValue(s) => Some(s.as_str() == TEST_ID),
+                        _ => None,
+                    })
+                    .unwrap_or(false)
+        });
+        assert!(has_p244, "expected P244={TEST_ID} claim in LOC run output");
+
+        // add_description picks up madsrdf:authoritativeLabel (in DESCRIPTION_IRIS)
+        // for the main authority subject → "Darwin, Charles, 1809-1882".
+        let descriptions = meta.item.descriptions();
+        let en_desc = descriptions
+            .iter()
+            .find(|ls| ls.language() == "en")
+            .map(|ls| ls.value());
+        assert!(
+            en_desc.is_some(),
+            "expected an English description in LOC run output"
+        );
+        assert!(
+            en_desc.unwrap().contains("Darwin"),
+            "English description should contain 'Darwin', got: {:?}",
+            en_desc
+        );
+
+        url_override::unregister("https://viaf.org");
+        url_override::unregister("https://id.loc.gov");
+        VIAF::clear_lookup_cache().await;
     }
 }
