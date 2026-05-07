@@ -1,4 +1,2 @@
 #!/bin/bash
-#toolforge webservice buildservice stop
-#toolforge webservice buildservice start --mount=none
-toolforge webservice buildservice restart --mount=none
+toolforge webservice buildservice restart --mount=none --mem 2G --cpu 2
