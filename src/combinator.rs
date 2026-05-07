@@ -9,6 +9,7 @@ use futures::future::join_all;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use wikimisc::merge_diff::MergeDiff;
+use wikimisc::wikibase::EntityTrait;
 
 #[derive(Debug, Clone, Default)]
 pub struct Combinator {
@@ -202,10 +203,41 @@ impl Combinator {
         if self.items.is_empty() {
             return None;
         }
+
+        // Snapshot the IDs of claims that already exist in the base item (from Wikidata).
+        // New claims added during merging have no ID; claims that existed before keep theirs.
+        let original_claim_ids: HashSet<String> = base_item
+            .item
+            .claims()
+            .iter()
+            .filter_map(|c| c.id())
+            .collect();
+
         for (_id, item) in self.items.iter() {
             let diff = base_item.merge(item);
             merge_diff.extend(&diff);
         }
+
+        // `added_statements` accumulated above is wrong when two sources assert the same
+        // statement (same property/value/qualifiers) with different references: each merge
+        // call emits a new version of that statement (with progressively more references),
+        // producing one entry per source instead of one combined entry.
+        //
+        // Replace with the authoritative list from `base_item` after cleanup: every claim
+        // that has no original ID is genuinely new, and `ItemMerger` has already merged all
+        // references for matching claims so there are no duplicates.
+        base_item.cleanup();
+        merge_diff.added_statements = base_item
+            .item
+            .claims()
+            .iter()
+            .filter(|c| match c.id() {
+                Some(id) => !original_claim_ids.contains(&id),
+                None => true,
+            })
+            .cloned()
+            .collect();
+
         Some(merge_diff)
     }
 }
@@ -313,6 +345,84 @@ mod tests {
     }
 
     // ── combine_on_base_item ─────────────────────────────────────────────────
+
+    /// Regression test: two sources asserting the same statement (same property/value/qualifiers)
+    /// with different references must produce ONE statement in the diff with both references,
+    /// not two duplicate statements each with one reference.
+    #[test]
+    fn test_combine_on_base_item_deduplicates_added_statements() {
+        use wikimisc::wikibase::Reference;
+
+        let mut combinator = Combinator::new();
+
+        let ref1 = Reference::new(vec![Snak::new_url("P854", "http://source1.example.com")]);
+        let ref2 = Reference::new(vec![Snak::new_url("P854", "http://source2.example.com")]);
+
+        // Two sources assert the same statement but with different references
+        let stmt1 = Statement::new_normal(
+            Snak::new(
+                SnakDataType::WikibaseItem,
+                "P21",
+                SnakType::Value,
+                Some(DataValue::new(
+                    DataValueType::EntityId,
+                    WbValue::Entity(wikimisc::wikibase::EntityValue::new(
+                        wikimisc::wikibase::EntityType::Item,
+                        "Q6581097",
+                    )),
+                )),
+            ),
+            vec![],
+            vec![ref1],
+        );
+        let stmt2 = Statement::new_normal(
+            Snak::new(
+                SnakDataType::WikibaseItem,
+                "P21",
+                SnakType::Value,
+                Some(DataValue::new(
+                    DataValueType::EntityId,
+                    WbValue::Entity(wikimisc::wikibase::EntityValue::new(
+                        wikimisc::wikibase::EntityType::Item,
+                        "Q6581097",
+                    )),
+                )),
+            ),
+            vec![],
+            vec![ref2],
+        );
+
+        let mut item1 = ItemEntity::new_empty();
+        item1.add_claim(stmt1);
+        let mut item2 = ItemEntity::new_empty();
+        item2.add_claim(stmt2);
+
+        combinator
+            .items
+            .insert("source1".to_string(), MetaItem::new_from_item(item1));
+        combinator
+            .items
+            .insert("source2".to_string(), MetaItem::new_from_item(item2));
+
+        let mut base = MetaItem::new_from_item(ItemEntity::new_empty());
+        let diff = combinator.combine_on_base_item(&mut base).unwrap();
+
+        assert_eq!(
+            base.item.claims().len(),
+            1,
+            "base_item must have exactly one statement after deduplication"
+        );
+        assert_eq!(
+            diff.added_statements.len(),
+            1,
+            "diff must contain exactly one added statement, not one per source"
+        );
+        assert_eq!(
+            diff.added_statements[0].references().len(),
+            2,
+            "the single added statement must carry both references"
+        );
+    }
 
     #[test]
     fn test_combine_on_base_item_empty_returns_none() {
