@@ -176,6 +176,7 @@ impl MetaItem {
         self.item
             .claims()
             .iter()
+            .filter(|claim| *claim.rank() != StatementRank::Deprecated)
             .filter_map(ExternalId::from_external_id_claim)
             .collect()
     }
