@@ -10,7 +10,7 @@ use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
 use wikimisc::wikibase::EntityTrait;
-use wikimisc::wikibase::{Snak, StatementRank};
+use wikimisc::wikibase::{Reference, Snak, StatementRank};
 
 lazy_static! {
     static ref RE_COUNTRY: Regex =
@@ -52,6 +52,16 @@ impl ExternalImporter for GND {
 
     fn transform_label(&self, s: &str) -> String {
         self.transform_label_last_first_name(s)
+    }
+
+    // GND should not be used as a reference for country of citizenship (P27),
+    // as its notion of "country" (geographicAreaCode) is broader than citizenship.
+    fn get_ref_for_property(&self, property: usize) -> Vec<Reference> {
+        if property == P_COUNTRY_OF_CITIZENSHIP {
+            vec![]
+        } else {
+            self.get_ref()
+        }
     }
 
     fn add_own_id(&self, ret: &mut MetaItem) -> Result<()> {
@@ -365,6 +375,20 @@ mod tests {
     async fn test_my_id() {
         let (_server, gnd) = mock_gnd().await;
         assert_eq!(gnd.my_id(), TEST_ID);
+        cleanup();
+    }
+
+    /// GND must not be used as a reference for country of citizenship (P27),
+    /// since its "country" notion is broader than citizenship, but it should
+    /// still be a valid reference for other properties.
+    #[tokio::test]
+    #[serial]
+    async fn test_no_citizenship_reference() {
+        let (_server, gnd) = mock_gnd().await;
+        assert!(gnd
+            .get_ref_for_property(P_COUNTRY_OF_CITIZENSHIP)
+            .is_empty());
+        assert!(!gnd.get_ref_for_property(P_DATE_OF_BIRTH).is_empty());
         cleanup();
     }
 

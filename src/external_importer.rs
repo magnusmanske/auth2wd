@@ -351,6 +351,15 @@ pub trait ExternalImporter: Send + Sync {
         Ok(ret)
     }
 
+    /// Returns the reference(s) to attach to a statement for a given property.
+    /// Defaults to `get_ref()`, but importers can override this to suppress
+    /// references for specific properties (e.g. GND should not be used as a
+    /// reference for country of citizenship, as its notion of "country" is
+    /// broader than citizenship).
+    fn get_ref_for_property(&self, _property: usize) -> Vec<Reference> {
+        self.get_ref()
+    }
+
     fn get_ref(&self) -> Vec<Reference> {
         let time = Utc::now();
         let time = time.format("+%Y-%m-%dT00:00:00Z").to_string();
@@ -406,7 +415,7 @@ pub trait ExternalImporter: Send + Sync {
                 )),
             ),
             vec![],
-            self.get_ref(),
+            self.get_ref_for_property(property),
         )
     }
 
@@ -424,7 +433,7 @@ pub trait ExternalImporter: Send + Sync {
                 )),
             ),
             vec![],
-            self.get_ref(),
+            self.get_ref_for_property(property),
         )
     }
 
@@ -442,7 +451,7 @@ pub trait ExternalImporter: Send + Sync {
                 )),
             ),
             vec![],
-            self.get_ref(),
+            self.get_ref_for_property(property),
         )
     }
 
@@ -460,7 +469,7 @@ pub trait ExternalImporter: Send + Sync {
                 )),
             ),
             vec![],
-            self.get_ref(),
+            self.get_ref_for_property(property),
         )
     }
 
@@ -485,7 +494,7 @@ pub trait ExternalImporter: Send + Sync {
                 )),
             ),
             vec![],
-            self.get_ref(),
+            self.get_ref_for_property(property),
         )
     }
 

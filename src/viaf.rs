@@ -13,6 +13,7 @@ use sophia::inmem::graph::FastGraph;
 use sophia::xml;
 use std::collections::HashMap;
 use tokio::sync::Mutex as AsyncMutex;
+use wikimisc::wikibase::Reference;
 
 lazy_static! {
     /// In-process cache for VIAF source-ID lookups, keyed by `(property, id)`.
@@ -109,6 +110,11 @@ impl ExternalImporter for VIAF {
     }
     fn graph(&self) -> &FastGraph {
         &self.graph
+    }
+    // VIAF is an aggregator: the data always originates from one of the IDs in
+    // the cluster, so VIAF itself should not be used as a reference.
+    fn get_ref(&self) -> Vec<Reference> {
+        vec![]
     }
     fn transform_label(&self, s: &str) -> String {
         self.transform_label_last_first_name(s)
@@ -341,6 +347,25 @@ mod tests {
             *meta_item.item.labels(),
             vec![LocaleString::new("en", "Magnus Manske")]
         );
+        url_override::unregister("https://viaf.org");
+    }
+
+    /// VIAF is an aggregator and must not be used as a reference: every
+    /// statement it produces should carry no references.
+    #[tokio::test]
+    #[serial]
+    async fn test_run_has_no_references() {
+        let (_server, viaf) = mock_viaf().await;
+        assert!(viaf.get_ref().is_empty());
+        let meta_item = viaf.run().await.unwrap();
+        assert!(!meta_item.item.claims().is_empty());
+        for claim in meta_item.item.claims() {
+            assert!(
+                claim.references().is_empty(),
+                "VIAF statement for {:?} unexpectedly carries references",
+                claim.main_snak().property()
+            );
+        }
         url_override::unregister("https://viaf.org");
     }
 

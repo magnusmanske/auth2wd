@@ -8,6 +8,7 @@ use async_trait::async_trait;
 use serde_json::Value;
 use wikimisc::wikibase::EntityTrait;
 use wikimisc::wikibase::LocaleString;
+use wikimisc::wikibase::Reference;
 
 #[derive(Debug, Clone)]
 pub struct WorldCat {
@@ -31,6 +32,11 @@ impl ExternalImporter for WorldCat {
     }
     fn my_id(&self) -> String {
         self.id.clone()
+    }
+    // WorldCat Entities is heavily based on Wikidata (circular sourcing) and is
+    // an aggregator, so it should not be used as a reference.
+    fn get_ref(&self) -> Vec<Reference> {
+        vec![]
     }
 
     async fn run(&self) -> Result<MetaItem> {
