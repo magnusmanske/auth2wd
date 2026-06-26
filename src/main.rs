@@ -162,7 +162,7 @@ async fn merge(Form(params): Form<MergeForm>) -> Json<serde_json::Value> {
     let mut im = ItemMerger::new(base_item);
     let diff = im.merge(&new_item);
 
-    let mut j = im.item.to_json();
+    let mut j = im.item().to_json();
     if base_item_has_fake_id {
         if let Some(jo) = j.as_object_mut() {
             jo.remove("id");

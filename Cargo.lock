@@ -3557,7 +3557,7 @@ dependencies = [
 [[package]]
 name = "wikimisc"
 version = "0.1.0"
-source = "git+https://github.com/magnusmanske/wikimisc#e810678ccb78a2888878e2b042452f6dd60aa02c"
+source = "git+https://github.com/magnusmanske/wikimisc#5b1d9cd24b92514b054503d94c2f8fd355bc8e60"
 dependencies = [
  "anyhow",
  "chrono",
