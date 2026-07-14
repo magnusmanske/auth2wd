@@ -3,6 +3,7 @@ use crate::properties::*;
 use anyhow::Result;
 use std::future::Future;
 use std::pin::Pin;
+use std::sync::LazyLock;
 
 /// Type alias for an async factory function that creates a boxed `ExternalImporter` from an ID.
 type ImporterFactory =
@@ -26,31 +27,155 @@ macro_rules! supported_property {
     };
 }
 
-lazy_static! {
-    /// Examples of all supported properties
-    pub static ref SUPPORTED_PROPERTIES: Vec<SupportedProperty> = {
-        vec![
-            supported_property!(P_ISNI, crate::isni::ISNI, "ISNI", "International Standard Name Identifier", "0000000121251077", None),
-            supported_property!(P_VIAF, crate::viaf::VIAF, "VIAF", "Virtual International Authority File", "27063124", None),
-            supported_property!(P_GND, crate::gnd::GND, "GND", "Deutsche Nationalbibliothek", "118523813", None),
-            supported_property!(P_LOC, crate::loc::LOC, "LoC", "Library of Congress", "n78095637", None),
-            supported_property!(P_NDL, crate::ndl::NDL, "NDL", "National Diet Library", "00054222", Some("Natsume Soseki".into())),
-            supported_property!(P_ULAN, crate::ulan::ULAN, "ULAN", "Union List of Artist Names", "500228559", None),
-            supported_property!(P_BNF, crate::bnf::BNF, "BnF", "Bibliothèque nationale de France", "11898689q", None),
-            supported_property!(P_IDREF, crate::id_ref::IdRef, "IdRef", "IdRef/SUDOC", "026812304", None),
-            supported_property!(P_PUBCHEM_CID, crate::pubchem_cid::PubChemCid, "PubChem CID", "PubChem Compound ID", "22027196", Some("4-[1-(4-Hydroxyphenyl)heptyl]phenol".to_string())),
-            supported_property!(P_SELIBR, crate::selibr::SELIBR, "SELIBR", "National Library of Sweden", "231727", None),
-            supported_property!(P_BNE, crate::bne::BNE, "BNE", "Biblioteca Nacional de España", "XX990809", None),
-            supported_property!(P_NORAF, crate::noraf::NORAF, "NORAF", "Norwegian Authority File", "90053126", Some("Rainer Maria Rilke".into())),
-            supported_property!(P_NUKAT, crate::nukat::NUKAT, "NUKAT", "NUKAT Center of Warsaw University Library", "n96637319", Some("Al Gore".into())),
-            supported_property!(P_NB, crate::nb::NB, "NB", "Nationale Thesaurus voor Auteurs ID", "068364229", None),
-            supported_property!(P_WORLDCAT, crate::worldcat::WorldCat, "WorldCat", "WorldCat Identities", "E39PBJd87VvgDDTV6RxBYm6qcP", None),
-            supported_property!(P_INATURALIST_TAXON, crate::inaturalist::INaturalist, "INaturalist", "INaturalist taxon ID", "890", Some("Ruffed Grouse".to_string())),
-            supported_property!(P_NCBI_TAXONOMY, crate::ncbi_taxonomy::NCBItaxonomy, "NCBI taxonomy", "NCBI taxon ID", "1747344", Some("Priocnessus nuperus".to_string())),
-            supported_property!(P_GBIF_TAXON, crate::gbif_taxon::GBIFtaxon, "GBIF taxon", "GBIF taxon ID", "5141342", Some("Battus philenor".to_string())),
-        ]
-    };
-}
+/// Examples of all supported properties
+pub static SUPPORTED_PROPERTIES: LazyLock<Vec<SupportedProperty>> = LazyLock::new(|| {
+    vec![
+        supported_property!(
+            P_ISNI,
+            crate::isni::ISNI,
+            "ISNI",
+            "International Standard Name Identifier",
+            "0000000121251077",
+            None
+        ),
+        supported_property!(
+            P_VIAF,
+            crate::viaf::VIAF,
+            "VIAF",
+            "Virtual International Authority File",
+            "27063124",
+            None
+        ),
+        supported_property!(
+            P_GND,
+            crate::gnd::GND,
+            "GND",
+            "Deutsche Nationalbibliothek",
+            "118523813",
+            None
+        ),
+        supported_property!(
+            P_LOC,
+            crate::loc::LOC,
+            "LoC",
+            "Library of Congress",
+            "n78095637",
+            None
+        ),
+        supported_property!(
+            P_NDL,
+            crate::ndl::NDL,
+            "NDL",
+            "National Diet Library",
+            "00054222",
+            Some("Natsume Soseki".into())
+        ),
+        supported_property!(
+            P_ULAN,
+            crate::ulan::ULAN,
+            "ULAN",
+            "Union List of Artist Names",
+            "500228559",
+            None
+        ),
+        supported_property!(
+            P_BNF,
+            crate::bnf::BNF,
+            "BnF",
+            "Bibliothèque nationale de France",
+            "11898689q",
+            None
+        ),
+        supported_property!(
+            P_IDREF,
+            crate::id_ref::IdRef,
+            "IdRef",
+            "IdRef/SUDOC",
+            "026812304",
+            None
+        ),
+        supported_property!(
+            P_PUBCHEM_CID,
+            crate::pubchem_cid::PubChemCid,
+            "PubChem CID",
+            "PubChem Compound ID",
+            "22027196",
+            Some("4-[1-(4-Hydroxyphenyl)heptyl]phenol".to_string())
+        ),
+        supported_property!(
+            P_SELIBR,
+            crate::selibr::SELIBR,
+            "SELIBR",
+            "National Library of Sweden",
+            "231727",
+            None
+        ),
+        supported_property!(
+            P_BNE,
+            crate::bne::BNE,
+            "BNE",
+            "Biblioteca Nacional de España",
+            "XX990809",
+            None
+        ),
+        supported_property!(
+            P_NORAF,
+            crate::noraf::NORAF,
+            "NORAF",
+            "Norwegian Authority File",
+            "90053126",
+            Some("Rainer Maria Rilke".into())
+        ),
+        supported_property!(
+            P_NUKAT,
+            crate::nukat::NUKAT,
+            "NUKAT",
+            "NUKAT Center of Warsaw University Library",
+            "n96637319",
+            Some("Al Gore".into())
+        ),
+        supported_property!(
+            P_NB,
+            crate::nb::NB,
+            "NB",
+            "Nationale Thesaurus voor Auteurs ID",
+            "068364229",
+            None
+        ),
+        supported_property!(
+            P_WORLDCAT,
+            crate::worldcat::WorldCat,
+            "WorldCat",
+            "WorldCat Identities",
+            "E39PBJd87VvgDDTV6RxBYm6qcP",
+            None
+        ),
+        supported_property!(
+            P_INATURALIST_TAXON,
+            crate::inaturalist::INaturalist,
+            "INaturalist",
+            "INaturalist taxon ID",
+            "890",
+            Some("Ruffed Grouse".to_string())
+        ),
+        supported_property!(
+            P_NCBI_TAXONOMY,
+            crate::ncbi_taxonomy::NCBItaxonomy,
+            "NCBI taxonomy",
+            "NCBI taxon ID",
+            "1747344",
+            Some("Priocnessus nuperus".to_string())
+        ),
+        supported_property!(
+            P_GBIF_TAXON,
+            crate::gbif_taxon::GBIFtaxon,
+            "GBIF taxon",
+            "GBIF taxon ID",
+            "5141342",
+            Some("Battus philenor".to_string())
+        ),
+    ]
+});
 
 pub struct SupportedProperty {
     property: usize,

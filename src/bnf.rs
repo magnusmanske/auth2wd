@@ -9,14 +9,15 @@ use regex::Regex;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
+use std::sync::LazyLock;
 
-lazy_static! {
-    static ref RE_NUMERIC_ID: Regex =
-        Regex::new(r#"^(\d{8,9})[0-9bcdfghjkmnpqrstvwxz]$"#).expect("Regexp error");
-    static ref RE_URL: Regex =
-        Regex::new(r#"<meta property="og:url" content="https://data.bnf.fr/\d+/(.+?)/" />"#)
-            .expect("Regexp error");
-}
+static RE_NUMERIC_ID: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"^(\d{8,9})[0-9bcdfghjkmnpqrstvwxz]$"#).expect("Regexp error"));
+#[allow(dead_code)]
+static RE_URL: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"<meta property="og:url" content="https://data.bnf.fr/\d+/(.+?)/" />"#)
+        .expect("Regexp error")
+});
 
 #[derive(Debug)]
 pub struct BNF {

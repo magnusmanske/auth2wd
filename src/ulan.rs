@@ -106,7 +106,6 @@ impl ULAN {
             let _ = ret.add_prop_text(ExternalId::new(property, url));
         }
     }
-
 }
 
 #[cfg(test)]

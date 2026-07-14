@@ -12,77 +12,82 @@ use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
 use std::collections::HashMap;
+use std::sync::LazyLock;
 use tokio::sync::Mutex as AsyncMutex;
 use wikimisc::wikibase::Reference;
 
-lazy_static! {
-    /// In-process cache for VIAF source-ID lookups, keyed by `(property, id)`.
-    /// Both successful matches (`Some(viaf_id)`) and definite "no match" results
-    /// (`None`) are cached so that the same `(property, id)` is never queried
-    /// twice in one process. Tests that exercise multiple mock responses for
-    /// the same key can call [`VIAF::clear_lookup_cache`] between cases.
-    static ref VIAF_LOOKUP_CACHE: AsyncMutex<HashMap<(usize, String), Option<String>>> =
-        AsyncMutex::new(HashMap::new());
+/// Maps a `(property, id)` source identifier to its cached VIAF lookup result:
+/// `Some(viaf_id)` for a match, `None` for a definite "no match".
+type ViafLookupCache = AsyncMutex<HashMap<(usize, String), Option<String>>>;
 
-    static ref KEY2PROP: HashMap<&'static str, usize> = HashMap::from([
-        ("DNB",     227),
-        ("PLWABN",  7293),
-        ("BIBSYS",  1015),
-        ("ICCU",    396),
-        ("DBC",     3846),
-        ("FAST",    2163),
-        ("VLACC",   7024),
-        ("ISNI",    213),
-        ("DE633",   5504),
-        ("LNL",     7026),
-        ("CAOONL",  8179),
-        ("EGAXA",   1309),
-        ("LC",      244),
+/// In-process cache for VIAF source-ID lookups, keyed by `(property, id)`.
+/// Both successful matches (`Some(viaf_id)`) and definite "no match" results
+/// (`None`) are cached so that the same `(property, id)` is never queried
+/// twice in one process. Tests that exercise multiple mock responses for
+/// the same key can call [`VIAF::clear_lookup_cache`] between cases.
+static VIAF_LOOKUP_CACHE: LazyLock<ViafLookupCache> =
+    LazyLock::new(|| AsyncMutex::new(HashMap::new()));
+
+static KEY2PROP: LazyLock<HashMap<&'static str, usize>> = LazyLock::new(|| {
+    HashMap::from([
+        ("DNB", 227),
+        ("PLWABN", 7293),
+        ("BIBSYS", 1015),
+        ("ICCU", 396),
+        ("DBC", 3846),
+        ("FAST", 2163),
+        ("VLACC", 7024),
+        ("ISNI", 213),
+        ("DE633", 5504),
+        ("LNL", 7026),
+        ("CAOONL", 8179),
+        ("EGAXA", 1309),
+        ("LC", 244),
         // ("NII",  XXXX),
         ("SIMACOB", 1280),
-        ("NUKAT",   1207),
-        ("CYT",     1048),
-        ("NDL",     349),
+        ("NUKAT", 1207),
+        ("CYT", 1048),
+        ("NDL", 349),
         // ("NLB",  XXXX),
         // ("B2Q",  XXXX),
-        ("ARBABN",  3788),
+        ("ARBABN", 3788),
         // ("NLA",  XXXX),
-        ("BLBNB",   4619),
-        ("BNC",     9984),
-        ("BNCHL",   7369),
-        ("ERRR",    6394),
+        ("BLBNB", 4619),
+        ("BNC", 9984),
+        ("BNCHL", 7369),
+        ("ERRR", 6394),
         // ("BNF",  268), // Deactivated; eg Q136170149 gives truncated ID
         ("GRATEVE", 3348),
-        ("N6I",     10227),
-        ("NLI",     949),
-        ("KRNLK",   5034),
-        ("LNB",     1368),
+        ("N6I", 10227),
+        ("NLI", 949),
+        ("KRNLK", 5034),
+        ("LNB", 1368),
         // ("LIH",  7699), // Something is wrong there
-        ("BNL",     7028),
-        ("MRBNR",   7058),
-        ("W2Z",     1015),
-        ("PTBNP",   1005),
-        ("NLR",     7029),
+        ("BNL", 7028),
+        ("MRBNR", 7058),
+        ("W2Z", 1015),
+        ("PTBNP", 1005),
+        ("NLR", 7029),
         // ("BNE",  XXXX),
-        ("SELIBR",  906),
-        ("NKC",     691),
+        ("SELIBR", 906),
+        ("NKC", 691),
         // ("NTA",  XXXX),
         // ("NSZL", XXXX),
-        ("NSK",     1375),
-        ("UIY",     7039),
+        ("NSK", 1375),
+        ("UIY", 7039),
         // ("PERSEUS", XXXX),
-        ("RERO",    3065),
-        ("NYNYRILM",9171),
+        ("RERO", 3065),
+        ("NYNYRILM", 9171),
         ("SKMASNL", 7700),
-        ("SUDOC",   269),
+        ("SUDOC", 269),
         // ("SZ",   XXXX),
-        ("SRP",     6934),
-        ("JPG",     P_ULAN),
+        ("SRP", 6934),
+        ("JPG", P_ULAN),
         // ("UAE",  XXXX),
-        ("BAV",     8034),
+        ("BAV", 8034),
         // ("WKP",  XXXX), // Maybe not?
-    ]);
-}
+    ])
+});
 
 #[derive(Clone, Debug)]
 pub struct VIAF {
@@ -153,10 +158,7 @@ impl VIAF {
     /// wall that 403s any request lacking the header set its own SPA sends.
     /// `Content-Type` alone (what reqwest's `.json()` adds) is not enough —
     /// `Accept`, `Origin`, and `Referer` are also required.
-    fn cluster_record_request(
-        client: &reqwest::Client,
-        url: &str,
-    ) -> reqwest::RequestBuilder {
+    fn cluster_record_request(client: &reqwest::Client, url: &str) -> reqwest::RequestBuilder {
         client
             .post(url)
             .header(reqwest::header::ACCEPT, "application/json")
@@ -233,10 +235,9 @@ impl VIAF {
     }
 
     fn external_ids(&self, ret: &mut MetaItem) -> Result<()> {
-        lazy_static! {
-            static ref RE_EXT_ID: Regex =
-                Regex::new(r"^http://viaf.org/viaf/sourceID/(.+?)%7C(.+?)#skos:Concept$").unwrap();
-        }
+        static RE_EXT_ID: LazyLock<Regex> = LazyLock::new(|| {
+            Regex::new(r"^http://viaf.org/viaf/sourceID/(.+?)%7C(.+?)#skos:Concept$").unwrap()
+        });
         let triples = self
             .triples_property_object_iris("http://xmlns.com/foaf/0.1/focus", &self.get_id_url())?;
         for url in triples {
@@ -396,8 +397,7 @@ mod tests {
         // ── Hit ─────────────────────────────────────────────────────────────
         {
             let server = MockServer::start().await;
-            let fixture =
-                include_str!("../test_data/fixtures/viaf_lookup_jpg_500228559.json");
+            let fixture = include_str!("../test_data/fixtures/viaf_lookup_jpg_500228559.json");
             Mock::given(method("POST"))
                 .and(path("/api/cluster-record"))
                 .respond_with(ResponseTemplate::new(200).set_body_string(fixture))

@@ -1,9 +1,8 @@
 use crate::url_override::maybe_rewrite;
 use anyhow::{anyhow, Result};
-use lazy_static::lazy_static;
 use reqwest::{header::RETRY_AFTER, StatusCode};
 use std::collections::HashMap;
-use std::sync::Mutex;
+use std::sync::{LazyLock, Mutex};
 use std::time::{Duration, Instant};
 
 const HTTP_USER_AGENT: &str =
@@ -14,12 +13,11 @@ const MAX_RETRIES: u32 = 3;
 const INITIAL_BACKOFF: Duration = Duration::from_secs(1);
 const MAX_BACKOFF: Duration = Duration::from_secs(8);
 
-lazy_static! {
-    /// Stores the time at which the next request to a given host:port may be issued.
-    /// Acts as both a throttle (concurrent callers reserve sequential slots) and a
-    /// way to spread bursts across hosts that rate-limit aggressively (e.g. DNB).
-    static ref HOST_NEXT_SLOT: Mutex<HashMap<String, Instant>> = Mutex::new(HashMap::new());
-}
+/// Stores the time at which the next request to a given host:port may be issued.
+/// Acts as both a throttle (concurrent callers reserve sequential slots) and a
+/// way to spread bursts across hosts that rate-limit aggressively (e.g. DNB).
+static HOST_NEXT_SLOT: LazyLock<Mutex<HashMap<String, Instant>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
 
 #[derive(Copy, Clone, Debug)]
 pub struct Utility {}

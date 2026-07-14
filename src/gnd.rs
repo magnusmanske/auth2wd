@@ -9,14 +9,14 @@ use regex::Regex;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
+use std::sync::LazyLock;
 use wikimisc::wikibase::EntityTrait;
 use wikimisc::wikibase::{Reference, Snak, StatementRank};
 
-lazy_static! {
-    static ref RE_COUNTRY: Regex =
-        Regex::new(r"^https?://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-(.+)$")
-            .expect("Regexp error");
-}
+static RE_COUNTRY: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^https?://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-(.+)$")
+        .expect("Regexp error")
+});
 
 #[derive(Clone, Debug)]
 pub struct GND {
@@ -175,11 +175,10 @@ impl ExternalImporter for GND {
 
 impl GND {
     async fn activity(&self, ret: &mut MetaItem) -> Result<()> {
-        lazy_static! {
-            static ref RE_SINGLE_YEAR: Regex = Regex::new(r"^(\d{3,4})$").expect("Regexp error");
-            static ref RE_YEAR_RANGE: Regex =
-                Regex::new(r"^(\d{3,4}) *- *(\d{3,4})$").expect("Regexp error");
-        }
+        static RE_SINGLE_YEAR: LazyLock<Regex> =
+            LazyLock::new(|| Regex::new(r"^(\d{3,4})$").expect("Regexp error"));
+        static RE_YEAR_RANGE: LazyLock<Regex> =
+            LazyLock::new(|| Regex::new(r"^(\d{3,4}) *- *(\d{3,4})$").expect("Regexp error"));
         let lits = self.triples_property_literals(
             "https://d-nb.info/standards/elementset/gnd#periodOfActivity",
         )?;

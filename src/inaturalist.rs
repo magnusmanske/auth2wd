@@ -8,16 +8,16 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use regex::Regex;
 use serde_json::Value;
+use std::sync::LazyLock;
 use wikimisc::wikibase::EntityTrait;
 use wikimisc::wikibase::LocaleString;
 use wikimisc::wikibase::Snak;
 
-lazy_static! {
-    static ref RE_SERVER_PAYLOAD: Regex =
-        Regex::new(r#" *taxon: (\{.+)\.results\[0\]"#).expect("Regexp error");
-    static ref RE_IUCN_REDLIST_URL: Regex =
-        Regex::new(r#"https://www.iucnredlist.org/species/(\d+)/\d+"#).expect("Regexp error");
-}
+static RE_SERVER_PAYLOAD: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#" *taxon: (\{.+)\.results\[0\]"#).expect("Regexp error"));
+static RE_IUCN_REDLIST_URL: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"https://www.iucnredlist.org/species/(\d+)/\d+"#).expect("Regexp error")
+});
 
 #[derive(Clone, Debug)]
 pub struct INaturalist {

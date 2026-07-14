@@ -1,26 +1,26 @@
 use anyhow::Result;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use std::sync::LazyLock;
 use std::{collections::HashMap, fmt, sync::Arc};
 use tokio::sync::Mutex;
 use wikimisc::wikibase::*;
 
 use crate::utility::Utility;
 
-lazy_static! {
-    static ref RE_PROPERTY_NUMERIC: Regex =
-        Regex::new(r#"^\s*[Pp](\d+)\s*$"#).expect("Regexp error");
-    static ref RE_FROM_STRING: Regex = Regex::new(r#"^[Pp](\d+):(.+)$"#).expect("Regexp error");
-    static ref EXTERNAL_IDS_OK_CACHE: Arc<Mutex<HashMap<ExternalId, bool>>> =
-        Arc::new(Mutex::new(HashMap::new()));
-    /// In-process cache for `search_wikidata_single_item`, keyed by raw
-    /// `srsearch` query string. Both hits (`Some(QID)`) and misses (`None`)
-    /// are cached so the same Wikidata search isn't repeated within one run.
-    /// Tests that exercise multiple mock responses for the same query can
-    /// call [`ExternalId::clear_wikidata_search_cache`] between cases.
-    static ref WIKIDATA_SEARCH_CACHE: Mutex<HashMap<String, Option<String>>> =
-        Mutex::new(HashMap::new());
-}
+static RE_PROPERTY_NUMERIC: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"^\s*[Pp](\d+)\s*$"#).expect("Regexp error"));
+static RE_FROM_STRING: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"^[Pp](\d+):(.+)$"#).expect("Regexp error"));
+static EXTERNAL_IDS_OK_CACHE: LazyLock<Arc<Mutex<HashMap<ExternalId, bool>>>> =
+    LazyLock::new(|| Arc::new(Mutex::new(HashMap::new())));
+/// In-process cache for `search_wikidata_single_item`, keyed by raw
+/// `srsearch` query string. Both hits (`Some(QID)`) and misses (`None`)
+/// are cached so the same Wikidata search isn't repeated within one run.
+/// Tests that exercise multiple mock responses for the same query can
+/// call [`ExternalId::clear_wikidata_search_cache`] between cases.
+static WIKIDATA_SEARCH_CACHE: LazyLock<Mutex<HashMap<String, Option<String>>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Hash)]
 pub struct ExternalId {

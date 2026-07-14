@@ -249,8 +249,8 @@ mod tests {
     use serde_json::Value;
     use serial_test::serial;
     use wikimisc::wikibase::{
-        DataValue, DataValueType, EntityTrait, ItemEntity, Snak, SnakDataType, SnakType,
-        Statement, StatementRank, Value as WbValue,
+        DataValue, DataValueType, EntityTrait, ItemEntity, Snak, SnakDataType, SnakType, Statement,
+        StatementRank, Value as WbValue,
     };
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -333,15 +333,23 @@ mod tests {
 
     #[test]
     fn test_has_parser_for_ext_id_supported() {
-        assert!(Combinator::has_parser_for_ext_id(&ExternalId::new(P_VIAF, "123")));
-        assert!(Combinator::has_parser_for_ext_id(&ExternalId::new(P_LOC, "n123")));
-        assert!(Combinator::has_parser_for_ext_id(&ExternalId::new(P_GND, "456")));
+        assert!(Combinator::has_parser_for_ext_id(&ExternalId::new(
+            P_VIAF, "123"
+        )));
+        assert!(Combinator::has_parser_for_ext_id(&ExternalId::new(
+            P_LOC, "n123"
+        )));
+        assert!(Combinator::has_parser_for_ext_id(&ExternalId::new(
+            P_GND, "456"
+        )));
     }
 
     #[test]
     fn test_has_parser_for_ext_id_unsupported() {
         // Property 99999 is not in SUPPORTED_PROPERTIES
-        assert!(!Combinator::has_parser_for_ext_id(&ExternalId::new(99999, "x")));
+        assert!(!Combinator::has_parser_for_ext_id(&ExternalId::new(
+            99999, "x"
+        )));
     }
 
     // ── combine_on_base_item ─────────────────────────────────────────────────

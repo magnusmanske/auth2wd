@@ -7,15 +7,21 @@ use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
 use sophia::inmem::graph::FastGraph;
+use std::sync::LazyLock;
 
-lazy_static! {
-    static ref RE_VIAF: Regex = Regex::new(r"\bhttps?://viaf.org/viaf/(\d+)").unwrap();
-    static ref RE_GND: Regex = Regex::new(r"\bhttps?://d-nb.info/gnd/(1[012]?\d{7}[0-9X]|[47]\d{6}-\d|[1-9]\d{0,7}-[0-9X]|3\d{7}[0-9X])\b").unwrap();
-    static ref RE_LOC: Regex = Regex::new(r#"\bhttps?://id.loc.gov/authorities/names/(.+?)""#).unwrap();
-    static ref RE_BORN_DIED: Regex = Regex::new(r"<span>Dates:.*?</span>.*?<span>(.+?)</span>").unwrap();
-    static ref RE_YEAR: Regex = Regex::new(r"(\d{3,4})").unwrap();
-    static ref RE_NAME: Regex = Regex::new(r"<span>Name:.*?</span>.*?<span>(.+?)</span>").unwrap();
-}
+static RE_VIAF: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\bhttps?://viaf.org/viaf/(\d+)").unwrap());
+static RE_GND: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"\bhttps?://d-nb.info/gnd/(1[012]?\d{7}[0-9X]|[47]\d{6}-\d|[1-9]\d{0,7}-[0-9X]|3\d{7}[0-9X])\b").unwrap()
+});
+static RE_LOC: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"\bhttps?://id.loc.gov/authorities/names/(.+?)""#).unwrap());
+static RE_BORN_DIED: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"<span>Dates:.*?</span>.*?<span>(.+?)</span>").unwrap());
+static RE_YEAR: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(\d{3,4})").unwrap());
+#[allow(dead_code)]
+static RE_NAME: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"<span>Name:.*?</span>.*?<span>(.+?)</span>").unwrap());
 
 #[derive(Debug)]
 pub struct ISNI {

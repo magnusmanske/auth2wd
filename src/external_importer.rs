@@ -8,17 +8,17 @@ use regex::Regex;
 use sophia::api::ns;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
-use sophia::turtle::serializer::nt::NtSerializer;
+use sophia::turtle::serializer::nt::NTriplesSerializer;
 use std::collections::HashMap;
+use std::sync::LazyLock;
 use std::vec::Vec;
 use wikimisc::wikibase::*;
 
 pub const TAXON_LABEL_LANGUAGES: &[&str] = &["en", "de", "es", "it", "nl", "fr"];
 
-lazy_static! {
-    static ref EXTERNAL_ID_REGEXPS : Vec<(Regex,String,usize)> = {
-        // NOTE: The pattern always needs to cover the whole string, so use ^$
-        vec![
+static EXTERNAL_ID_REGEXPS: LazyLock<Vec<(Regex, String, usize)>> = LazyLock::new(|| {
+    // NOTE: The pattern always needs to cover the whole string, so use ^$
+    vec![
             (Regex::new(r"^https?://viaf.org/viaf/(\d+)$").unwrap(),String::from("${1}"),P_VIAF),
             (Regex::new(r"^https?://www.viaf.org/viaf/(\d+)$").unwrap(),String::from("${1}"),P_VIAF),
             (Regex::new(r"^https?://isni.org/isni/(\d{4})(\d{4})(\d{4})(\d{3}[\dX])$").unwrap(),String::from("${1}${2}${3}${4}"),P_ISNI),
@@ -58,24 +58,25 @@ lazy_static! {
             (Regex::new(r"^https?://viaf.org/en/viaf/LC%7C(.+)$").unwrap(),String::from("${1}"),P_LOC),
             (Regex::new(r"^https?://www.persee.fr/authority/(\d+)$").unwrap(),String::from("${1}"),P_PERSEE),
         ]
-    };
+});
 
-    pub static ref DO_NOT_USE_EXTERNAL_URL_REGEXPS : Vec<Regex> = {
-        // NOTE: The pattern always needs to cover the whole string, so use ^$
-        vec![
-            Regex::new(r"^https?://www.wikidata.org/.*$").unwrap(),
-            Regex::new(r"^https?://[a-z-]+.wikipedia.org/.*$").unwrap(),
-            Regex::new(r"^https?://viaf.org/viaf/sourceID/.*#skos:Concept$").unwrap(),
-            Regex::new(r"^https?://d-nb.info/gnd/.*$").unwrap(),
-            Regex::new(r"^https?://www.loc.gov/mads/rdf/v1#.*$").unwrap(),
-            Regex::new(r"^https?://www.w3.org/2004/02/skos/core#.*$").unwrap(),
-            Regex::new(r"^https?://(www.)?orcid.org/.*-\d{0,3}-.*$").unwrap(),
-            Regex::new(r"^https?://data.bnf.fr/#foaf:Person$").unwrap(),
-        ]
-    };
+pub static DO_NOT_USE_EXTERNAL_URL_REGEXPS: LazyLock<Vec<Regex>> = LazyLock::new(|| {
+    // NOTE: The pattern always needs to cover the whole string, so use ^$
+    vec![
+        Regex::new(r"^https?://www.wikidata.org/.*$").unwrap(),
+        Regex::new(r"^https?://[a-z-]+.wikipedia.org/.*$").unwrap(),
+        Regex::new(r"^https?://viaf.org/viaf/sourceID/.*#skos:Concept$").unwrap(),
+        Regex::new(r"^https?://d-nb.info/gnd/.*$").unwrap(),
+        Regex::new(r"^https?://www.loc.gov/mads/rdf/v1#.*$").unwrap(),
+        Regex::new(r"^https?://www.w3.org/2004/02/skos/core#.*$").unwrap(),
+        Regex::new(r"^https?://(www.)?orcid.org/.*-\d{0,3}-.*$").unwrap(),
+        Regex::new(r"^https?://data.bnf.fr/#foaf:Person$").unwrap(),
+    ]
+});
 
-    /// Used in various taxonomy sources
-    pub static ref TAXON_MAP: HashMap<&'static str, &'static str> = vec![
+/// Used in various taxonomy sources
+pub static TAXON_MAP: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
+    vec![
         ("cultivar", "Q4886"),
         ("species", "Q7432"),
         ("genus", "Q34740"),
@@ -144,18 +145,25 @@ lazy_static! {
         ("hyporder", "Q21074316"),
     ]
     .into_iter()
-    .collect();
+    .collect()
+});
 
-    pub static ref VALID_IMAGE_LICENSES: HashMap<&'static str, &'static str> =
+pub static VALID_IMAGE_LICENSES: LazyLock<HashMap<&'static str, &'static str>> =
+    LazyLock::new(|| {
         vec![
             ("cc-by-sa", "Q6905942"),
             ("cc-by", "Q6905323"),
-            ("http://creativecommons.org/licenses/by/4.0/","Q20007257"),
-            ("http://creativecommons.org/licenses/by-sa/4.0/","Q18199165"),
+            ("http://creativecommons.org/licenses/by/4.0/", "Q20007257"),
+            (
+                "http://creativecommons.org/licenses/by-sa/4.0/",
+                "Q18199165",
+            ),
         ]
-            .into_iter()
-            .collect();
-    pub static ref IUCN_REDLIST: HashMap<&'static str, &'static str> = vec![
+        .into_iter()
+        .collect()
+    });
+pub static IUCN_REDLIST: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
+    vec![
         ("ne", "Q3350324"),
         ("dd", "Q3245245"),
         ("lc", "Q211005"),
@@ -167,8 +175,8 @@ lazy_static! {
         ("ex", "Q237350"),
     ]
     .into_iter()
-    .collect();
-}
+    .collect()
+});
 
 const SAME_AS_IRIS: &[&str] = &[
     "http://www.w3.org/2002/07/owl#sameAs",
@@ -223,9 +231,7 @@ pub trait ExternalImporter: Send + Sync {
     async fn run(&self) -> Result<MetaItem>;
 
     fn graph(&self) -> &FastGraph {
-        lazy_static! {
-            static ref DUMMY_GRAPH: FastGraph = FastGraph::new();
-        }
+        static DUMMY_GRAPH: LazyLock<FastGraph> = LazyLock::new(FastGraph::new);
         &DUMMY_GRAPH
     }
 
@@ -234,7 +240,7 @@ pub trait ExternalImporter: Send + Sync {
     }
 
     fn get_graph_text(&mut self) -> String {
-        let mut nt_stringifier = NtSerializer::new_stringifier();
+        let mut nt_stringifier = NTriplesSerializer::new_stringifier();
         let graph = self.graph();
         match nt_stringifier.serialize_graph(graph) {
             Ok(s) => s.to_string(),

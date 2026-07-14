@@ -10,6 +10,7 @@ use serde_json::json;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
+use std::sync::LazyLock;
 
 #[derive(Debug)]
 pub struct NUKAT {
@@ -57,9 +58,8 @@ impl NUKAT {
     /// VIAF-format NUKAT ID (e.g., "n  96637319") by inserting two spaces
     /// after the initial letter prefix.
     fn id_for_viaf(id: &str) -> String {
-        lazy_static! {
-            static ref RE_NUKAT_ID: Regex = Regex::new(r"^([a-z]+)(\d+)$").expect("Regexp error");
-        }
+        static RE_NUKAT_ID: LazyLock<Regex> =
+            LazyLock::new(|| Regex::new(r"^([a-z]+)(\d+)$").expect("Regexp error"));
         match RE_NUKAT_ID.captures(id) {
             Some(caps) => format!("{}  {}", &caps[1], &caps[2]),
             None => id.to_string(),

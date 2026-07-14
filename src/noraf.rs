@@ -7,6 +7,7 @@ use async_trait::async_trait;
 use regex::Regex;
 use serde_json::Value;
 use sophia::inmem::graph::FastGraph;
+use std::sync::LazyLock;
 use wikimisc::wikibase::{EntityTrait, LocaleString, SnakDataType};
 
 // Was: Bibsys
@@ -32,9 +33,7 @@ impl ExternalImporter for NORAF {
     }
 
     fn graph(&self) -> &FastGraph {
-        lazy_static! {
-            static ref DUMMY_GRAPH: FastGraph = FastGraph::new();
-        }
+        static DUMMY_GRAPH: LazyLock<FastGraph> = LazyLock::new(FastGraph::new);
         &DUMMY_GRAPH
     }
 
@@ -107,9 +106,8 @@ impl NORAF {
     }
 
     fn add_dates(&self, date: &str, ret: &mut MetaItem) {
-        lazy_static! {
-            static ref RE_BORN_DIED: Regex = Regex::new(r#"^(.*)-(.*)$"#).expect("Regexp error");
-        }
+        static RE_BORN_DIED: LazyLock<Regex> =
+            LazyLock::new(|| Regex::new(r#"^(.*)-(.*)$"#).expect("Regexp error"));
         if let Some(caps) = RE_BORN_DIED.captures(date) {
             // caps.get(1) and caps.get(2) are always Some when the regex matches
             if let Some((time, precision)) = caps.get(1).and_then(|m| ret.parse_date(m.as_str())) {
