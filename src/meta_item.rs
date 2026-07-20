@@ -188,17 +188,18 @@ impl MetaItem {
     }
 
     /// Removes duplicate claims from the item.
-    /// Two claims are considered duplicates if they have the same main snak and qualifiers.
+    /// Two claims are considered duplicates if they have the same main snak and *compatible*
+    /// qualifiers, i.e. one claim's qualifiers are a subset of the other's. This prevents adding
+    /// a bare statement (e.g. an external ID with no qualifiers) as a duplicate of an existing
+    /// statement that merely carries an extra qualifier such as P1810 ("subject named as").
+    /// See <https://github.com/magnusmanske/auth2wd/issues/10>.
     /// When duplicates are found, references from the duplicate are merged into the first occurrence.
     fn dedup_claims(&mut self) {
         let mut unique_claims: Vec<Statement> = Vec::new();
         for claim in self.item.claims().to_vec() {
             let existing = unique_claims.iter_mut().find(|existing| {
                 ItemMerger::is_snak_identical(claim.main_snak(), existing.main_snak())
-                    && ItemMerger::are_qualifiers_identical(
-                        claim.qualifiers(),
-                        existing.qualifiers(),
-                    )
+                    && Self::are_qualifiers_compatible(claim.qualifiers(), existing.qualifiers())
             });
             match existing {
                 Some(existing_claim) => {
@@ -210,6 +211,14 @@ impl MetaItem {
                         }
                     }
                     existing_claim.set_references(refs);
+                    // Keep the richer qualifier set so we don't silently drop qualifiers when
+                    // combining sources, but never rewrite an already-persisted statement
+                    // (one that has an ID from Wikidata) to avoid unexpected edits.
+                    if existing_claim.id().is_none()
+                        && claim.qualifiers().len() > existing_claim.qualifiers().len()
+                    {
+                        existing_claim.set_qualifier_snaks(claim.qualifiers().to_owned());
+                    }
                 }
                 None => {
                     unique_claims.push(claim);
@@ -217,6 +226,17 @@ impl MetaItem {
             }
         }
         *self.item.claims_mut() = unique_claims;
+    }
+
+    /// Two qualifier lists are compatible if one is a subset of the other.
+    fn are_qualifiers_compatible(a: &[Snak], b: &[Snak]) -> bool {
+        Self::is_qualifier_subset(a, b) || Self::is_qualifier_subset(b, a)
+    }
+
+    /// Returns `true` if every snak in `sub` has an identical snak in `sup`.
+    fn is_qualifier_subset(sub: &[Snak], sup: &[Snak]) -> bool {
+        sub.iter()
+            .all(|q| sup.iter().any(|e| ItemMerger::is_snak_identical(q, e)))
     }
 
     pub fn fix_images(&mut self, base_item: &MetaItem) {
@@ -360,6 +380,62 @@ mod tests {
         mi.add_prop_text(ext_id1.clone());
         mi.cleanup();
         assert_eq!(mi.prop_text, vec![ext_id2, ext_id1]);
+    }
+
+    /// Regression test for https://github.com/magnusmanske/auth2wd/issues/10 :
+    /// a bare statement must not be added as a duplicate of an existing statement that only
+    /// differs by carrying an extra qualifier (e.g. P1810 "subject named as").
+    #[test]
+    fn test_dedup_claims_bare_not_duplicated_against_qualified() {
+        let mut mi = MetaItem::new();
+
+        // Existing (Wikidata) external-ID statement, with an ID and a P1810 qualifier.
+        let mut existing = Statement::new_normal(
+            Snak::new_external_id("P691", "jn19990210001"),
+            vec![Snak::new_string("P1810", "Some Name")],
+            vec![],
+        );
+        existing.set_id("Q234888$existing".to_string());
+
+        // Newly imported statement, same value but no qualifiers.
+        let imported = Statement::new_normal(
+            Snak::new_external_id("P691", "jn19990210001"),
+            vec![],
+            vec![],
+        );
+
+        mi.item.add_claim(existing);
+        mi.item.add_claim(imported);
+        mi.cleanup();
+
+        assert_eq!(
+            mi.item.claims().len(),
+            1,
+            "the bare statement must be merged into the qualified one, not duplicated"
+        );
+        // The kept statement must be the existing (persisted) one, with its qualifier intact.
+        assert_eq!(mi.item.claims()[0].id(), Some("Q234888$existing".to_string()));
+        assert_eq!(mi.item.claims()[0].qualifiers().len(), 1);
+    }
+
+    /// Genuinely different statements (same value, non-overlapping qualifiers) must be kept.
+    #[test]
+    fn test_dedup_claims_distinct_qualifiers_kept() {
+        let mut mi = MetaItem::new();
+        let s1 = Statement::new_normal(
+            Snak::new_item("P39", "Q4416090"),
+            vec![Snak::new_time("P580", "+2000-00-00T00:00:00Z", 9)],
+            vec![],
+        );
+        let s2 = Statement::new_normal(
+            Snak::new_item("P39", "Q4416090"),
+            vec![Snak::new_time("P580", "+2010-00-00T00:00:00Z", 9)],
+            vec![],
+        );
+        mi.item.add_claim(s1);
+        mi.item.add_claim(s2);
+        mi.cleanup();
+        assert_eq!(mi.item.claims().len(), 2);
     }
 
     #[test]
