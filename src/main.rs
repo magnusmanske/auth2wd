@@ -40,7 +40,7 @@
 
 use auth2wd::*;
 use axum::Form;
-use axum::{extract::Path, response::Html, routing::get, Json, Router};
+use axum::{extract::Path, http::StatusCode, response::Html, routing::get, Json, Router};
 use combinator::*;
 use external_importer::*;
 use meta_item::MetaItem;
@@ -63,6 +63,10 @@ use wikimisc::wikibase::{EntityTrait, ItemEntity, Snak, Statement};
 fn wrap_html(html: &str) -> String {
     let outer: String = fs::read_to_string("./html/wrapper.html").unwrap();
     outer.replace("$1$", html)
+}
+
+async fn healthz() -> StatusCode {
+    StatusCode::OK
 }
 
 async fn root() -> Html<String> {
@@ -223,6 +227,7 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = Router::new()
         .route("/", get(root))
+        .route("/healthz", get(healthz))
         .route("/supported_properties", get(supported_properties))
         .route("/item/{prop}/{id}", get(item))
         .route("/meta_item/{prop}/{id}", get(meta_item))
