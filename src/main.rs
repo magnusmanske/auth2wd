@@ -38,14 +38,17 @@
     // clippy::wildcard_imports
 )]
 
+#[global_allocator]
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 use auth2wd::*;
 use axum::Form;
-use axum::{extract::Path, http::StatusCode, response::Html, routing::get, Json, Router};
+use axum::{Json, Router, extract::Path, http::StatusCode, response::Html, routing::get};
 use combinator::*;
 use external_importer::*;
 use meta_item::MetaItem;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
