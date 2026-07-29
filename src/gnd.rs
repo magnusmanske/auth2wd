@@ -81,6 +81,7 @@ impl ExternalImporter for GND {
         let mut ret = MetaItem::new();
         self.add_the_usual(&mut ret).await?;
         ret.item.descriptions_mut().clear(); // Descriptions are usually nonsense
+        ret.item.aliases_mut().clear(); // GND aliases are unreliable and should never be imported
 
         // Nationality
         for url in self.triples_subject_iris(
