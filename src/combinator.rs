@@ -4,10 +4,11 @@ use crate::meta_item::*;
 use crate::properties::P_VIAF;
 use crate::supported_property::SUPPORTED_PROPERTIES;
 use crate::viaf::VIAF;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use futures::future::join_all;
 use std::collections::HashMap;
 use std::collections::HashSet;
+use tracing::warn;
 use wikimisc::merge_diff::MergeDiff;
 use wikimisc::wikibase::EntityTrait;
 
@@ -92,7 +93,13 @@ impl Combinator {
         let parsers = join_all(futures).await;
         let parsers: Vec<Box<dyn ExternalImporter>> = parsers
             .into_iter()
-            .filter_map(|parser| parser.ok())
+            .filter_map(|parser| match parser {
+                Ok(p) => Some(p),
+                Err(e) => {
+                    warn!("Failed to create importer: {e}");
+                    None
+                }
+            })
             .collect();
         parsers
     }
@@ -161,7 +168,14 @@ impl Combinator {
             for (parser, item) in std::iter::zip(running_parsers, items) {
                 let item = match item {
                     Ok(item) => item,
-                    Err(_) => continue,
+                    Err(e) => {
+                        warn!(
+                            "Importer {}/{} failed: {e}",
+                            parser.my_property(),
+                            parser.my_id()
+                        );
+                        continue;
+                    }
                 };
                 let key = ExternalId::new(parser.my_property(), &parser.my_id()).to_string();
                 if self.items.contains_key(&key) {

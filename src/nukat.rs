@@ -3,7 +3,7 @@ use crate::meta_item::*;
 use crate::properties::*;
 use crate::url_override::maybe_rewrite;
 use crate::utility::Utility;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use regex::Regex;
 use serde_json::json;

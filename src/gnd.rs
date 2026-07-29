@@ -187,26 +187,21 @@ impl GND {
         }
         if let Some(lit) = lits.first() {
             if let Some(year) = RE_SINGLE_YEAR.captures(lit) {
-                if let Some(year) = year.get(1) {
-                    if let Some((time, precision)) = ret.parse_date(year.as_str()) {
-                        ret.add_claim(self.new_statement_time(1317, &time, precision));
-                        // P1317 floruit
-                    }
+                if let Some(year) = year.get(1)
+                    && let Some((time, precision)) = ret.parse_date(year.as_str())
+                {
+                    ret.add_claim(self.new_statement_time(P_FLORUIT, &time, precision));
                 }
             } else if let Some(result) = RE_YEAR_RANGE.captures(lit) {
-                if let Some(start_year) = result.get(1) {
-                    if let Some((time, precision)) = ret.parse_date(start_year.as_str()) {
-                        ret.add_claim(self.new_statement_time(
-                            P_WORK_PERIOD_START,
-                            &time,
-                            precision,
-                        ));
-                    }
+                if let Some(start_year) = result.get(1)
+                    && let Some((time, precision)) = ret.parse_date(start_year.as_str())
+                {
+                    ret.add_claim(self.new_statement_time(P_WORK_PERIOD_START, &time, precision));
                 }
-                if let Some(end_year) = result.get(2) {
-                    if let Some((time, precision)) = ret.parse_date(end_year.as_str()) {
-                        ret.add_claim(self.new_statement_time(P_WORK_PERIOD_END, &time, precision));
-                    }
+                if let Some(end_year) = result.get(2)
+                    && let Some((time, precision)) = ret.parse_date(end_year.as_str())
+                {
+                    ret.add_claim(self.new_statement_time(P_WORK_PERIOD_END, &time, precision));
                 }
             }
         }
@@ -225,12 +220,11 @@ impl GND {
                 .graph()
                 .triples_matching([b], Any, Any)
                 .for_each_triple(|t| {
-                    if let Some(iri) = t.p().iri() {
-                        if iri.starts_with("http://www.w3.org/1999/02/22-rdf-syntax-ns#_") {
-                            if let Some(gnd_irl) = t.o().iri() {
-                                gnd_urls.push(gnd_irl.to_string());
-                            }
-                        }
+                    if let Some(iri) = t.p().iri()
+                        && iri.starts_with("http://www.w3.org/1999/02/22-rdf-syntax-ns#_")
+                        && let Some(gnd_irl) = t.o().iri()
+                    {
+                        gnd_urls.push(gnd_irl.to_string());
                     }
                 });
             for gnd_url in gnd_urls {
@@ -384,9 +378,10 @@ mod tests {
     #[serial]
     async fn test_no_citizenship_reference() {
         let (_server, gnd) = mock_gnd().await;
-        assert!(gnd
-            .get_ref_for_property(P_COUNTRY_OF_CITIZENSHIP)
-            .is_empty());
+        assert!(
+            gnd.get_ref_for_property(P_COUNTRY_OF_CITIZENSHIP)
+                .is_empty()
+        );
         assert!(!gnd.get_ref_for_property(P_DATE_OF_BIRTH).is_empty());
         cleanup();
     }

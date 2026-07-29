@@ -241,13 +241,12 @@ impl VIAF {
         let triples = self
             .triples_property_object_iris("http://xmlns.com/foaf/0.1/focus", &self.get_id_url())?;
         for url in triples {
-            if let Some(captures) = RE_EXT_ID.captures(&url) {
-                if let (Some(source_id), Some(concept_id)) = (captures.get(1), captures.get(2)) {
-                    if let Some(prop_id) = KEY2PROP.get(source_id.as_str()) {
-                        let extid = ExternalId::new(*prop_id, concept_id.as_str());
-                        ret.add_claim(self.new_statement_string(extid.property(), extid.id()));
-                    }
-                }
+            if let Some(captures) = RE_EXT_ID.captures(&url)
+                && let (Some(source_id), Some(concept_id)) = (captures.get(1), captures.get(2))
+                && let Some(prop_id) = KEY2PROP.get(source_id.as_str())
+            {
+                let extid = ExternalId::new(*prop_id, concept_id.as_str());
+                ret.add_claim(self.new_statement_string(extid.property(), extid.id()));
             }
         }
         Ok(())

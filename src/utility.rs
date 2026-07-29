@@ -1,6 +1,6 @@
 use crate::url_override::maybe_rewrite;
-use anyhow::{anyhow, Result};
-use reqwest::{header::RETRY_AFTER, StatusCode};
+use anyhow::{Result, anyhow};
+use reqwest::{StatusCode, header::RETRY_AFTER};
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex};
 use std::time::{Duration, Instant};

@@ -91,8 +91,11 @@ impl ExternalId {
         if let Some(cached) = WIKIDATA_SEARCH_CACHE.lock().await.get(query) {
             return cached.clone();
         }
-        // TODO urlencode query?
-        let url = format!("https://www.wikidata.org/w/api.php?action=query&list=search&srnamespace=0&format=json&srsearch={}",&query);
+        let encoded_query =
+            url::form_urlencoded::byte_serialize(query.as_bytes()).collect::<String>();
+        let url = format!(
+            "https://www.wikidata.org/w/api.php?action=query&list=search&srnamespace=0&format=json&srsearch={encoded_query}"
+        );
         // The early `?` exits do not cache: a network/parse failure is treated
         // as transient so a later call can retry. Only well-formed responses
         // (a known totalhits value) populate the cache.

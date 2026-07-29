@@ -264,14 +264,14 @@ impl MetaItem {
                 .iter()
                 .filter(|c| c.main_snak().property() == prop)
                 .for_each(|c| {
-                    if let Some(dv) = c.main_snak().data_value() {
-                        if let Value::Time(t) = dv.value() {
-                            if *t.precision() > best_precision {
-                                best_precision = *t.precision();
-                            }
-                            if *t.precision() < worst_precision {
-                                worst_precision = *t.precision();
-                            }
+                    if let Some(dv) = c.main_snak().data_value()
+                        && let Value::Time(t) = dv.value()
+                    {
+                        if *t.precision() > best_precision {
+                            best_precision = *t.precision();
+                        }
+                        if *t.precision() < worst_precision {
+                            worst_precision = *t.precision();
                         }
                     }
                 });
@@ -284,16 +284,15 @@ impl MetaItem {
                 .filter(|c| c.main_snak().property() == prop)
                 .filter(|c| *c.rank() == StatementRank::Normal)
                 .for_each(|c| {
-                    if let Some(dv) = c.main_snak().data_value() {
-                        if let Value::Time(t) = dv.value() {
-                            if *t.precision() < best_precision {
-                                // Deprecate statement
-                                c.set_rank(StatementRank::Deprecated);
-                                // reason for deprecated rank: item/value with less precision and/or accuracy
-                                let snak = Snak::new_item("P2241", "Q42727519");
-                                c.add_qualifier_snak(snak);
-                            }
-                        }
+                    if let Some(dv) = c.main_snak().data_value()
+                        && let Value::Time(t) = dv.value()
+                        && *t.precision() < best_precision
+                    {
+                        // Deprecate statement
+                        c.set_rank(StatementRank::Deprecated);
+                        // reason for deprecated rank: item/value with less precision and/or accuracy
+                        let snak = Snak::new_item("P2241", "Q42727519");
+                        c.add_qualifier_snak(snak);
                     }
                 });
         }
@@ -414,7 +413,10 @@ mod tests {
             "the bare statement must be merged into the qualified one, not duplicated"
         );
         // The kept statement must be the existing (persisted) one, with its qualifier intact.
-        assert_eq!(mi.item.claims()[0].id(), Some("Q234888$existing".to_string()));
+        assert_eq!(
+            mi.item.claims()[0].id(),
+            Some("Q234888$existing".to_string())
+        );
         assert_eq!(mi.item.claims()[0].qualifiers().len(), 1);
     }
 

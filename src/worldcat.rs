@@ -1,8 +1,8 @@
+use crate::ExternalId;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
-use crate::url_override::maybe_rewrite;
-use crate::ExternalId;
+use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::Value;
@@ -55,9 +55,9 @@ impl ExternalImporter for WorldCat {
 
 impl WorldCat {
     pub async fn new(id: &str) -> Result<Self> {
-        let url = maybe_rewrite(&format!("https://id.oclc.org/worldcat/entity/{id}.jsonld"));
-        let resp = reqwest::get(&url).await?.text().await?;
-        let j = serde_json::from_str(&resp)?;
+        let text =
+            Utility::get_url(&format!("https://id.oclc.org/worldcat/entity/{id}.jsonld")).await?;
+        let j = serde_json::from_str(&text)?;
         Ok(Self {
             id: id.to_string(),
             json: j,
@@ -155,6 +155,7 @@ impl WorldCat {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::standard_importer_tests;
     use crate::url_override;
     use serial_test::serial;
     use wiremock::matchers::{method, path};
@@ -162,7 +163,7 @@ mod tests {
 
     const TEST_ID: &str = "E39PBJrcqvXdm3kkwGr7HVG8md";
 
-    async fn mock_worldcat() -> (MockServer, WorldCat) {
+    async fn mock() -> (MockServer, WorldCat) {
         let server = MockServer::start().await;
         let fixture =
             include_str!("../test_data/fixtures/worldcat_E39PBJrcqvXdm3kkwGr7HVG8md.jsonld");
@@ -183,69 +184,30 @@ mod tests {
         url_override::unregister("https://id.oclc.org");
     }
 
-    #[tokio::test]
-    #[serial]
-    async fn test_new() {
-        let (_server, _worldcat) = mock_worldcat().await;
-        cleanup();
-    }
-
-    #[tokio::test]
-    #[serial]
-    async fn test_my_property() {
-        let (_server, worldcat) = mock_worldcat().await;
-        assert_eq!(worldcat.my_property(), P_WORLDCAT);
-        cleanup();
-    }
-
-    #[tokio::test]
-    #[serial]
-    async fn test_my_stated_in() {
-        let (_server, worldcat) = mock_worldcat().await;
-        assert_eq!(worldcat.my_stated_in(), "Q112122720");
-        cleanup();
-    }
-
-    #[tokio::test]
-    #[serial]
-    async fn test_primary_language() {
-        let (_server, worldcat) = mock_worldcat().await;
-        assert_eq!(worldcat.primary_language(), "en");
-        cleanup();
-    }
-
-    #[tokio::test]
-    #[serial]
-    async fn test_get_key_url() {
-        let (_server, worldcat) = mock_worldcat().await;
-        assert_eq!(
-            worldcat.get_key_url(TEST_ID),
-            "https://id.oclc.org/worldcat/entity/E39PBJrcqvXdm3kkwGr7HVG8md"
-        );
-        cleanup();
-    }
-
-    #[tokio::test]
-    #[serial]
-    async fn test_my_id() {
-        let (_server, worldcat) = mock_worldcat().await;
-        assert_eq!(worldcat.my_id(), TEST_ID);
-        cleanup();
-    }
+    standard_importer_tests!(
+        P_WORLDCAT,
+        "Q112122720",
+        "en",
+        "https://id.oclc.org/worldcat/entity/E39PBJrcqvXdm3kkwGr7HVG8md"
+    );
 
     #[tokio::test]
     #[serial]
     async fn test_run() {
-        let (_server, worldcat) = mock_worldcat().await;
+        let (_server, worldcat) = mock().await;
         let meta_item = worldcat.run().await.unwrap();
-        assert!(meta_item
-            .item
-            .labels()
-            .contains(&LocaleString::new("en", "Helen Clark")));
-        assert!(meta_item
-            .item
-            .aliases()
-            .contains(&LocaleString::new("en", "Helen Elizabeth Clark")));
+        assert!(
+            meta_item
+                .item
+                .labels()
+                .contains(&LocaleString::new("en", "Helen Clark"))
+        );
+        assert!(
+            meta_item
+                .item
+                .aliases()
+                .contains(&LocaleString::new("en", "Helen Elizabeth Clark"))
+        );
         assert_eq!(meta_item.item.claims().len(), 3);
         cleanup();
     }

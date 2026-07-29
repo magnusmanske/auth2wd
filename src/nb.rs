@@ -6,9 +6,8 @@ use crate::url_override::maybe_rewrite;
 use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
-use reqwest::header::{HeaderMap, HeaderValue, ACCEPT};
+use reqwest::header::{ACCEPT, HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
-use sophia::inmem::graph::FastGraph;
 use wikimisc::wikibase::EntityTrait;
 use wikimisc::wikibase::LocaleString;
 
@@ -50,7 +49,6 @@ impl Triple {
 #[derive(Debug)]
 pub struct NB {
     id: String,
-    graph: FastGraph,
     data: Vec<Triple>,
 }
 
@@ -66,10 +64,6 @@ impl ExternalImporter for NB {
 
     fn my_stated_in(&self) -> &str {
         "Q105488572"
-    }
-
-    fn graph(&self) -> &FastGraph {
-        &self.graph
     }
 
     fn primary_language(&self) -> String {
@@ -134,12 +128,11 @@ impl ExternalImporter for NB {
                     None => ret.add_prop_text(ExternalId::new(P_DATE_OF_DEATH, &triple.o.value)),
                 };
             }
-            if triple.is_named_node("http://schema.org/sameAs")
-                || triple.is_named_node("http://www.w3.org/2002/07/owl#sameAs")
+            if (triple.is_named_node("http://schema.org/sameAs")
+                || triple.is_named_node("http://www.w3.org/2002/07/owl#sameAs"))
+                && let Some(ext_id) = self.url2external_id(&triple.o.value)
             {
-                if let Some(ext_id) = self.url2external_id(&triple.o.value) {
-                    ret.add_claim(self.new_statement_string(ext_id.property(), ext_id.id()));
-                }
+                ret.add_claim(self.new_statement_string(ext_id.property(), ext_id.id()));
             }
         }
 
@@ -165,7 +158,6 @@ impl NB {
 
         Ok(Self {
             id: id.to_string(),
-            graph: FastGraph::new(),
             data,
         })
     }
@@ -173,9 +165,8 @@ impl NB {
 
 #[cfg(test)]
 mod tests {
-    use wikimisc::wikibase::{EntityTrait, LocaleString};
-
     use super::*;
+    use crate::standard_importer_tests;
     use crate::url_override;
     use serial_test::serial;
     use wiremock::matchers::{method, path};
@@ -183,7 +174,7 @@ mod tests {
 
     const TEST_ID: &str = "068364229";
 
-    async fn mock_nb() -> (MockServer, NB) {
+    async fn mock() -> (MockServer, NB) {
         let server = MockServer::start().await;
         let fixture = include_str!("../test_data/fixtures/nb_068364229.json");
 
@@ -217,57 +208,11 @@ mod tests {
         url_override::unregister("https://viaf.org");
     }
 
-    #[tokio::test]
-    #[serial]
-    async fn test_new() {
-        let (_server, _nb) = mock_nb().await;
-        cleanup();
-    }
-
-    #[tokio::test]
-    #[serial]
-    async fn test_my_property() {
-        let (_server, nb) = mock_nb().await;
-        assert_eq!(nb.my_property(), P_NB);
-        cleanup();
-    }
-
-    #[tokio::test]
-    #[serial]
-    async fn test_my_stated_in() {
-        let (_server, nb) = mock_nb().await;
-        assert_eq!(nb.my_stated_in(), "Q105488572");
-        cleanup();
-    }
-
-    #[tokio::test]
-    #[serial]
-    async fn test_primary_language() {
-        let (_server, nb) = mock_nb().await;
-        assert_eq!(nb.primary_language(), "nl");
-        cleanup();
-    }
-
-    #[tokio::test]
-    #[serial]
-    async fn test_get_key_url() {
-        let (_server, nb) = mock_nb().await;
-        assert_eq!(
-            nb.get_key_url(TEST_ID),
-            "http://data.bibliotheken.nl/id/thes/p068364229"
-        );
-        cleanup();
-    }
-
-    #[tokio::test]
-    #[serial]
-    async fn test_run() {
-        let (_server, nb) = mock_nb().await;
-        let meta_item = nb.run().await.unwrap();
-        assert_eq!(
-            *meta_item.item.labels(),
-            vec![LocaleString::new("nl", "Charles Robert Darwin")]
-        );
-        cleanup();
-    }
+    standard_importer_tests!(
+        P_NB,
+        "Q105488572",
+        "nl",
+        "http://data.bibliotheken.nl/id/thes/p068364229",
+        vec![LocaleString::new("nl", "Charles Robert Darwin")]
+    );
 }

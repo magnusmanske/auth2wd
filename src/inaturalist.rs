@@ -1,10 +1,10 @@
+use crate::ExternalId;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
 use crate::url_override::maybe_rewrite;
 use crate::utility::Utility;
-use crate::ExternalId;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use regex::Regex;
 use serde_json::Value;
@@ -186,13 +186,11 @@ impl INaturalist {
                 // Try to parse IUCN Red List specis ID from URL
                 if let Some(url) = cs.get("url") {
                     let url = url.as_str().unwrap_or_default();
-                    if let Some(captures) = RE_IUCN_REDLIST_URL.captures(url) {
-                        if let Some(s) = captures.get(1) {
-                            let iucn_species_id = s.as_str();
-                            ret.add_claim(
-                                self.new_statement_string(P_IUCN_TAXON_ID, iucn_species_id),
-                            );
-                        }
+                    if let Some(captures) = RE_IUCN_REDLIST_URL.captures(url)
+                        && let Some(s) = captures.get(1)
+                    {
+                        let iucn_species_id = s.as_str();
+                        ret.add_claim(self.new_statement_string(P_IUCN_TAXON_ID, iucn_species_id));
                     }
                 }
                 // Get IUCN Red List status

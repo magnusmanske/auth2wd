@@ -1,7 +1,10 @@
 /// URL prefix override registry — used in tests to redirect external HTTP calls
 /// to a local wiremock server.
 ///
-/// In production code this map is always empty, so `maybe_rewrite` is a no-op.
+/// In production the registry is always empty, so `maybe_rewrite` is a no-op.
+/// The `register`, `unregister`, and `clear` entry points exist at runtime but
+/// are intended for test use only; they are `#[doc(hidden)]` so they don't
+/// appear in public docs.
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 
@@ -12,10 +15,9 @@ fn overrides() -> &'static Mutex<HashMap<String, String>> {
 }
 
 /// Register a URL prefix replacement: any URL that starts with `from` will
-/// have that prefix replaced with `to`.
-///
-/// Only called from test code (unit tests and integration tests).
-/// Compiled into the library so integration tests in `tests/` can use it.
+/// have that prefix replaced with `to`.  Test-only; no-op in production
+/// because the map is never populated outside tests.
+#[doc(hidden)]
 pub fn register(from: impl Into<String>, to: impl Into<String>) {
     overrides()
         .lock()
@@ -24,9 +26,7 @@ pub fn register(from: impl Into<String>, to: impl Into<String>) {
 }
 
 /// Remove a single registered override by its `from` prefix.
-///
-/// Only called from test code (unit tests and integration tests).
-/// Compiled into the library so integration tests in `tests/` can use it.
+#[doc(hidden)]
 pub fn unregister(from: &str) {
     overrides()
         .lock()
@@ -35,9 +35,7 @@ pub fn unregister(from: &str) {
 }
 
 /// Remove all registered overrides.
-///
-/// Only called from test code (unit tests and integration tests).
-/// Compiled into the library so integration tests in `tests/` can use it.
+#[doc(hidden)]
 pub fn clear() {
     overrides()
         .lock()
@@ -47,6 +45,7 @@ pub fn clear() {
 
 /// Rewrite `url` using any registered prefix overrides.
 /// Returns the original URL unchanged when no override matches.
+/// In production builds this is a no-op (the map is always empty).
 pub fn maybe_rewrite(url: &str) -> String {
     let map = overrides().lock().expect("url_override mutex poisoned");
     for (from, to) in map.iter() {

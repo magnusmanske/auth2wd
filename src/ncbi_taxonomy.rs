@@ -1,9 +1,9 @@
+use crate::ExternalId;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
 use crate::url_override::maybe_rewrite;
-use crate::ExternalId;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use wikimisc::wikibase::EntityTrait;
@@ -123,7 +123,9 @@ struct Name {
 
 impl NCBItaxonomy {
     pub async fn new(id: &str) -> Result<Self> {
-        let url = maybe_rewrite(&format!("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=taxonomy&id={id}&format=xml"));
+        let url = maybe_rewrite(&format!(
+            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=taxonomy&id={id}&format=xml"
+        ));
         let resp = reqwest::get(&url).await?.text().await?;
         let taxa_set: TaxaSet = serde_xml_rs::from_str(&resp)?;
         // Use first taxon, there should only be one!

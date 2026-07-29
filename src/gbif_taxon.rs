@@ -1,8 +1,8 @@
+use crate::ExternalId;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
 use crate::url_override::maybe_rewrite;
-use crate::ExternalId;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::Value;

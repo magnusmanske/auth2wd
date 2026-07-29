@@ -159,3 +159,6 @@ pub const P_NUKAT: usize = 1207;
 
 // National Library of Hungary ID
 pub const P_NSZL: usize = 3133;
+
+// Floruit (date when a person was known to be active)
+pub const P_FLORUIT: usize = 1317;

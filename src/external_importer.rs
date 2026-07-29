@@ -8,7 +8,7 @@ use regex::Regex;
 use sophia::api::ns;
 use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
-use sophia::turtle::serializer::nt::NTriplesSerializer;
+use sophia::turtle::serializer::nt::NtSerializer;
 use std::collections::HashMap;
 use std::sync::LazyLock;
 use std::vec::Vec;
@@ -239,8 +239,8 @@ pub trait ExternalImporter: Send + Sync {
         self.get_key_url("id")
     }
 
-    fn get_graph_text(&mut self) -> String {
-        let mut nt_stringifier = NTriplesSerializer::new_stringifier();
+    fn get_graph_text(&self) -> String {
+        let mut nt_stringifier = NtSerializer::new_stringifier();
         let graph = self.graph();
         match nt_stringifier.serialize_graph(graph) {
             Ok(s) => s.to_string(),
@@ -248,7 +248,7 @@ pub trait ExternalImporter: Send + Sync {
         }
     }
 
-    fn dump_graph(&mut self) {
+    fn dump_graph(&self) {
         println!("{}", self.get_graph_text());
     }
 
@@ -273,10 +273,10 @@ pub trait ExternalImporter: Send + Sync {
         self.graph()
             .triples_matching([&iri_id], [&iri_p], Any)
             .for_each_triple(|t| {
-                if let Some(iri) = t.o().iri() {
-                    if let Ok(ns) = ns::Namespace::new(iri) {
-                        ret.push(ns.to_string());
-                    }
+                if let Some(iri) = t.o().iri()
+                    && let Ok(ns) = ns::Namespace::new(iri)
+                {
+                    ret.push(ns.to_string());
                 }
             })?;
         ret.sort();
@@ -331,10 +331,10 @@ pub trait ExternalImporter: Send + Sync {
         self.graph()
             .triples_matching(Any, [&iri_p], [&iri_o])
             .for_each_triple(|t| {
-                if let Some(iri) = t.s().iri() {
-                    if let Ok(ns) = ns::Namespace::new(iri) {
-                        ret.push(ns.to_string());
-                    }
+                if let Some(iri) = t.s().iri()
+                    && let Ok(ns) = ns::Namespace::new(iri)
+                {
+                    ret.push(ns.to_string());
                 }
             })?;
         ret.sort();
@@ -690,6 +690,10 @@ pub trait ExternalImporter: Send + Sync {
         Ok(())
     }
 
+    /// Standard pipeline for RDF-based importers: own ID → VIAF lookup →
+    /// instance-of → sameAs links → gender → labels/aliases → description →
+    /// language. Non-RDF importers (ISNI, WorldCat, etc.) should override this
+    /// to skip the graph-dependent steps.
     async fn add_the_usual(&self, ret: &mut MetaItem) -> Result<()> {
         self.add_own_id(ret)?;
         self.try_viaf(ret).await?;
@@ -771,6 +775,80 @@ pub trait ExternalImporter: Send + Sync {
         }
         Ok(())
     }
+}
+
+/// Generates the standard battery of importer tests: `test_new`,
+/// `test_my_property`, `test_my_stated_in`, `test_primary_language`,
+/// `test_get_key_url`, and `test_my_id`.  When `$expected_label` is
+/// provided a `test_run` is also emitted.
+///
+/// The caller must provide a `mock()` function that returns
+/// `(MockServer, ImporterType)` and a `cleanup()` function that
+/// unregisters URL overrides — both must be in scope at the call site.
+#[macro_export]
+macro_rules! standard_importer_tests {
+    // Without test_run
+    ($prop_const:expr, $stated_in:expr, $lang:expr, $key_url:expr) => {
+        #[tokio::test]
+        #[serial]
+        async fn test_new() {
+            let (_server, _importer) = mock().await;
+            cleanup();
+        }
+
+        #[tokio::test]
+        #[serial]
+        async fn test_my_property() {
+            let (_server, importer) = mock().await;
+            assert_eq!(importer.my_property(), $prop_const);
+            cleanup();
+        }
+
+        #[tokio::test]
+        #[serial]
+        async fn test_my_stated_in() {
+            let (_server, importer) = mock().await;
+            assert_eq!(importer.my_stated_in(), $stated_in);
+            cleanup();
+        }
+
+        #[tokio::test]
+        #[serial]
+        async fn test_primary_language() {
+            let (_server, importer) = mock().await;
+            assert_eq!(importer.primary_language(), $lang);
+            cleanup();
+        }
+
+        #[tokio::test]
+        #[serial]
+        async fn test_get_key_url() {
+            let (_server, importer) = mock().await;
+            assert_eq!(importer.get_key_url(TEST_ID), $key_url);
+            cleanup();
+        }
+
+        #[tokio::test]
+        #[serial]
+        async fn test_my_id() {
+            let (_server, importer) = mock().await;
+            assert_eq!(importer.my_id(), TEST_ID);
+            cleanup();
+        }
+    };
+    // With test_run
+    ($prop_const:expr, $stated_in:expr, $lang:expr, $key_url:expr, $expected_label:expr) => {
+        $crate::standard_importer_tests!($prop_const, $stated_in, $lang, $key_url);
+
+        #[tokio::test]
+        #[serial]
+        async fn test_run() {
+            let (_server, importer) = mock().await;
+            let meta_item = importer.run().await.unwrap();
+            assert_eq!(*meta_item.item.labels(), $expected_label);
+            cleanup();
+        }
+    };
 }
 
 #[cfg(test)]

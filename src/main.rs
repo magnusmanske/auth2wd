@@ -52,7 +52,7 @@ use serde_json::{Value, json};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::net::SocketAddr;
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::{env, fs};
 use supported_property::SUPPORTED_PROPERTIES;
 use tower_http::cors::{Any, CorsLayer};
@@ -111,7 +111,7 @@ async fn meta_item(Path((property, id)): Path<(String, String)>) -> Json<serde_j
 }
 
 async fn graph(Path((property, id)): Path<(String, String)>) -> String {
-    let mut parser: Box<dyn ExternalImporter> =
+    let parser: Box<dyn ExternalImporter> =
         match Combinator::get_parser_for_property(&property, &id).await {
             Ok(parser) => parser,
             Err(e) => return e.to_string(),
@@ -170,10 +170,8 @@ async fn merge(Form(params): Form<MergeForm>) -> Json<serde_json::Value> {
     let diff = im.merge(&new_item);
 
     let mut j = im.item().to_json();
-    if base_item_has_fake_id {
-        if let Some(jo) = j.as_object_mut() {
-            jo.remove("id");
-        }
+    if base_item_has_fake_id && let Some(jo) = j.as_object_mut() {
+        jo.remove("id");
     }
     let j = json!({"item":j,"diff":diff});
     Json(j)
@@ -247,9 +245,12 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
         .and_then(|v| v.parse::<u16>().ok())
         .unwrap_or(8000);
 
-    let address = [0, 0, 0, 0]; // TODOO env::var("AC2WD_ADDRESS")
+    let address: IpAddr = env::var("AC2WD_ADDRESS")
+        .ok()
+        .and_then(|a| a.parse().ok())
+        .unwrap_or(IpAddr::V4(Ipv4Addr::UNSPECIFIED));
 
-    let addr = SocketAddr::from((address, port));
+    let addr = SocketAddr::new(address, port);
     tracing::debug!("listening on {}", addr);
     let listener = tokio::net::TcpListener::bind(addr)
         .await
@@ -364,7 +365,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some("graph") => {
             // Single graph
             let ext_id = get_extid_from_argv(&argv)?;
-            let mut parser = Combinator::get_parser_for_ext_id(&ext_id).await?;
+            let parser = Combinator::get_parser_for_ext_id(&ext_id).await?;
             parser.dump_graph();
         }
         Some("list") => {
@@ -377,15 +378,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let file = File::open(filename)?;
             let reader = BufReader::new(file);
             let mut api = get_wikidata_api("config.json").await?;
+            let mut failures = 0_u32;
             for (index, line) in reader.lines().enumerate() {
-                if index >= start {
-                    if let Ok(item) = line {
-                        println!("{index}: {item}");
-                        if let Ok(diff) = get_extend(&item).await {
-                            let _ = apply_diff(&item, &diff, &mut api).await; // Ignore result
+                if index >= start
+                    && let Ok(item) = line
+                {
+                    println!("{index}: {item}");
+                    match get_extend(&item).await {
+                        Ok(diff) => {
+                            if let Err(e) = apply_diff(&item, &diff, &mut api).await {
+                                eprintln!("  FAILED to apply diff for {item}: {e}");
+                                failures += 1;
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("  FAILED to extend {item}: {e}");
+                            failures += 1;
                         }
                     }
                 }
+            }
+            if failures > 0 {
+                eprintln!("Done with {failures} failure(s)");
             }
         }
         Some("extend") => {

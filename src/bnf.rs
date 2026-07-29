@@ -3,7 +3,7 @@ use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
 use crate::utility::Utility;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use regex::Regex;
 use sophia::api::prelude::*;

@@ -182,7 +182,8 @@ pub struct SupportedProperty {
     name: String,
     source: String,
     demo_id: String,
-    demo_name: String,
+    /// Optional human-readable demo name; falls back to the source name when `None`.
+    demo_name: Option<String>,
     factory: ImporterFactory,
 }
 
@@ -212,7 +213,7 @@ impl SupportedProperty {
             name: name.into(),
             source: source.into(),
             demo_id: demo_id.into(),
-            demo_name: demo_name.unwrap_or("Charles Darwin".into()),
+            demo_name,
             factory,
         }
     }
@@ -227,7 +228,7 @@ impl SupportedProperty {
             self.property,
             &self.demo_id,
             &self.name,
-            &self.demo_name,
+            self.demo_name.as_deref().unwrap_or(&self.source),
             &self.source,
             &self.property,
             &self.property
