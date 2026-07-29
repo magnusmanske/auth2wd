@@ -131,7 +131,12 @@ async fn test_viaf_run_with_mock() {
         assert!(meta_item.is_ok(), "VIAF::run failed: {:?}", meta_item.err());
         let meta_item = meta_item.unwrap();
         use wikimisc::wikibase::EntityTrait;
-        assert_eq!(meta_item.item.label_in_locale("en"), Some("Magnus Manske"));
+        // VIAF is an aggregator with unreliable name data: it must contribute
+        // claims (external IDs etc.) but no labels, aliases, or descriptions.
+        assert!(!meta_item.item.claims().is_empty());
+        assert!(meta_item.item.labels().is_empty());
+        assert!(meta_item.item.aliases().is_empty());
+        assert!(meta_item.item.descriptions().is_empty());
     })
     .await;
 }

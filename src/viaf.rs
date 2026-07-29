@@ -125,6 +125,18 @@ impl ExternalImporter for VIAF {
         self.transform_label_last_first_name(s)
     }
 
+    // VIAF's own name literals are aggregation artifacts — often concatenated
+    // without separators ("MasayukiMuraishi"), reordered ("正行村石"), or
+    // carrying wrong language tags — and every name in a cluster originates
+    // from a member source that provides it properly. As with `get_ref()`,
+    // contribute none of them.
+    fn add_label_aliases(&self, _ret: &mut MetaItem) -> Result<()> {
+        Ok(())
+    }
+    fn add_description(&self, _ret: &mut MetaItem) -> Result<()> {
+        Ok(())
+    }
+
     async fn run(&self) -> Result<MetaItem> {
         let mut ret = MetaItem::new();
         self.add_the_usual(&mut ret).await?;
@@ -255,7 +267,7 @@ impl VIAF {
 
 #[cfg(test)]
 mod tests {
-    use wikimisc::wikibase::{EntityTrait, LocaleString};
+    use wikimisc::wikibase::EntityTrait;
 
     use super::*;
     use crate::url_override;
@@ -338,15 +350,17 @@ mod tests {
         url_override::unregister("https://viaf.org");
     }
 
+    /// VIAF name literals are aggregation artifacts (concatenated, reordered,
+    /// mistagged) — the importer must not contribute any labels, aliases, or
+    /// descriptions; member sources provide them properly.
     #[tokio::test]
     #[serial]
-    async fn test_run() {
+    async fn test_run_adds_no_labels_aliases_descriptions() {
         let (_server, viaf) = mock_viaf().await;
         let meta_item = viaf.run().await.unwrap();
-        assert_eq!(
-            *meta_item.item.labels(),
-            vec![LocaleString::new("en", "Magnus Manske")]
-        );
+        assert!(meta_item.item.labels().is_empty());
+        assert!(meta_item.item.aliases().is_empty());
+        assert!(meta_item.item.descriptions().is_empty());
         url_override::unregister("https://viaf.org");
     }
 

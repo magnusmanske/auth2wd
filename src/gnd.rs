@@ -397,6 +397,47 @@ mod tests {
         cleanup();
     }
 
+    /// Name variants whose language tag does not match the primary language
+    /// must be skipped entirely: GND records for e.g. Japanese people carry
+    /// kanji/katakana variants tagged `ja`/`und-Kana`, which must not become
+    /// German labels or aliases (modeled on GND 1089683332 / Q133611399).
+    #[tokio::test]
+    #[serial]
+    async fn test_label_aliases_respect_language_tags() {
+        let server = MockServer::start().await;
+        let rdf = r#"<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:gndo="https://d-nb.info/standards/elementset/gnd#">
+  <rdf:Description rdf:about="https://d-nb.info/gnd/1089683332">
+    <gndo:preferredNameForThePerson rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Muraishi, Masayuki</gndo:preferredNameForThePerson>
+    <gndo:variantNameForThePerson xml:lang="de">Muraishi, M.</gndo:variantNameForThePerson>
+    <gndo:variantNameForThePerson xml:lang="ja">村石正行</gndo:variantNameForThePerson>
+    <gndo:variantNameForThePerson xml:lang="und-Kana">ムライシマサユキ</gndo:variantNameForThePerson>
+  </rdf:Description>
+</rdf:RDF>"#;
+        Mock::given(method("GET"))
+            .and(path("/gnd/1089683332/about/lds.rdf"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(rdf))
+            .mount(&server)
+            .await;
+        url_override::register("https://d-nb.info", server.uri());
+
+        let gnd = GND::new("1089683332").await.unwrap();
+        let mut meta_item = MetaItem::new();
+        gnd.add_label_aliases(&mut meta_item).unwrap();
+
+        assert_eq!(
+            *meta_item.item.labels(),
+            vec![LocaleString::new("de", "Masayuki Muraishi")]
+        );
+        assert_eq!(
+            *meta_item.item.aliases(),
+            vec![LocaleString::new("de", "M. Muraishi")]
+        );
+
+        url_override::unregister("https://d-nb.info");
+    }
+
     #[tokio::test]
     #[serial]
     async fn test_run() {

@@ -324,6 +324,40 @@ pub trait ExternalImporter: Send + Sync {
         self.triples_subject_literals(&self.get_id_url(), p)
     }
 
+    /// Like `triples_literals`, but keeps each literal's language tag
+    /// (`None` for plain or typed literals).
+    fn triples_literals_with_language(&self, p: &str) -> Result<Vec<(String, Option<String>)>> {
+        let mut ret = vec![];
+        let iri_id = Iri::new(self.get_id_url())?;
+        let iri_p = Iri::new(p)?;
+        self.graph()
+            .triples_matching([&iri_id], [&iri_p], Any)
+            .for_each_triple(|t| {
+                if let Some(literal) = t.o().lexical_form() {
+                    let language = t.o().language_tag().map(|l| l.as_str().to_string());
+                    ret.push((literal.to_string(), language));
+                }
+            })?;
+        ret.sort();
+        ret.dedup();
+        Ok(ret)
+    }
+
+    /// Whether a literal with the given language tag may be used as a
+    /// `primary_language()` label/alias/description. Untagged literals pass;
+    /// tagged ones must share the primary language subtag ("en-US" matches
+    /// "en", but "ja" or "und-Kana" do not match "de"). This keeps sources
+    /// from adding e.g. katakana name variants as German or English text.
+    fn matches_primary_language(&self, language_tag: Option<&str>) -> bool {
+        match language_tag {
+            None => true,
+            Some(tag) => tag
+                .split('-')
+                .next()
+                .is_some_and(|primary| primary.eq_ignore_ascii_case(&self.primary_language())),
+        }
+    }
+
     fn triples_property_object_iris(&self, p: &str, o: &str) -> Result<Vec<String>> {
         let mut ret = vec![];
         let iri_p = Iri::new(p)?;
@@ -593,7 +627,10 @@ pub trait ExternalImporter: Send + Sync {
         let language = self.primary_language();
 
         for url in LABEL_ALIAS_IRIS {
-            for s in self.triples_literals(url)? {
+            for (s, language_tag) in self.triples_literals_with_language(url)? {
+                if !self.matches_primary_language(language_tag.as_deref()) {
+                    continue;
+                }
                 let s = self.transform_label(&s);
                 let s = self.limit_string_length(&s);
                 match ret.item.label_in_locale(&language) {
@@ -669,7 +706,10 @@ pub trait ExternalImporter: Send + Sync {
     fn add_description(&self, ret: &mut MetaItem) -> Result<()> {
         let language = self.primary_language();
         for iri in DESCRIPTION_IRIS {
-            for s in self.triples_literals(iri)? {
+            for (s, language_tag) in self.triples_literals_with_language(iri)? {
+                if !self.matches_primary_language(language_tag.as_deref()) {
+                    continue;
+                }
                 if ret.item.description_in_locale(&language).is_none() {
                     let mut s = self.limit_string_length(&s);
                     if language == "fr" {
