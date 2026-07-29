@@ -3223,7 +3223,8 @@ dependencies = [
 [[package]]
 name = "wikimisc"
 version = "0.1.0"
-source = "git+https://github.com/magnusmanske/wikimisc#b74362b547652e3f969ffeb9e612f256d7e9ca79"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70466a5b60ac1d58fc37210d017b9da4775656a7ac1feac9a4f617f129e39dc4"
 dependencies = [
  "chrono",
  "regex",
