@@ -22,6 +22,11 @@ static EXTERNAL_IDS_OK_CACHE: LazyLock<Arc<Mutex<HashMap<ExternalId, bool>>>> =
 static WIKIDATA_SEARCH_CACHE: LazyLock<Mutex<HashMap<String, Option<String>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
+/// Both caches above are unbounded, so their sizes go to the service dashboard.
+fn record_cache_size(cache: &'static str, entries: usize) {
+    wikimisc::metrics::gauge!("auth2wd_cache_entries", "cache" => cache).set(entries as f64);
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Hash)]
 pub struct ExternalId {
     property: usize,
@@ -109,10 +114,9 @@ impl ExternalId {
         } else {
             None
         };
-        WIKIDATA_SEARCH_CACHE
-            .lock()
-            .await
-            .insert(query.to_string(), result.clone());
+        let mut cache = WIKIDATA_SEARCH_CACHE.lock().await;
+        cache.insert(query.to_string(), result.clone());
+        record_cache_size("wikidata_search", cache.len());
         result
     }
 
@@ -120,6 +124,7 @@ impl ExternalId {
     /// exercise multiple distinct mock responses for the same query string.
     pub async fn clear_wikidata_search_cache() {
         WIKIDATA_SEARCH_CACHE.lock().await.clear();
+        record_cache_size("wikidata_search", 0);
     }
 
     pub async fn get_item_for_external_id_value(&self) -> Option<String> {
@@ -155,7 +160,9 @@ impl ExternalId {
         }
         if was_checked {
             // No need to store the result if no check was run
-            EXTERNAL_IDS_OK_CACHE.lock().await.insert(self.clone(), ret);
+            let mut cache = EXTERNAL_IDS_OK_CACHE.lock().await;
+            cache.insert(self.clone(), ret);
+            record_cache_size("external_ids_ok", cache.len());
         }
         Ok(ret)
     }

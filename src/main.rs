@@ -43,6 +43,9 @@ static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 use auth2wd::*;
 use axum::Form;
+use axum::extract::Request;
+use axum::middleware::{self, Next};
+use axum::response::Response;
 use axum::{Json, Router, extract::Path, http::StatusCode, response::Html, routing::get};
 use combinator::*;
 use external_importer::*;
@@ -53,6 +56,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::time::Instant;
 use std::{env, fs};
 use supported_property::SUPPORTED_PROPERTIES;
 use tower_http::cors::{Any, CorsLayer};
@@ -61,6 +65,7 @@ use tower_http::{compression::CompressionLayer, trace::TraceLayer};
 use wikimisc::item_merger::ItemMerger;
 use wikimisc::mediawiki::api::Api;
 use wikimisc::merge_diff::MergeDiff;
+use wikimisc::telemetry::{Telemetry, TelemetryError};
 use wikimisc::wikibase::{EntityTrait, ItemEntity, Snak, Statement};
 
 fn wrap_html(html: &str) -> String {
@@ -221,8 +226,33 @@ async fn supported_properties() -> Json<serde_json::Value> {
     Json(json!(ret))
 }
 
+/// Records each request for the service dashboard; health checks are left out.
+async fn record_request(req: Request, next: Next) -> Response {
+    if req.uri().path() == "/healthz" {
+        return next.run(req).await;
+    }
+    let start = Instant::now();
+    let response = next.run(req).await;
+    wikimisc::telemetry::record_http_request(response.status().as_u16(), start.elapsed());
+    response
+}
+
+/// Starts pushing metrics to the service dashboard (token from `$DASHBOARD_TOKEN`).
+/// Telemetry is optional: a missing token or any other error only gets logged.
+fn start_telemetry() {
+    match Telemetry::builder("web")
+        .version(env!("CARGO_PKG_VERSION"))
+        .install()
+    {
+        Ok(_) => tracing::info!("telemetry enabled"),
+        Err(e @ TelemetryError::NoToken) => tracing::info!("telemetry disabled: {e}"),
+        Err(e) => tracing::warn!("telemetry disabled: {e}"),
+    }
+}
+
 async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
+    start_telemetry();
 
     let cors = CorsLayer::new().allow_origin(Any);
 
@@ -236,6 +266,7 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
         .route("/extend/{item}", get(extend))
         .route("/merge", get(merge_info).post(merge))
         .nest_service("/images", ServeDir::new("images"))
+        .layer(middleware::from_fn(record_request))
         .layer(TraceLayer::new_for_http())
         .layer(CompressionLayer::new())
         .layer(cors);

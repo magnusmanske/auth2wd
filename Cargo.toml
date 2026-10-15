@@ -21,6 +21,7 @@ url = "2"
 wikimisc = { git = "https://github.com/magnusmanske/wikimisc", features = [
 	"date",
 	"item-merger",
+	"telemetry",
 	"wikibase",
 ] }
 serde = "1"

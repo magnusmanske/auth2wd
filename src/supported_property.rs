@@ -218,8 +218,15 @@ impl SupportedProperty {
         }
     }
 
+    /// Creates the importer, which fetches and parses the source record.
+    /// Failures are counted per source (a bounded label: one value per entry).
     pub async fn generator(&self, id: &str) -> Result<Box<dyn ExternalImporter>> {
-        (self.factory)(id).await
+        let result = (self.factory)(id).await;
+        if result.is_err() {
+            wikimisc::metrics::counter!("auth2wd_parser_failures_total", "source" => self.name.clone())
+                .increment(1);
+        }
+        result
     }
 
     pub fn as_li(&self) -> String {
