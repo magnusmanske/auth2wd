@@ -59,6 +59,7 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::time::Instant;
 use std::{env, fs};
 use supported_property::SUPPORTED_PROPERTIES;
+use tower_http::catch_panic::CatchPanicLayer;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::services::ServeDir;
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
@@ -250,13 +251,23 @@ fn start_telemetry() {
     }
 }
 
+/// Wraps `router` in the server's middleware stack (the last `.layer()` is outermost).
+/// A panicking handler fails only its own request with a 500; `record_request`
+/// sits outside `CatchPanicLayer` so the dashboard counts that 500.
+fn with_middleware(router: Router) -> Router {
+    router
+        .layer(CatchPanicLayer::new())
+        .layer(middleware::from_fn(record_request))
+        .layer(TraceLayer::new_for_http())
+        .layer(CompressionLayer::new())
+        .layer(CorsLayer::new().allow_origin(Any))
+}
+
 async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
     start_telemetry();
 
-    let cors = CorsLayer::new().allow_origin(Any);
-
-    let app = Router::new()
+    let routes = Router::new()
         .route("/", get(root))
         .route("/healthz", get(healthz))
         .route("/supported_properties", get(supported_properties))
@@ -265,11 +276,8 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
         .route("/graph/{prop}/{id}", get(graph))
         .route("/extend/{item}", get(extend))
         .route("/merge", get(merge_info).post(merge))
-        .nest_service("/images", ServeDir::new("images"))
-        .layer(middleware::from_fn(record_request))
-        .layer(TraceLayer::new_for_http())
-        .layer(CompressionLayer::new())
-        .layer(cors);
+        .nest_service("/images", ServeDir::new("images"));
+    let app = with_middleware(routes);
 
     let port: u16 = env::var("AC2WD_PORT")
         .ok()
@@ -455,3 +463,25 @@ P7545	askArt person ID (has JSON in HTML source) DOES NOT WORK, BEHIND CLOUDFLAR
 https://vokabular.bs.no/bibbi/nb/page/22778
 
 */
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::body::Body;
+    use tower::ServiceExt;
+
+    async fn panicking_handler() -> StatusCode {
+        panic!("test panic")
+    }
+
+    #[tokio::test]
+    async fn test_panicking_handler_returns_500() {
+        let app = with_middleware(Router::new().route("/panic", get(panicking_handler)));
+        let request = Request::builder()
+            .uri("/panic")
+            .body(Body::empty())
+            .unwrap();
+        let response = app.oneshot(request).await.unwrap();
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+    }
+}

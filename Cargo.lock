@@ -135,6 +135,7 @@ dependencies = [
  "serial_test",
  "sophia",
  "tokio",
+ "tower",
  "tower-http",
  "tracing",
  "tracing-subscriber",

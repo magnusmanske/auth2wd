@@ -43,6 +43,7 @@ futures = "0.3"
 [dev-dependencies]
 async-once-cell = "0.5"
 serial_test = "3"
+tower = { version = "0.5", features = ["util"] }
 wiremock = "0.6"
 
 [profile.dev]
@@ -51,5 +52,4 @@ debug = false
 [profile.release]
 opt-level = 3
 lto = 'fat'
-panic = 'abort'
 codegen-units = 1
