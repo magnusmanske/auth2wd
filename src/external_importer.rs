@@ -700,8 +700,8 @@ pub trait ExternalImporter: Send + Sync {
             };
             let mut found = false;
             for p31 in p31s {
-                let extid = ExternalId::new(ext_id.property(), p31);
-                if let Some(item) = extid.wikidata_item_with_text(ext_id.id()).await {
+                let instance_of = ExternalId::new(P_INSTANCE_OF, p31);
+                if let Some(item) = instance_of.wikidata_item_with_text(ext_id.id()).await {
                     mi.add_claim(self.new_statement_item(ext_id.property(), &item));
                     found = true;
                     break;
@@ -804,7 +804,7 @@ mod tests {
     use super::*;
     use crate::url_override;
     use serial_test::serial;
-    use wiremock::matchers::{method, path};
+    use wiremock::matchers::{body_string_contains, method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
     /// Spin up a wiremock server with the VIAF fixture and return a VIAF
@@ -873,6 +873,41 @@ mod tests {
         assert_eq!("foo", t.lowercase_first_letter("Foo"));
         assert_eq!("foo", t.lowercase_first_letter("foo"));
         assert_eq!("", t.lowercase_first_letter(""));
+        cleanup();
+    }
+
+    /// The rescue search must constrain on P31 (instance of), not on the
+    /// property the text was harvested for.
+    #[tokio::test]
+    #[serial]
+    async fn test_try_rescue_prop_text_searches_instance_of() {
+        crate::external_id::clear_wikidata_search_cache().await;
+        let (_server, t) = mock_viaf_for_tests().await;
+        let wd = MockServer::start().await;
+        let single_result = r#"{"batchcomplete":"","query":{"searchinfo":{"totalhits":1},"search":[{"ns":0,"title":"Q188","pageid":1,"size":1,"wordcount":0,"snippet":"","timestamp":"2024-01-01T00:00:00Z"}]}}"#;
+        Mock::given(method("POST"))
+            .and(path("/w/api.php"))
+            .and(body_string_contains("haswbstatement%3A%22P31%3DQ34770%22"))
+            .respond_with(ResponseTemplate::new(200).set_body_string(single_result))
+            .mount(&wd)
+            .await;
+        url_override::register("https://www.wikidata.org", wd.uri());
+
+        let mut mi = MetaItem::new();
+        let _ = mi.add_prop_text(ExternalId::new(P_LANGUAGES, "German"));
+        t.try_rescue_prop_text(&mut mi).await.unwrap();
+
+        let expected = t.new_statement_item(P_LANGUAGES, "Q188");
+        assert!(
+            mi.item
+                .claims()
+                .iter()
+                .any(|c| c.main_snak() == expected.main_snak())
+        );
+        assert!(mi.prop_text.is_empty());
+
+        url_override::unregister("https://www.wikidata.org");
+        crate::external_id::clear_wikidata_search_cache().await;
         cleanup();
     }
 }
