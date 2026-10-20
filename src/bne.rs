@@ -2,7 +2,7 @@ use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
-use crate::url_override::maybe_rewrite;
+use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
 use sophia::api::prelude::*;
@@ -62,9 +62,7 @@ impl ExternalImporter for BNE {
         for bd in birth_death {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
                 let _ = match ret.parse_date(&s) {
-                    Some((time, precision)) => {
-                        ret.add_claim(self.new_statement_time(bd.1, &time, precision))
-                    }
+                    Some(date) => ret.add_claim(self.new_statement_time(bd.1, &date)),
                     None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
                 };
             }
@@ -78,8 +76,7 @@ impl ExternalImporter for BNE {
 
 impl BNE {
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = maybe_rewrite(&format!("https://datos.bne.es/resource/{id}.rdf"));
-        let resp = reqwest::get(&rdf_url).await?.text().await?;
+        let resp = Utility::get_url(&format!("https://datos.bne.es/resource/{id}.rdf")).await?;
         let mut graph: FastGraph = FastGraph::new();
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {

@@ -9,7 +9,7 @@ use sophia::api::prelude::*;
 use sophia::inmem::graph::FastGraph;
 use sophia::xml;
 
-use crate::external_id::ExternalId;
+use crate::external_id::{ExternalId, ExternalIdExt};
 
 #[derive(Debug)]
 pub struct ULAN {
@@ -95,7 +95,7 @@ impl ULAN {
     async fn add_ulan_item(&self, url: &str, property: usize, ret: &mut MetaItem) {
         if let Some(ulan_id) = url.split('/').next_back() {
             if let Some(item) = ExternalId::new(self.my_property(), ulan_id)
-                .get_item_for_external_id_value()
+                .wikidata_item()
                 .await
             {
                 ret.add_claim(self.new_statement_item(property, &item));

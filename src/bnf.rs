@@ -73,9 +73,7 @@ impl ExternalImporter for BNF {
         for bd in birth_death_rdvocab {
             for s in self.triples_subject_iris(&self.get_id_url(), bd.0)? {
                 let _ = match ret.parse_date(&s) {
-                    Some((time, precision)) => {
-                        ret.add_claim(self.new_statement_time(bd.1, &time, precision))
-                    }
+                    Some(date) => ret.add_claim(self.new_statement_time(bd.1, &date)),
                     None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
                 };
             }
@@ -88,9 +86,7 @@ impl ExternalImporter for BNF {
         for bd in birth_death_vocab {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
                 let _ = match ret.parse_date(&s) {
-                    Some((time, precision)) => {
-                        ret.add_claim(self.new_statement_time(bd.1, &time, precision))
-                    }
+                    Some(date) => ret.add_claim(self.new_statement_time(bd.1, &date)),
                     None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
                 };
             }

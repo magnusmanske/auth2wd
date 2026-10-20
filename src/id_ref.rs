@@ -2,7 +2,7 @@ use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
-use crate::url_override::maybe_rewrite;
+use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
 use sophia::api::prelude::*;
@@ -48,7 +48,7 @@ impl ExternalImporter for IdRef {
         for url in self.triples_iris("http://dbpedia.org/ontology/citizenship")? {
             match self.url2external_id(&url) {
                 Some(extid) => {
-                    let _ = match extid.get_item_for_external_id_value().await {
+                    let _ = match extid.wikidata_item().await {
                         Some(item) => {
                             ret.add_claim(self.new_statement_item(P_COUNTRY_OF_CITIZENSHIP, &item))
                         }
@@ -68,9 +68,7 @@ impl ExternalImporter for IdRef {
                 "http://purl.org/vocab/bio/0.1/date",
             )? {
                 let _ = match ret.parse_date(&s) {
-                    Some((time, precision)) => {
-                        ret.add_claim(self.new_statement_time(bd.1, &time, precision))
-                    }
+                    Some(date) => ret.add_claim(self.new_statement_time(bd.1, &date)),
                     None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
                 };
             }
@@ -84,8 +82,7 @@ impl ExternalImporter for IdRef {
 
 impl IdRef {
     pub async fn new(id: &str) -> Result<Self> {
-        let rdf_url = maybe_rewrite(&format!("https://www.idref.fr/{id}.rdf"));
-        let resp = reqwest::get(&rdf_url).await?.text().await?;
+        let resp = Utility::get_url(&format!("https://www.idref.fr/{id}.rdf")).await?;
         let mut graph: FastGraph = FastGraph::new();
         let _ = xml::parser::parse_str(&resp).add_to_graph(&mut graph)?;
         Ok(Self {

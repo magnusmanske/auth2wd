@@ -7,6 +7,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use regex::Regex;
 use std::sync::LazyLock;
+use wikimisc::date::Date;
 
 static RE_VIAF: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\bhttps?://viaf.org/viaf/(\d+)").unwrap());
@@ -97,9 +98,10 @@ impl ISNI {
     fn add_year_from_string(&self, ret: &mut MetaItem, prop: usize, s: &str) {
         if let Some(captures) = RE_YEAR.captures(s)
             && let Some(year) = captures.get(1)
+            && let Ok(year) = year.as_str().parse()
+            && let Ok(date) = Date::new(year, None, None)
         {
-            let time = format!("+{}-01-01T00:00:00Z", year.as_str());
-            ret.add_claim(self.new_statement_time(prop, &time, 9));
+            ret.add_claim(self.new_statement_time(prop, &date));
         }
     }
 

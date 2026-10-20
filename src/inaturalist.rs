@@ -1,4 +1,4 @@
-use crate::ExternalId;
+use crate::external_id::search_wikidata_single_item;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
@@ -85,7 +85,7 @@ impl INaturalist {
             "haswbstatement:P{}={parent_id} haswbstatement:P{}=Q16521",
             P_INATURALIST_TAXON, P_INSTANCE_OF
         );
-        let item = ExternalId::search_wikidata_single_item(&query).await?;
+        let item = search_wikidata_single_item(&query).await?;
         ret.add_claim(self.new_statement_item(P_PARENT_TAXON, &item));
         Some(())
     }

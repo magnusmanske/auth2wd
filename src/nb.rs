@@ -114,17 +114,13 @@ impl ExternalImporter for NB {
             }
             if triple.is_named_node("http://schema.org/birthDate") {
                 match ret.parse_date(&triple.o.value) {
-                    Some((time, precision)) => {
-                        ret.add_claim(self.new_statement_time(P_DATE_OF_BIRTH, &time, precision))
-                    }
+                    Some(date) => ret.add_claim(self.new_statement_time(P_DATE_OF_BIRTH, &date)),
                     None => ret.add_prop_text(ExternalId::new(P_DATE_OF_BIRTH, &triple.o.value)),
                 };
             }
             if triple.is_named_node("http://schema.org/deathDate") {
                 match ret.parse_date(&triple.o.value) {
-                    Some((time, precision)) => {
-                        ret.add_claim(self.new_statement_time(P_DATE_OF_DEATH, &time, precision))
-                    }
+                    Some(date) => ret.add_claim(self.new_statement_time(P_DATE_OF_DEATH, &date)),
                     None => ret.add_prop_text(ExternalId::new(P_DATE_OF_DEATH, &triple.o.value)),
                 };
             }

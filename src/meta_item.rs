@@ -1,9 +1,12 @@
 use crate::external_id::*;
 use crate::properties::{P_DATE_OF_BIRTH, P_DATE_OF_DEATH};
+use crate::utility::Utility;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_json::json;
 use std::str::FromStr;
 use std::vec::Vec;
+use tokio::sync::OnceCell;
+use wikimisc::date::Date;
 use wikimisc::item_merger::ItemMerger;
 use wikimisc::merge_diff::MergeDiff;
 use wikimisc::wikibase::*;
@@ -50,9 +53,13 @@ impl MetaItem {
     }
 
     pub async fn from_entity(id: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let api = mediawiki::api::Api::new("https://www.wikidata.org/w/api.php").await?;
+        // Shared, so the site info is fetched once rather than on every call.
+        static API: OnceCell<mediawiki::api::Api> = OnceCell::const_new();
+        let api = API
+            .get_or_try_init(|| async { Utility::wikidata().api().await })
+            .await?;
         let entity_container = entity_container::EntityContainer::new();
-        let entity = entity_container.load_entity(&api, id).await?;
+        let entity = entity_container.load_entity(api, id).await?;
         let item = match entity {
             Entity::Item(item) => item,
             _ => return Err(format!("Not an item: '{id}'").into()),
@@ -63,10 +70,9 @@ impl MetaItem {
         })
     }
 
-    /// Parses a date string and returns a tuple with the time and precision.
-    pub fn parse_date(&self, s: &str) -> Option<(String, u64)> {
-        let date = wikimisc::date::Date::from_str(s).ok()?;
-        Some((date.time().to_string(), date.precision()))
+    /// Parses a date string.
+    pub fn parse_date(&self, s: &str) -> Option<Date> {
+        Date::from_str(s).ok()
     }
 
     /// Checks if a reference already exists in a list of references.
@@ -166,7 +172,7 @@ impl MetaItem {
     }
 
     pub fn add_prop_text(&mut self, ext_id: ExternalId) -> Option<Statement> {
-        if !ExternalId::do_not_use_external_url(ext_id.id()) {
+        if !do_not_use_external_url(ext_id.id()) {
             self.prop_text.push(ext_id);
         }
         None
@@ -343,20 +349,24 @@ mod tests {
     #[test]
     fn test_parse_date() {
         let mi = MetaItem::new();
+        let parsed = |s: &str| {
+            mi.parse_date(s)
+                .map(|date| (date.time().to_string(), date.precision()))
+        };
         assert_eq!(
-            mi.parse_date("1987"),
+            parsed("1987"),
             Some(("+1987-00-00T00:00:00Z".to_string(), 9))
         );
         assert_eq!(
-            mi.parse_date("1987-12"),
+            parsed("1987-12"),
             Some(("+1987-12-00T00:00:00Z".to_string(), 10))
         );
         assert_eq!(
-            mi.parse_date("1987-12-27"),
+            parsed("1987-12-27"),
             Some(("+1987-12-27T00:00:00Z".to_string(), 11))
         );
         assert_eq!(
-            mi.parse_date("http://data.bnf.fr/date/1978"),
+            parsed("http://data.bnf.fr/date/1978"),
             Some(("+1978-00-00T00:00:00Z".to_string(), 9))
         );
     }

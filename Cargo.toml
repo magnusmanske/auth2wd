@@ -13,20 +13,25 @@ path = "src/lib.rs"
 mimalloc = { version = "0.1", features = ["secure"] }
 async-trait = "0.1"
 sophia = { version = "0.8", features = ["xml"] }
-reqwest = { version = "0.12", features = ["blocking", "json"] }
+reqwest = { version = "0.13", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 serde-xml-rs = "0.8"
 regex = "1"
-url = "2"
 wikimisc = { git = "https://github.com/magnusmanske/wikimisc", features = [
 	"date",
+	"entity-id",
+	"external-id",
+	"http",
 	"item-merger",
+	"logging",
+	"server",
+	"statements",
 	"telemetry",
 	"wikibase",
+	"wikidata",
 ] }
 serde = "1"
 serde_json = "1"
-chrono = "0.4"
 axum = { version = "0.8", features = [
 	"http1",
 	"http2",
@@ -35,8 +40,7 @@ axum = { version = "0.8", features = [
 	"macros",
 ] }
 tracing = "0.1"
-tracing-subscriber = "0.3"
-tower-http = { version = "0.6", features = ["full"] }
+tower-http = { version = "0.7", features = ["full"] }
 anyhow = "1"
 futures = "0.3"
 

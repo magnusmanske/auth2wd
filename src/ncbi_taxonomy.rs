@@ -1,8 +1,8 @@
-use crate::ExternalId;
+use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
-use crate::url_override::maybe_rewrite;
+use crate::utility::Utility;
 use anyhow::{Result, anyhow};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
@@ -123,10 +123,10 @@ struct Name {
 
 impl NCBItaxonomy {
     pub async fn new(id: &str) -> Result<Self> {
-        let url = maybe_rewrite(&format!(
+        let url = format!(
             "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=taxonomy&id={id}&format=xml"
-        ));
-        let resp = reqwest::get(&url).await?.text().await?;
+        );
+        let resp = Utility::get_url(&url).await?;
         let taxa_set: TaxaSet = serde_xml_rs::from_str(&resp)?;
         // Use first taxon, there should only be one!
         let taxon = match taxa_set.taxon.first() {
@@ -145,7 +145,7 @@ impl NCBItaxonomy {
             "haswbstatement:P{}={parent_id} haswbstatement:P{}=Q16521",
             P_NCBI_TAXONOMY, P_INSTANCE_OF
         );
-        let item = ExternalId::search_wikidata_single_item(&query).await?;
+        let item = search_wikidata_single_item(&query).await?;
         ret.add_claim(self.new_statement_item(P_PARENT_TAXON, &item));
         Some(())
     }

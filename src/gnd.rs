@@ -91,7 +91,7 @@ impl ExternalImporter for GND {
             let country_code = RE_COUNTRY.replace(&url, "${1}");
             if country_code != url {
                 let ext_id = ExternalId::new(P_ISO_3166_1_ALPHA_2, &country_code);
-                let _ = match ext_id.get_item_for_external_id_value().await {
+                let _ = match ext_id.wikidata_item().await {
                     Some(item) => {
                         ret.add_claim(self.new_statement_item(P_COUNTRY_OF_CITIZENSHIP, &item))
                     }
@@ -114,9 +114,7 @@ impl ExternalImporter for GND {
         for bd in birth_death {
             for s in self.triples_subject_literals(&self.get_id_url(), bd.0)? {
                 let _ = match ret.parse_date(&s) {
-                    Some((time, precision)) => {
-                        ret.add_claim(self.new_statement_time(bd.1, &time, precision))
-                    }
+                    Some(date) => ret.add_claim(self.new_statement_time(bd.1, &date)),
                     None => ret.add_prop_text(ExternalId::new(bd.1, &s)),
                 };
             }
@@ -189,20 +187,20 @@ impl GND {
         if let Some(lit) = lits.first() {
             if let Some(year) = RE_SINGLE_YEAR.captures(lit) {
                 if let Some(year) = year.get(1)
-                    && let Some((time, precision)) = ret.parse_date(year.as_str())
+                    && let Some(date) = ret.parse_date(year.as_str())
                 {
-                    ret.add_claim(self.new_statement_time(P_FLORUIT, &time, precision));
+                    ret.add_claim(self.new_statement_time(P_FLORUIT, &date));
                 }
             } else if let Some(result) = RE_YEAR_RANGE.captures(lit) {
                 if let Some(start_year) = result.get(1)
-                    && let Some((time, precision)) = ret.parse_date(start_year.as_str())
+                    && let Some(date) = ret.parse_date(start_year.as_str())
                 {
-                    ret.add_claim(self.new_statement_time(P_WORK_PERIOD_START, &time, precision));
+                    ret.add_claim(self.new_statement_time(P_WORK_PERIOD_START, &date));
                 }
                 if let Some(end_year) = result.get(2)
-                    && let Some((time, precision)) = ret.parse_date(end_year.as_str())
+                    && let Some(date) = ret.parse_date(end_year.as_str())
                 {
-                    ret.add_claim(self.new_statement_time(P_WORK_PERIOD_END, &time, precision));
+                    ret.add_claim(self.new_statement_time(P_WORK_PERIOD_END, &date));
                 }
             }
         }
@@ -238,7 +236,7 @@ impl GND {
     async fn add_gnd_item(&self, url: &str, property: usize, ret: &mut MetaItem) {
         if let Some(gnd_id) = url.split('/').next_back() {
             if let Some(item) = ExternalId::new(self.my_property(), gnd_id)
-                .get_item_for_external_id_value()
+                .wikidata_item()
                 .await
             {
                 ret.add_claim(self.new_statement_item(property, &item));

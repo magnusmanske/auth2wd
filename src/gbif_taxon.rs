@@ -1,8 +1,8 @@
-use crate::ExternalId;
+use crate::external_id::*;
 use crate::external_importer::*;
 use crate::meta_item::*;
 use crate::properties::*;
-use crate::url_override::maybe_rewrite;
+use crate::utility::Utility;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::Value;
@@ -50,8 +50,7 @@ impl ExternalImporter for GBIFtaxon {
 
 impl GBIFtaxon {
     pub async fn new(id: &str) -> Result<Self> {
-        let url = maybe_rewrite(&format!("https://api.gbif.org/v1/species/{id}"));
-        let resp = reqwest::get(&url).await?.text().await?;
+        let resp = Utility::get_url(&format!("https://api.gbif.org/v1/species/{id}")).await?;
         let json = serde_json::from_str(&resp)?;
         Ok(Self {
             id: id.to_string(),
@@ -66,7 +65,7 @@ impl GBIFtaxon {
             self.my_property(),
             P_INSTANCE_OF
         );
-        let item = ExternalId::search_wikidata_single_item(&query).await?;
+        let item = search_wikidata_single_item(&query).await?;
         ret.add_claim(self.new_statement_item(P_PARENT_TAXON, &item));
         Some(())
     }
@@ -105,11 +104,11 @@ impl GBIFtaxon {
     }
 
     async fn add_commons_compatible_image(&self, ret: &mut MetaItem) -> Option<()> {
-        let url = maybe_rewrite(&format!(
+        let url = format!(
             "https://api.gbif.org/v1/occurrence/search?limit=20&media_type=stillImage&taxon_key={}",
             self.id
-        ));
-        let resp = reqwest::get(&url).await.ok()?.text().await.ok()?;
+        );
+        let resp = Utility::get_url(&url).await.ok()?;
         let json: Value = serde_json::from_str(&resp).ok()?;
         let results = json.get("results")?.as_array()?;
         for result in results {

@@ -58,9 +58,7 @@ impl ExternalImporter for NDL {
             let entity_url = self.get_key_url("id");
             for s in self.triples_subject_literals(&entity_url, iri)? {
                 let _ = match ret.parse_date(&s) {
-                    Some((time, precision)) => {
-                        ret.add_claim(self.new_statement_time(property, &time, precision))
-                    }
+                    Some(date) => ret.add_claim(self.new_statement_time(property, &date)),
                     None => ret.add_prop_text(crate::external_id::ExternalId::new(property, &s)),
                 };
             }

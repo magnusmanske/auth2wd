@@ -141,8 +141,8 @@ impl WorldCat {
             }
         }
 
-        if let Some((time, precision)) = ret.parse_date(&time) {
-            let _ = ret.add_claim(self.new_statement_time(prop, &time, precision));
+        if let Some(date) = ret.parse_date(&time) {
+            let _ = ret.add_claim(self.new_statement_time(prop, &date));
         };
         Some(())
     }

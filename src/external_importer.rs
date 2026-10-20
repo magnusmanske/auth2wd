@@ -3,7 +3,6 @@ use crate::meta_item::*;
 use crate::properties::*;
 use anyhow::Result;
 use async_trait::async_trait;
-use chrono::prelude::*;
 use regex::Regex;
 use sophia::api::ns;
 use sophia::api::prelude::*;
@@ -12,9 +11,17 @@ use sophia::turtle::serializer::nt::NtSerializer;
 use std::collections::HashMap;
 use std::sync::LazyLock;
 use std::vec::Vec;
+use wikimisc::date::Date;
+use wikimisc::entity_id::PropertyId;
+use wikimisc::statements;
 use wikimisc::wikibase::*;
 
 pub const TAXON_LABEL_LANGUAGES: &[&str] = &["en", "de", "es", "it", "nl", "fr"];
+
+/// The typed ID of a property number from `crate::properties`.
+const fn property_id(property: usize) -> PropertyId {
+    PropertyId::new(property as u64)
+}
 
 static EXTERNAL_ID_REGEXPS: LazyLock<Vec<(Regex, String, usize)>> = LazyLock::new(|| {
     // NOTE: The pattern always needs to cover the whole string, so use ^$
@@ -401,147 +408,51 @@ pub trait ExternalImporter: Send + Sync {
     }
 
     fn get_ref(&self) -> Vec<Reference> {
-        let time = Utc::now();
-        let time = time.format("+%Y-%m-%dT00:00:00Z").to_string();
-        vec![Reference::new(vec![
-            Snak::new(
-                SnakDataType::WikibaseItem,
-                "P248",
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::EntityId,
-                    Value::Entity(EntityValue::new(EntityType::Item, self.my_stated_in())),
-                )),
-            ),
-            Snak::new(
-                SnakDataType::ExternalId,
-                format!("P{}", self.my_property()),
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::StringType,
-                    Value::StringValue(self.my_id()),
-                )),
-            ),
-            Snak::new(
-                SnakDataType::Time,
-                "P813",
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::Time,
-                    Value::Time(TimeValue::new(
-                        0,
-                        0,
-                        "http://www.wikidata.org/entity/Q1985727",
-                        11,
-                        &time,
-                        0,
-                    )),
-                )),
-            ),
-        ])]
+        vec![
+            ExternalId::new(self.my_property(), &self.my_id())
+                .as_reference(self.my_stated_in(), true),
+        ]
     }
 
+    /// A statement with `main_snak` and the references for `property`.
+    fn new_statement(&self, property: usize, main_snak: Snak) -> Statement {
+        statements::statement(main_snak, self.get_ref_for_property(property))
+    }
+
+    /// An external-ID statement.
     fn new_statement_string(&self, property: usize, s: &str) -> Statement {
-        Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::ExternalId,
-                format!("P{property}"),
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::StringType,
-                    Value::StringValue(s.to_owned()),
-                )),
-            ),
-            vec![],
-            self.get_ref_for_property(property),
+        self.new_statement(
+            property,
+            statements::external_id_snak(property_id(property), s),
         )
     }
 
     fn new_statement_monolingual_text(&self, property: usize, lang: &str, s: &str) -> Statement {
-        Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::MonolingualText,
-                format!("P{property}"),
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::MonoLingualText,
-                    Value::MonoLingual(MonoLingualText::new(s, lang)),
-                )),
-            ),
-            vec![],
-            self.get_ref_for_property(property),
+        self.new_statement(
+            property,
+            statements::monolingual_snak(property_id(property), lang, s),
         )
     }
 
     fn new_statement_url(&self, property: usize, s: &str) -> Statement {
-        Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::Url,
-                format!("P{property}"),
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::StringType,
-                    Value::StringValue(s.to_owned()),
-                )),
-            ),
-            vec![],
-            self.get_ref_for_property(property),
-        )
+        self.new_statement(property, statements::url_snak(property_id(property), s))
     }
 
     fn new_statement_item(&self, property: usize, q: &str) -> Statement {
-        Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::WikibaseItem,
-                format!("P{property}"),
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::EntityId,
-                    Value::Entity(EntityValue::new(EntityType::Item, q)),
-                )),
-            ),
-            vec![],
-            self.get_ref_for_property(property),
+        self.new_statement(
+            property,
+            Snak::new_item(property_id(property).to_string(), q.to_string()),
         )
     }
 
-    fn new_statement_time(&self, property: usize, time: &str, precision: u64) -> Statement {
-        Statement::new(
-            "statement",
-            StatementRank::Normal,
-            Snak::new(
-                SnakDataType::Time,
-                format!("P{property}"),
-                SnakType::Value,
-                Some(DataValue::new(
-                    DataValueType::Time,
-                    Value::Time(TimeValue::new(
-                        0,
-                        0,
-                        "http://www.wikidata.org/entity/Q1985727",
-                        precision,
-                        time,
-                        0,
-                    )),
-                )),
-            ),
-            vec![],
-            self.get_ref_for_property(property),
-        )
+    fn new_statement_time(&self, property: usize, date: &Date) -> Statement {
+        self.new_statement(property, statements::time_snak(property_id(property), date))
     }
 
     async fn add_same_as(&self, ret: &mut MetaItem) -> Result<()> {
         for iri in SAME_AS_IRIS {
             for url in self.triples_iris(iri)? {
-                if ExternalId::do_not_use_external_url(&url) {
+                if do_not_use_external_url(&url) {
                     continue;
                 }
                 let _ = match self.url2external_id(&url) {
@@ -682,7 +593,7 @@ pub trait ExternalImporter: Send + Sync {
         for s in self.triples_literals(p_iri)? {
             let query = format!("{s} haswbstatement:P31={p31}");
             // TODO check all returned items for label/alias instead of just returning item if a single one was found
-            match ExternalId::search_wikidata_single_item(&query).await {
+            match search_wikidata_single_item(&query).await {
                 Some(item) => {
                     ret.add_claim(self.new_statement_item(prop, &item));
                     found = true;
@@ -790,10 +701,7 @@ pub trait ExternalImporter: Send + Sync {
             let mut found = false;
             for p31 in p31s {
                 let extid = ExternalId::new(ext_id.property(), p31);
-                if let Some(item) = extid
-                    .get_item_for_string_external_id_value(ext_id.id())
-                    .await
-                {
+                if let Some(item) = extid.wikidata_item_with_text(ext_id.id()).await {
                     mi.add_claim(self.new_statement_item(ext_id.property(), &item));
                     found = true;
                     break;
@@ -924,21 +832,19 @@ mod tests {
 
     #[tokio::test]
     async fn test_do_not_use_external_url() {
-        assert!(ExternalId::do_not_use_external_url(
+        assert!(do_not_use_external_url(
             "https://www.wikidata.org/entity/Q2071541"
         ));
-        assert!(ExternalId::do_not_use_external_url(
+        assert!(do_not_use_external_url(
             "https://www.wikidata.org/item/Q2071541"
         ));
-        assert!(ExternalId::do_not_use_external_url(
+        assert!(do_not_use_external_url(
             "http://www.wikidata.org/entity/Q2071541"
         ));
-        assert!(!ExternalId::do_not_use_external_url(
+        assert!(!do_not_use_external_url(
             "https://www.wikidatarrr.org/entity/Q2071541"
         ));
-        assert!(ExternalId::do_not_use_external_url(
-            "http://data.bnf.fr/#foaf:Person"
-        ));
+        assert!(do_not_use_external_url("http://data.bnf.fr/#foaf:Person"));
     }
 
     #[tokio::test]

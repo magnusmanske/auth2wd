@@ -43,10 +43,7 @@ static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 use auth2wd::*;
 use axum::Form;
-use axum::extract::Request;
-use axum::middleware::{self, Next};
-use axum::response::Response;
-use axum::{Json, Router, extract::Path, http::StatusCode, response::Html, routing::get};
+use axum::{Json, Router, extract::Path, response::Html, routing::get};
 use combinator::*;
 use external_importer::*;
 use meta_item::MetaItem;
@@ -55,27 +52,21 @@ use serde_json::{Value, json};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
-use std::time::Instant;
 use std::{env, fs};
 use supported_property::SUPPORTED_PROPERTIES;
-use tower_http::catch_panic::CatchPanicLayer;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::services::ServeDir;
-use tower_http::{compression::CompressionLayer, trace::TraceLayer};
+use utility::Utility;
 use wikimisc::item_merger::ItemMerger;
 use wikimisc::mediawiki::api::Api;
 use wikimisc::merge_diff::MergeDiff;
-use wikimisc::telemetry::{Telemetry, TelemetryError};
+use wikimisc::server;
+use wikimisc::telemetry::Telemetry;
 use wikimisc::wikibase::{EntityTrait, ItemEntity, Snak, Statement};
 
 fn wrap_html(html: &str) -> String {
     let outer: String = fs::read_to_string("./html/wrapper.html").unwrap();
     outer.replace("$1$", html)
-}
-
-async fn healthz() -> StatusCode {
-    StatusCode::OK
 }
 
 async fn root() -> Html<String> {
@@ -227,49 +218,32 @@ async fn supported_properties() -> Json<serde_json::Value> {
     Json(json!(ret))
 }
 
-/// Records each request for the service dashboard; health checks are left out.
-async fn record_request(req: Request, next: Next) -> Response {
-    if req.uri().path() == "/healthz" {
-        return next.run(req).await;
-    }
-    let start = Instant::now();
-    let response = next.run(req).await;
-    wikimisc::telemetry::record_http_request(response.status().as_u16(), start.elapsed());
-    response
-}
-
 /// Starts pushing metrics to the service dashboard (token from `$DASHBOARD_TOKEN`).
 /// Telemetry is optional: a missing token or any other error only gets logged.
+/// `server::serve` handles the shutdown signals and sends the final push.
 fn start_telemetry() {
-    match Telemetry::builder("web")
+    Telemetry::builder("web")
         .version(env!("CARGO_PKG_VERSION"))
-        .install()
-    {
-        Ok(_) => tracing::info!("telemetry enabled"),
-        Err(e @ TelemetryError::NoToken) => tracing::info!("telemetry disabled: {e}"),
-        Err(e) => tracing::warn!("telemetry disabled: {e}"),
-    }
+        .handle_signals(false)
+        .install_or_log();
 }
 
-/// Wraps `router` in the server's middleware stack (the last `.layer()` is outermost).
-/// A panicking handler fails only its own request with a 500; `record_request`
-/// sits outside `CatchPanicLayer` so the dashboard counts that 500.
+/// Wraps `router` in the server's middleware stack: panic catching innermost,
+/// so a panicking handler fails only its own request with a 500, and the
+/// dashboard (fed by `request_metrics`, which leaves out health checks) counts
+/// that 500. CORS is outermost.
 fn with_middleware(router: Router) -> Router {
-    router
-        .layer(CatchPanicLayer::new())
-        .layer(middleware::from_fn(record_request))
-        .layer(TraceLayer::new_for_http())
-        .layer(CompressionLayer::new())
+    server::request_metrics(server::standard_layers(router), &["/healthz"])
         .layer(CorsLayer::new().allow_origin(Any))
 }
 
 async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
-    tracing_subscriber::fmt::init();
+    wikimisc::logging::init();
     start_telemetry();
 
     let routes = Router::new()
         .route("/", get(root))
-        .route("/healthz", get(healthz))
+        .route("/healthz", get(server::health::ok))
         .route("/supported_properties", get(supported_properties))
         .route("/item/{prop}/{id}", get(item))
         .route("/meta_item/{prop}/{id}", get(meta_item))
@@ -279,31 +253,17 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
         .nest_service("/images", ServeDir::new("images"));
     let app = with_middleware(routes);
 
-    let port: u16 = env::var("AC2WD_PORT")
-        .ok()
-        .and_then(|v| v.parse::<u16>().ok())
-        .unwrap_or(8000);
-
-    let address: IpAddr = env::var("AC2WD_ADDRESS")
-        .ok()
-        .and_then(|a| a.parse().ok())
-        .unwrap_or(IpAddr::V4(Ipv4Addr::UNSPECIFIED));
-
-    let addr = SocketAddr::new(address, port);
+    let addr = server::listen_addr("AC2WD", 8000);
     tracing::debug!("listening on {}", addr);
-    let listener = tokio::net::TcpListener::bind(addr)
-        .await
-        .expect("Could not create listener");
-    axum::serve(listener, app)
-        .await
-        .expect("Could not start server");
-
+    let listener = tokio::net::TcpListener::bind(addr).await?;
+    server::serve(listener, app).await?;
     Ok(())
 }
 
 fn get_extid_from_argv(argv: &[String]) -> Result<ExternalId, Box<dyn std::error::Error>> {
     let property = argv.get(2).expect("USAGE: combinator PROP ID");
-    let property = ExternalId::prop_numeric(property).expect("malformed property: '{property}'");
+    let property = ExternalId::prop_numeric(property)
+        .ok_or_else(|| format!("malformed property: '{property}'"))?;
     let id = argv.get(3).expect("USAGE: combinator PROP ID");
     Ok(ExternalId::new(property, id))
 }
@@ -361,7 +321,7 @@ async fn get_wikidata_api(path: &str) -> Result<Api, Box<dyn std::error::Error>>
     let oauth2_token = j["oauth2_token"]
         .as_str()
         .expect("No oauth2_token in {path}");
-    let mut api = Api::new("https://www.wikidata.org/w/api.php").await?;
+    let mut api = Utility::wikidata().api().await?;
     api.set_oauth2(oauth2_token);
     Ok(api)
 }
@@ -468,6 +428,8 @@ https://vokabular.bs.no/bibbi/nb/page/22778
 mod tests {
     use super::*;
     use axum::body::Body;
+    use axum::extract::Request;
+    use axum::http::StatusCode;
     use tower::ServiceExt;
 
     async fn panicking_handler() -> StatusCode {
