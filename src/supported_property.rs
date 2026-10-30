@@ -233,12 +233,12 @@ impl SupportedProperty {
         format!(
             r#"<li><a href="/item/P{}/{}">{}</a> ("{}" from {}) <small>[[<a href="https://www.wikidata.org/wiki/Property:P{}">P{}</a>]]</small></li>"#,
             self.property,
-            &self.demo_id,
-            &self.name,
+            self.demo_id,
+            self.name,
             self.demo_name.as_deref().unwrap_or(&self.source),
-            &self.source,
-            &self.property,
-            &self.property
+            self.source,
+            self.property,
+            self.property
         )
     }
 

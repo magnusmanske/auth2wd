@@ -227,7 +227,7 @@ impl Combinator {
             .filter_map(|c| c.id())
             .collect();
 
-        for (_id, item) in self.items.iter() {
+        for item in self.items.values() {
             let diff = base_item.merge(item);
             merge_diff.extend(&diff);
         }

@@ -61,7 +61,7 @@ use wikimisc::item_merger::ItemMerger;
 use wikimisc::mediawiki::api::Api;
 use wikimisc::merge_diff::MergeDiff;
 use wikimisc::server;
-use wikimisc::telemetry::Telemetry;
+use wikimisc::telemetry;
 use wikimisc::wikibase::{EntityTrait, ItemEntity, Snak, Statement};
 
 fn wrap_html(html: &str) -> String {
@@ -222,10 +222,7 @@ async fn supported_properties() -> Json<serde_json::Value> {
 /// Telemetry is optional: a missing token or any other error only gets logged.
 /// `server::serve` handles the shutdown signals and sends the final push.
 fn start_telemetry() {
-    Telemetry::builder("web")
-        .version(env!("CARGO_PKG_VERSION"))
-        .handle_signals(false)
-        .install_or_log();
+    telemetry::install_web(env!("CARGO_PKG_VERSION"), None);
 }
 
 /// Wraps `router` in the server's middleware stack: panic catching innermost,
@@ -352,7 +349,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 diff.added_statements.len()
             );
             let payload = json!(diff);
-            println!("{}", &serde_json::to_string_pretty(&payload)?);
+            println!("{}", serde_json::to_string_pretty(&payload)?);
         }
         Some("parser") => {
             // Single parser
@@ -404,7 +401,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some("extend") => {
             let item = argv.get(2).expect("Item argument required");
             let diff = get_extend(item).await?;
-            println!("{}", &serde_json::to_string_pretty(&diff)?);
+            println!("{}", serde_json::to_string_pretty(&diff)?);
         }
         Some("merge") => {
             return Err("The 'merge' CLI command is not yet implemented".into());
